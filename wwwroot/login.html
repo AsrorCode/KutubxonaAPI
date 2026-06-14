@@ -1,0 +1,241 @@
+﻿<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kirish — Kutubxona</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #2c1810 0%, #5d3a1e 100%);
+            color: #f4ebd9;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .auth-card {
+            background: rgba(0,0,0,0.4);
+            border: 2px solid #8b4513;
+            border-radius: 16px;
+            padding: 40px;
+            width: 100%;
+            max-width: 420px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+        }
+
+        .auth-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+            .auth-header h1 {
+                font-size: 32px;
+                background: linear-gradient(45deg, #ffd700, #ff8c00);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                margin-bottom: 8px;
+            }
+
+            .auth-header .icon {
+                font-size: 50px;
+                margin-bottom: 10px;
+            }
+
+            .auth-header .subtitle {
+                color: #c8b89c;
+                font-size: 14px;
+            }
+
+        .form-field {
+            margin-bottom: 18px;
+        }
+
+            .form-field label {
+                display: block;
+                color: #ffd700;
+                font-weight: 600;
+                margin-bottom: 6px;
+                font-size: 14px;
+            }
+
+            .form-field input {
+                width: 100%;
+                padding: 12px 16px;
+                background: #faf3e0;
+                color: #2c1810;
+                border: 2px solid #8b4513;
+                border-radius: 8px;
+                font-size: 15px;
+                outline: none;
+                transition: all 0.3s;
+            }
+
+                .form-field input:focus {
+                    border-color: #ffd700;
+                }
+
+        .submit-btn {
+            background: linear-gradient(135deg, #ffd700, #ff8c00);
+            color: #2c1810;
+            border: none;
+            padding: 14px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 10px;
+            transition: all 0.3s;
+        }
+
+            .submit-btn:hover:not(:disabled) {
+                transform: translateY(-2px);
+                box-shadow: 0 6px 20px rgba(255,215,0,0.3);
+            }
+
+            .submit-btn:disabled {
+                opacity: 0.5;
+                cursor: not-allowed;
+            }
+
+        .auth-footer {
+            text-align: center;
+            margin-top: 20px;
+            color: #c8b89c;
+            font-size: 14px;
+        }
+
+            .auth-footer a {
+                color: #ffd700;
+                text-decoration: none;
+                font-weight: 600;
+            }
+
+                .auth-footer a:hover {
+                    text-decoration: underline;
+                }
+
+        .status {
+            padding: 12px;
+            border-radius: 6px;
+            margin-top: 15px;
+            font-size: 13px;
+            display: none;
+            text-align: center;
+        }
+
+            .status.success {
+                background: rgba(16,185,129,0.2);
+                border: 1px solid #10b981;
+                color: #6ee7b7;
+                display: block;
+            }
+
+            .status.error {
+                background: rgba(239,68,68,0.2);
+                border: 1px solid #ef4444;
+                color: #fca5a5;
+                display: block;
+            }
+
+        .back-link {
+            display: inline-block;
+            margin-bottom: 20px;
+            color: #ffd700;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+            .back-link:hover {
+                text-decoration: underline;
+            }
+    </style>
+</head>
+<body>
+    <div class="auth-card">
+        <a href="/" class="back-link">← Kutubxonaga qaytish</a>
+
+        <div class="auth-header">
+            <div class="icon">🔐</div>
+            <h1>Tizimga kirish</h1>
+            <p class="subtitle">Hisobingizga kiring</p>
+        </div>
+
+        <form id="loginForm" onsubmit="return submitLogin(event)">
+            <div class="form-field">
+                <label for="email">Email</label>
+                <input type="email" id="email" required placeholder="email@example.com" autocomplete="email">
+            </div>
+
+            <div class="form-field">
+                <label for="password">Parol</label>
+                <input type="password" id="password" required placeholder="••••••••" autocomplete="current-password">
+            </div>
+
+            <button type="submit" class="submit-btn" id="submitBtn">Kirish</button>
+            <div id="status" class="status"></div>
+        </form>
+
+        <div class="auth-footer">
+            Hisobingiz yo'qmi? <a href="/register.html">Ro'yxatdan o'ting</a>
+        </div>
+    </div>
+
+    <script>
+        async function submitLogin(e) {
+            e.preventDefault();
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value;
+            const statusEl = document.getElementById('status');
+            const btn = document.getElementById('submitBtn');
+
+            btn.disabled = true;
+            btn.textContent = 'Kiritilmoqda...';
+
+            try {
+                const response = await fetch('/api/auth/login', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ email, password })
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.message || 'Kirish xato');
+                }
+
+                // Token va user'ni localStorage'ga saqlash
+                localStorage.setItem('auth_token', data.token);
+                localStorage.setItem('auth_user', JSON.stringify(data.user));
+
+                statusEl.textContent = `✅ Xush kelibsiz, ${data.user.firstName}!`;
+                statusEl.className = 'status success';
+
+                // 1 soniyadan keyin asosiy sahifaga qaytish
+                setTimeout(() => { window.location.href = '/'; }, 1000);
+            } catch (error) {
+                statusEl.textContent = error.message;
+                statusEl.className = 'status error';
+                btn.disabled = false;
+                btn.textContent = 'Kirish';
+            }
+            return false;
+        }
+
+        // Agar allaqachon login bo'lgan bo'lsa - asosiy sahifaga
+        if (localStorage.getItem('auth_token')) {
+            window.location.href = '/';
+        }
+    </script>
+</body>
+</html>

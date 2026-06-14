@@ -1,0 +1,18 @@
+# Build folders
+bin/
+obj/
+
+# IDE files
+.vs/
+.vscode/
+.idea/
+*.user
+*.suo
+
+# Database files
+*.mdf
+*.ldf
+
+# Logs
+logs/
+*.log

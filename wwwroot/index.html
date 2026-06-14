@@ -1,0 +1,1459 @@
+﻿<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kutubxona - Online o'qish</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #2c1810 0%, #5d3a1e 50%, #2c1810 100%);
+            color: #f4ebd9;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 30px 20px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 25px;
+            padding: 20px;
+        }
+
+        h1 {
+            font-size: 42px;
+            background: linear-gradient(45deg, #ffd700, #ff8c00);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            font-size: 16px;
+            color: #c8b89c;
+            font-style: italic;
+        }
+
+        .admin-link {
+            display: inline-block;
+            margin-top: 15px;
+            color: #ffd700;
+            text-decoration: none;
+            font-size: 14px;
+            padding: 6px 14px;
+            border: 1px solid #8b4513;
+            border-radius: 6px;
+        }
+
+        .auth-bar {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 9999;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .user-greeting {
+            color: #ffd700;
+            font-size: 14px;
+            font-weight: 600;
+            background: rgba(0,0,0,0.3);
+            padding: 8px 16px;
+            border-radius: 20px;
+            border: 1px solid #8b4513;
+        }
+
+        .auth-btn {
+            color: #ffd700;
+            text-decoration: none;
+            padding: 8px 16px;
+            border: 1px solid #8b4513;
+            border-radius: 6px;
+            font-size: 13px;
+            cursor: pointer;
+            background: rgba(0,0,0,0.3);
+            transition: all 0.3s;
+        }
+
+            .auth-btn:hover {
+                background: #8b4513;
+            }
+
+        .auth-btn-primary {
+            background: #ffd700;
+            color: #2c1810;
+            border-color: #ffd700;
+        }
+
+            .auth-btn-primary:hover {
+                background: #ffed4e;
+            }
+
+            .admin-link:hover {
+                background: #8b4513;
+            }
+
+        .search-wrap {
+            max-width: 600px;
+            margin: 0 auto 30px;
+            position: relative;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 14px 50px 14px 20px;
+            background: rgba(0,0,0,0.3);
+            border: 2px solid #8b4513;
+            border-radius: 50px;
+            color: #f4ebd9;
+            font-size: 15px;
+            outline: none;
+            transition: all 0.3s;
+        }
+
+            .search-input:focus {
+                border-color: #ffd700;
+                background: rgba(0,0,0,0.5);
+            }
+
+            .search-input::placeholder {
+                color: #8b7355;
+            }
+
+        .search-icon {
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #ffd700;
+            font-size: 18px;
+        }
+
+        .continue-section {
+            background: linear-gradient(135deg, #ffd700 0%, #ff8c00 100%);
+            border-radius: 14px;
+            padding: 20px 28px;
+            margin-bottom: 30px;
+            color: #2c1810;
+            display: none;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+            box-shadow: 0 10px 30px rgba(255, 140, 0, 0.3);
+        }
+
+            .continue-section.active {
+                display: flex;
+            }
+
+        .continue-info {
+            flex: 1;
+        }
+
+        .continue-label {
+            font-size: 13px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            opacity: 0.7;
+        }
+
+        .continue-title {
+            font-size: 22px;
+            font-weight: 800;
+            margin: 4px 0;
+        }
+
+        .continue-meta {
+            font-size: 14px;
+            opacity: 0.8;
+        }
+
+        .continue-btn {
+            background: #2c1810;
+            color: #ffd700;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+            .continue-btn:hover {
+                transform: translateY(-2px);
+            }
+
+        .section-title {
+            font-size: 22px;
+            color: #ffd700;
+            margin-bottom: 18px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+            .section-title .clear-filter {
+                background: rgba(0,0,0,0.3);
+                color: #f4ebd9;
+                border: 1px solid #8b4513;
+                padding: 6px 14px;
+                border-radius: 6px;
+                cursor: pointer;
+                font-size: 13px;
+            }
+
+                .section-title .clear-filter:hover {
+                    background: #8b4513;
+                }
+
+        .category-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 18px;
+            margin-bottom: 40px;
+        }
+
+        .category-card {
+            background: linear-gradient(135deg, #3d2817 0%, #5d3a1e 100%);
+            border: 2px solid #8b4513;
+            border-radius: 12px;
+            padding: 22px 18px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+            .category-card:hover {
+                transform: translateY(-4px);
+                border-color: #ffd700;
+                box-shadow: 0 10px 25px rgba(255, 215, 0, 0.2);
+            }
+
+            .category-card.active {
+                background: linear-gradient(135deg, #ffd700 0%, #ff8c00 100%);
+                border-color: #ffd700;
+                color: #2c1810;
+            }
+
+        .category-icon {
+            font-size: 40px;
+            margin-bottom: 8px;
+        }
+
+        .category-name {
+            font-size: 15px;
+            font-weight: 700;
+            color: #ffd700;
+        }
+
+        .category-card.active .category-name {
+            color: #2c1810;
+        }
+
+        .category-count {
+            font-size: 12px;
+            color: #c8b89c;
+            margin-top: 4px;
+        }
+
+        .category-card.active .category-count {
+            color: #2c1810;
+            opacity: 0.7;
+        }
+
+        .book-selection {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .book-card {
+            background: linear-gradient(135deg, #8b4513 0%, #a0522d 100%);
+            border-radius: 8px;
+            padding: 25px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4), inset 0 0 0 3px #5d3a1e;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+            .book-card h2 {
+                font-size: 22px;
+                color: #ffd700;
+                margin-bottom: 8px;
+            }
+
+            .book-card .author {
+                color: #f4ebd9;
+                font-style: italic;
+                margin-bottom: 12px;
+            }
+
+            .book-card .meta {
+                display: flex;
+                justify-content: space-between;
+                font-size: 13px;
+                color: #d4c4a8;
+                margin-bottom: 12px;
+            }
+
+            .book-card .badge {
+                background: rgba(0, 0, 0, 0.3);
+                padding: 4px 10px;
+                border-radius: 12px;
+                font-size: 12px;
+            }
+
+        .rating-display {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 12px;
+            padding: 8px 0;
+            border-top: 1px solid rgba(0,0,0,0.2);
+        }
+
+        .stars {
+            color: #ffd700;
+            font-size: 16px;
+            letter-spacing: 2px;
+        }
+
+        .rating-text {
+            font-size: 13px;
+            color: #d4c4a8;
+        }
+
+        .progress-wrap {
+            margin-bottom: 12px;
+        }
+
+        .progress-label {
+            font-size: 12px;
+            color: #ffd700;
+            margin-bottom: 5px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .progress-track {
+            height: 7px;
+            background: rgba(0, 0, 0, 0.35);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(to right, #ffd700, #ff8c00);
+            border-radius: 4px;
+            transition: width 0.4s;
+        }
+
+        .card-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: auto;
+        }
+
+        .card-btn {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .btn-read {
+            background: #ffd700;
+            color: #2c1810;
+        }
+
+            .btn-read:hover {
+                background: #ffed4e;
+            }
+
+        .btn-comments {
+            background: rgba(0,0,0,0.3);
+            color: #f4ebd9;
+        }
+
+            .btn-comments:hover {
+                background: rgba(0,0,0,0.5);
+            }
+
+        .reader {
+            display: none;
+            margin-top: 30px;
+        }
+
+            .reader.active {
+                display: block;
+            }
+
+        .reader-header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+            .reader-header h2 {
+                color: #ffd700;
+                font-size: 28px;
+                margin-bottom: 5px;
+            }
+
+            .reader-header .author {
+                color: #c8b89c;
+                font-style: italic;
+            }
+
+        .back-btn {
+            background: rgba(0, 0, 0, 0.3);
+            color: #f4ebd9;
+            border: 2px solid #8b4513;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+
+            .back-btn:hover {
+                background: #8b4513;
+            }
+
+        .book-wrapper {
+            perspective: 2000px;
+            margin: 0 auto;
+            max-width: 700px;
+        }
+
+        .book {
+            position: relative;
+            width: 100%;
+            height: 600px;
+            transform-style: preserve-3d;
+        }
+
+        .page {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #faf3e0;
+            color: #2c1810;
+            padding: 50px 60px;
+            border-radius: 4px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+            background-image: repeating-linear-gradient(transparent, transparent 35px, rgba(139, 69, 19, 0.1) 35px, rgba(139, 69, 19, 0.1) 36px);
+            transform-origin: left center;
+            transition: transform 0.8s cubic-bezier(0.645, 0.045, 0.355, 1.000);
+            backface-visibility: hidden;
+            overflow: hidden;
+        }
+
+        .page-content {
+            font-size: 17px;
+            line-height: 2.0;
+            text-align: justify;
+            color: #2c1810;
+            font-family: 'Georgia', serif;
+            height: calc(100% - 50px);
+            overflow-y: auto;
+            padding-right: 10px;
+        }
+
+            .page-content p {
+                margin-bottom: 1em;
+                text-indent: 2em;
+            }
+
+                .page-content p:first-child {
+                    text-indent: 0;
+                }
+
+                .page-content p:first-of-type::first-letter {
+                    font-size: 1.4em;
+                    font-weight: 700;
+                    color: #8b4513;
+                }
+
+        .page-number {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 14px;
+            color: #8b4513;
+            font-weight: 600;
+        }
+
+        .page.flipping {
+            transform: rotateY(-180deg);
+        }
+
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 30px;
+            gap: 20px;
+        }
+
+        .nav-btn {
+            background: linear-gradient(135deg, #8b4513, #a0522d);
+            color: #f4ebd9;
+            border: none;
+            padding: 14px 30px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+            .nav-btn:hover:not(:disabled) {
+                transform: translateY(-2px);
+            }
+
+            .nav-btn:disabled {
+                opacity: 0.4;
+                cursor: not-allowed;
+            }
+
+        .page-info {
+            text-align: center;
+            color: #ffd700;
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+            .page-info .current {
+                font-size: 24px;
+            }
+
+        .reader-progress {
+            max-width: 700px;
+            margin: 15px auto 0;
+            height: 6px;
+            background: rgba(0,0,0,0.35);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .reader-progress-fill {
+            height: 100%;
+            background: linear-gradient(to right, #ffd700, #ff8c00);
+            transition: width 0.4s;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 60px;
+            color: #ffd700;
+            font-size: 18px;
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(255, 215, 0, 0.2);
+            border-top-color: #ffd700;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 15px;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .message {
+            text-align: center;
+            padding: 40px;
+            color: #c8b89c;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+
+        .error {
+            color: #ff6b6b;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: #2c1810;
+            color: #ffd700;
+            padding: 14px 28px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.5);
+            border: 1px solid #8b4513;
+            opacity: 0;
+            transition: all 0.4s;
+            z-index: 2000;
+        }
+
+            .toast.show {
+                transform: translateX(-50%) translateY(0);
+                opacity: 1;
+            }
+
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 40px 20px;
+            overflow-y: auto;
+        }
+
+            .modal-overlay.active {
+                display: flex;
+            }
+
+        .modal {
+            background: linear-gradient(135deg, #3d2817 0%, #5d3a1e 100%);
+            border-radius: 12px;
+            max-width: 600px;
+            width: 100%;
+            padding: 30px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.7);
+            border: 2px solid #8b4513;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #8b4513;
+        }
+
+            .modal-header h2 {
+                color: #ffd700;
+                font-size: 24px;
+            }
+
+            .modal-header .modal-author {
+                color: #c8b89c;
+                font-style: italic;
+                font-size: 14px;
+            }
+
+        .close-modal {
+            background: none;
+            border: none;
+            color: #f4ebd9;
+            font-size: 28px;
+            cursor: pointer;
+            line-height: 1;
+        }
+
+            .close-modal:hover {
+                color: #ffd700;
+            }
+
+        .avg-rating {
+            text-align: center;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+        }
+
+            .avg-rating .big-num {
+                font-size: 36px;
+                color: #ffd700;
+                font-weight: bold;
+            }
+
+            .avg-rating .avg-stars {
+                font-size: 22px;
+                color: #ffd700;
+                letter-spacing: 3px;
+            }
+
+            .avg-rating .count {
+                font-size: 13px;
+                color: #c8b89c;
+                margin-top: 5px;
+            }
+
+        .comment-form {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+            .comment-form h3 {
+                color: #ffd700;
+                font-size: 16px;
+                margin-bottom: 12px;
+            }
+
+        .form-field {
+            margin-bottom: 12px;
+        }
+
+            .form-field label {
+                display: block;
+                color: #f4ebd9;
+                font-size: 13px;
+                margin-bottom: 5px;
+            }
+
+            .form-field input, .form-field textarea {
+                width: 100%;
+                padding: 10px;
+                background: #faf3e0;
+                color: #2c1810;
+                border: 2px solid #8b4513;
+                border-radius: 6px;
+                font-size: 14px;
+            }
+
+            .form-field textarea {
+                min-height: 80px;
+                resize: vertical;
+            }
+
+        .star-rating-input {
+            display: flex;
+            gap: 5px;
+            font-size: 30px;
+        }
+
+        .star-input {
+            cursor: pointer;
+            color: #6b5340;
+            transition: color 0.2s;
+        }
+
+            .star-input.filled {
+                color: #ffd700;
+            }
+
+            .star-input:hover {
+                transform: scale(1.2);
+            }
+
+        .submit-comment-btn {
+            background: linear-gradient(135deg, #059669, #10b981);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            width: 100%;
+        }
+
+            .submit-comment-btn:hover:not(:disabled) {
+                transform: translateY(-2px);
+            }
+
+            .submit-comment-btn:disabled {
+                opacity: 0.5;
+                cursor: not-allowed;
+            }
+
+        .comments-list {
+            margin-top: 10px;
+        }
+
+        .comment-item {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 12px;
+        }
+
+        .comment-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .comment-author {
+            color: #ffd700;
+            font-weight: 600;
+        }
+
+        .comment-stars {
+            color: #ffd700;
+            font-size: 14px;
+        }
+
+        .comment-text {
+            color: #f4ebd9;
+            line-height: 1.6;
+            font-size: 14px;
+        }
+
+        .comment-date {
+            color: #8b7355;
+            font-size: 11px;
+            margin-top: 6px;
+        }
+
+        .delete-comment {
+            background: none;
+            border: none;
+            color: #ff6b6b;
+            cursor: pointer;
+            font-size: 12px;
+            margin-top: 5px;
+        }
+
+            .delete-comment:hover {
+                text-decoration: underline;
+            }
+
+        .form-status {
+            padding: 10px;
+            border-radius: 6px;
+            margin-top: 10px;
+            font-size: 13px;
+            display: none;
+        }
+
+            .form-status.success {
+                background: rgba(16,185,129,0.2);
+                color: #6ee7b7;
+                display: block;
+            }
+
+            .form-status.error {
+                background: rgba(239,68,68,0.2);
+                color: #fca5a5;
+                display: block;
+            }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 28px;
+            }
+
+            .book {
+                height: 500px;
+            }
+
+            .page {
+                padding: 30px 25px;
+            }
+
+            .page-content {
+                font-size: 15px;
+                line-height: 1.8;
+            }
+
+            .continue-section {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .category-grid {
+                grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+                gap: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="auth-bar" id="authBar"></div>
+
+    <div class="container">
+        <header>
+            <h1>📚 Kutubxona</h1>
+            <p class="subtitle">Jahon va o'zbek adabiyoti — onlayn o'qish</p>
+            <br>
+            <a href="/admin.html" class="admin-link">⚙️ Admin panel</a>
+        </header>
+
+        <div class="search-wrap">
+            <input type="text" id="searchInput" class="search-input" placeholder="Kitob nomi yoki muallifni qidiring..." oninput="onSearchInput()">
+            <span class="search-icon">🔍</span>
+        </div>
+
+        <div class="continue-section" id="continueSection">
+            <div class="continue-info">
+                <div class="continue-label">📖 Davom eting</div>
+                <div class="continue-title" id="continueTitle"></div>
+                <div class="continue-meta" id="continueMeta"></div>
+            </div>
+            <button class="continue-btn" id="continueBtn">Davom etish →</button>
+        </div>
+
+        <div id="categoriesWrap">
+            <div class="section-title">🗂️ Kategoriyalar</div>
+            <div class="category-grid" id="categoryGrid"></div>
+        </div>
+
+        <div id="booksWrap">
+            <div class="section-title" id="booksTitle">
+                <span id="booksTitleText">Barcha kitoblar</span>
+                <button class="clear-filter" id="clearFilterBtn" onclick="clearFilter()" style="display:none;">✕ Filtrni tozalash</button>
+            </div>
+            <div id="bookList" class="book-selection">
+                <div class="loading"><div class="spinner"></div><p>Kitoblar yuklanmoqda...</p></div>
+            </div>
+        </div>
+
+        <div id="reader" class="reader">
+            <button class="back-btn" onclick="closeReader()">← Kitoblar ro'yxatiga qaytish</button>
+            <div class="reader-header">
+                <h2 id="readerTitle"></h2>
+                <p class="author" id="readerAuthor"></p>
+            </div>
+            <div class="book-wrapper">
+                <div class="book" id="book">
+                    <div class="page" id="page">
+                        <div class="page-content" id="pageContent">
+                            <div class="loading"><div class="spinner"></div><p>Sahifa yuklanmoqda...</p></div>
+                        </div>
+                        <div class="page-number" id="pageNumberDisplay"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="reader-progress">
+                <div class="reader-progress-fill" id="readerProgressFill" style="width:0%"></div>
+            </div>
+            <div class="controls">
+                <button class="nav-btn" id="prevBtn" onclick="previousPage()">← Oldingi</button>
+                <div class="page-info">
+                    <span class="current" id="currentPage">0</span>
+                    <span>/ <span id="totalPages">0</span></span>
+                </div>
+                <button class="nav-btn" id="nextBtn" onclick="nextPage()">Keyingi →</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="commentsModal">
+        <div class="modal">
+            <div class="modal-header">
+                <div>
+                    <h2 id="modalBookTitle"></h2>
+                    <div class="modal-author" id="modalBookAuthor"></div>
+                </div>
+                <button class="close-modal" onclick="closeComments()">×</button>
+            </div>
+            <div class="avg-rating">
+                <div class="big-num" id="avgRatingNum">0.0</div>
+                <div class="avg-stars" id="avgRatingStars">☆☆☆☆☆</div>
+                <div class="count" id="commentCount">Hali izoh yo'q</div>
+            </div>
+            <div class="comment-form">
+                <h3>✍️ Izoh qoldiring</h3>
+                <div class="form-field">
+                    <label>Ismingiz</label>
+                    <input type="text" id="commentName" placeholder="Masalan: Aziza" maxlength="100">
+                </div>
+                <div class="form-field">
+                    <label>Bahoyingiz</label>
+                    <div class="star-rating-input" id="starInput">
+                        <span class="star-input" data-value="1">★</span>
+                        <span class="star-input" data-value="2">★</span>
+                        <span class="star-input" data-value="3">★</span>
+                        <span class="star-input" data-value="4">★</span>
+                        <span class="star-input" data-value="5">★</span>
+                    </div>
+                </div>
+                <div class="form-field">
+                    <label>Izohingiz</label>
+                    <textarea id="commentText" placeholder="Bu kitob haqida fikringiz..." maxlength="1000"></textarea>
+                </div>
+                <button class="submit-comment-btn" id="submitCommentBtn" onclick="submitComment()">Izohni yuborish</button>
+                <div class="form-status" id="formStatus"></div>
+            </div>
+            <div class="comments-list" id="commentsList"></div>
+        </div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <script>
+        const API_BASE = window.location.origin;
+        function getAuthHeaders(includeJson = true) {
+            const headers = {};
+            const token = localStorage.getItem('auth_token');
+            if (token) headers['Authorization'] = `Bearer ${token}`;
+            if (includeJson) headers['Content-Type'] = 'application/json';
+            return headers;
+        }
+
+        // ============ AUTH ============
+        function getCurrentUser() {
+            const userStr = localStorage.getItem('auth_user');
+            return userStr ? JSON.parse(userStr) : null;
+        }
+        function logout() {
+            if (!confirm('Tizimdan chiqmoqchimisiz?')) return;
+            localStorage.removeItem('auth_token');
+            localStorage.removeItem('auth_user');
+            window.location.reload();
+        }
+        function renderAuthBar() {
+            const user = getCurrentUser();
+            const bar = document.getElementById('authBar');
+            if (user) {
+                bar.innerHTML = `
+            <span class="user-greeting">👤 ${escapeHtml(user.firstName)}</span>
+            <button class="auth-btn" onclick="logout()">Chiqish</button>
+        `;
+            } else {
+                bar.innerHTML = `
+            <a href="/login.html" class="auth-btn">Kirish</a>
+            <a href="/register.html" class="auth-btn auth-btn-primary">Ro'yxatdan o'tish</a>
+        `;
+            }
+        }
+        renderAuthBar();
+
+        let currentBook = null;
+        let currentPageNumber = 1;
+        let totalPagesCount = 0;
+        let isFlipping = false;
+        let allBooks = [];
+        let bookStats = {};
+        let modalBookId = null;
+        let selectedRating = 0;
+        let selectedCategory = null;
+        let searchQuery = '';
+
+        const CATEGORY_ICONS = {
+            "O'zbek romani": '📖', "O'zbek hikoyasi": '📜', "Chet el adabiyoti": '🌍',
+            "Klassik adabiyot": '🏛️', "Detektiv": '🕵️', "Fantastika": '🚀',
+            "Ilmiy fantastika": '🚀', "Tarixiy": '⚔️', "Bolalar uchun": '🧸',
+            "Bolalar": '🧸', "She'r": '🎭', "She'rlar": '🎭', "Ilmiy": '🔬',
+            "Falsafiy": '💭', "Biografiya": '👤', "Roman": '📖', "Hikoya": '📜', "Boshqa": '📚'
+        };
+        function getCategoryIcon(cat) { return CATEGORY_ICONS[cat] || '📚'; }
+
+        function getAllProgress() { return JSON.parse(localStorage.getItem('reading_progress') || '{}'); }
+        function getBookProgress(bookId) { return getAllProgress()[bookId] || null; }
+        function saveProgress(bookId, page, totalPages) {
+            const all = getAllProgress();
+            all[bookId] = { page, totalPages, lastRead: new Date().toISOString() };
+            localStorage.setItem('reading_progress', JSON.stringify(all));
+        }
+        function getMostRecentBook() {
+            const all = getAllProgress();
+            let recent = null, recentTime = 0;
+            for (const bookId in all) {
+                const time = new Date(all[bookId].lastRead).getTime();
+                if (time > recentTime) { recentTime = time; recent = { bookId: parseInt(bookId), ...all[bookId] }; }
+            }
+            return recent;
+        }
+
+        async function loadInitial() {
+            try {
+                const response = await fetch(`${API_BASE}/api/Books`);
+                if (!response.ok) throw new Error('Kitoblarni yuklashda xato');
+                allBooks = await response.json();
+
+                await Promise.all(allBooks.map(async book => {
+                    try {
+                        const cRes = await fetch(`${API_BASE}/api/books/${book.id}/comments`);
+                        if (cRes.ok) {
+                            const cData = await cRes.json();
+                            bookStats[book.id] = { avgRating: cData.averageRating || 0, commentCount: cData.totalComments || 0 };
+                        }
+                    } catch (e) { bookStats[book.id] = { avgRating: 0, commentCount: 0 }; }
+                }));
+
+                renderCategories();
+                renderBooks();
+                updateContinueSection();
+            } catch (error) {
+                document.getElementById('bookList').innerHTML = `<div class="message error">Xato: ${error.message}</div>`;
+            }
+        }
+
+        function renderCategories() {
+            const grid = document.getElementById('categoryGrid');
+            const groups = {};
+            allBooks.forEach(b => {
+                const cat = b.category || 'Boshqa';
+                groups[cat] = (groups[cat] || 0) + 1;
+            });
+            const categories = Object.keys(groups).sort();
+            if (categories.length === 0) { document.getElementById('categoriesWrap').style.display = 'none'; return; }
+            grid.innerHTML = categories.map(cat => `
+                        <div class="category-card ${selectedCategory === cat ? 'active' : ''}" onclick="selectCategory('${escapeJs(cat)}')">
+                            <div class="category-icon">${getCategoryIcon(cat)}</div>
+                            <div class="category-name">${escapeHtml(cat)}</div>
+                            <div class="category-count">${groups[cat]} kitob</div>
+                        </div>`).join('');
+        }
+
+        function selectCategory(cat) {
+            selectedCategory = selectedCategory === cat ? null : cat;
+            renderCategories(); renderBooks();
+        }
+
+        function clearFilter() {
+            selectedCategory = null; searchQuery = '';
+            document.getElementById('searchInput').value = '';
+            renderCategories(); renderBooks();
+        }
+
+        let searchTimeout;
+        function onSearchInput() {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => {
+                searchQuery = document.getElementById('searchInput').value.trim().toLowerCase();
+                renderBooks();
+            }, 300);
+        }
+
+        function getFilteredBooks() {
+            return allBooks.filter(b => {
+                const matchCat = !selectedCategory || b.category === selectedCategory;
+                const matchSearch = !searchQuery
+                    || b.title.toLowerCase().includes(searchQuery)
+                    || b.author.toLowerCase().includes(searchQuery);
+                return matchCat && matchSearch;
+            });
+        }
+
+        function renderBooks() {
+            const bookListEl = document.getElementById('bookList');
+            const titleText = document.getElementById('booksTitleText');
+            const clearBtn = document.getElementById('clearFilterBtn');
+
+            if (selectedCategory && searchQuery) {
+                titleText.textContent = `🔍 "${searchQuery}" — ${selectedCategory}`;
+                clearBtn.style.display = 'inline-block';
+            } else if (selectedCategory) {
+                titleText.textContent = `${getCategoryIcon(selectedCategory)} ${selectedCategory}`;
+                clearBtn.style.display = 'inline-block';
+            } else if (searchQuery) {
+                titleText.textContent = `🔍 Qidiruv: "${searchQuery}"`;
+                clearBtn.style.display = 'inline-block';
+            } else {
+                titleText.textContent = 'Barcha kitoblar';
+                clearBtn.style.display = 'none';
+            }
+
+            const filtered = getFilteredBooks();
+            if (allBooks.length === 0) { bookListEl.innerHTML = '<div class="message">Kutubxonada hozircha kitoblar yo\'q.</div>'; return; }
+            if (filtered.length === 0) { bookListEl.innerHTML = '<div class="message">Bu shartlarga mos kitob topilmadi.</div>'; return; }
+
+            bookListEl.innerHTML = '';
+            for (const book of filtered) {
+                const stats = bookStats[book.id] || { avgRating: 0, commentCount: 0 };
+                const progress = getBookProgress(book.id);
+                let progressHtml = '';
+                let readBtnText = '📖 O\'qish';
+                if (progress && progress.totalPages > 0) {
+                    const percent = Math.round((progress.page / progress.totalPages) * 100);
+                    progressHtml = `
+                                <div class="progress-wrap">
+                                    <div class="progress-label"><span>O'qilgan: ${progress.page}/${progress.totalPages}</span><span>${percent}%</span></div>
+                                    <div class="progress-track"><div class="progress-fill" style="width:${percent}%"></div></div>
+                                </div>`;
+                    readBtnText = percent >= 100 ? '🔄 Qayta o\'qish' : '▶ Davom etish';
+                }
+                const card = document.createElement('div');
+                card.className = 'book-card';
+                card.innerHTML = `
+                            <h2>${escapeHtml(book.title)}</h2>
+                            <p class="author">✍️ ${escapeHtml(book.author)}</p>
+                            <div class="meta">
+                                <span class="badge">${escapeHtml(book.category)}</span>
+                                <span>${book.year || '—'}</span>
+                            </div>
+                            <div class="rating-display">
+                                <span class="stars">${renderStars(stats.avgRating)}</span>
+                                <span class="rating-text">${stats.avgRating > 0 ? stats.avgRating + ' / 5' : 'Baholanmagan'} (${stats.commentCount} izoh)</span>
+                            </div>
+                            ${progressHtml}
+                            <div class="card-buttons">
+                                <button class="card-btn btn-read" onclick="openBook(${book.id})">${readBtnText}</button>
+                                <button class="card-btn btn-comments" onclick="openComments(${book.id}, '${escapeJs(book.title)}', '${escapeJs(book.author)}')">💬 Izohlar</button>
+                            </div>`;
+                bookListEl.appendChild(card);
+            }
+        }
+
+        function updateContinueSection() {
+            const recent = getMostRecentBook();
+            const section = document.getElementById('continueSection');
+            if (!recent) { section.classList.remove('active'); return; }
+            const book = allBooks.find(b => b.id === recent.bookId);
+            if (!book) { section.classList.remove('active'); return; }
+            section.classList.add('active');
+            document.getElementById('continueTitle').textContent = book.title;
+            document.getElementById('continueMeta').textContent = `✍️ ${book.author} • ${recent.page}/${recent.totalPages} sahifa o'qilgan`;
+            document.getElementById('continueBtn').onclick = () => openBook(recent.bookId);
+        }
+
+        function renderStars(rating) {
+            const full = Math.round(rating);
+            let stars = '';
+            for (let i = 1; i <= 5; i++) stars += i <= full ? '★' : '☆';
+            return stars;
+        }
+
+        async function openBook(bookId) {
+            try {
+                const response = await fetch(`${API_BASE}/api/books/${bookId}/pages`);
+                if (!response.ok) throw new Error('Kitob sahifalarini topib bo\'lmadi');
+                const data = await response.json();
+                if (data.totalPages === 0) { alert('Bu kitobning sahifalari hali qo\'shilmagan.'); return; }
+                currentBook = bookId;
+                totalPagesCount = data.totalPages;
+                const progress = getBookProgress(bookId);
+                let startPage = (progress && progress.page >= 1 && progress.page <= data.totalPages) ? progress.page : 1;
+                currentPageNumber = startPage;
+                document.querySelectorAll('#categoriesWrap, #booksWrap, .continue-section, .search-wrap').forEach(el => el.style.display = 'none');
+                document.getElementById('reader').classList.add('active');
+                await loadPage(startPage);
+                if (startPage > 1) showToast(`📖 ${startPage}-sahifadan davom etmoqdasiz`);
+            } catch (error) { alert('Xato: ' + error.message); }
+        }
+
+        function closeReader() {
+            document.getElementById('reader').classList.remove('active');
+            document.querySelectorAll('#categoriesWrap, #booksWrap, .search-wrap').forEach(el => el.style.display = '');
+            currentBook = null;
+            loadInitial();
+        }
+
+        // Matnni paragraflarga ajratib HTML qilish (kitob shaklida)
+        function formatBookContent(text) {
+            if (!text) return '';
+            // Avval ikkita yangi qator (\n\n) bo'yicha paragraflarga ajratamiz
+            const paragraphs = text
+                .split(/\n\s*\n/)
+                .map(p => p.trim())
+                .filter(p => p.length > 0);
+
+            if (paragraphs.length === 0) {
+                return `<p>${escapeHtml(text)}</p>`;
+            }
+
+            return paragraphs
+                .map(p => `<p>${escapeHtml(p).replace(/\n/g, '<br>')}</p>`)
+                .join('');
+        }
+
+        async function loadPage(pageNumber) {
+            const pageContentEl = document.getElementById('pageContent');
+            try {
+                const response = await fetch(`${API_BASE}/api/books/${currentBook}/pages/${pageNumber}`);
+                if (!response.ok) throw new Error(`Sahifa ${pageNumber} topilmadi`);
+                const data = await response.json();
+                document.getElementById('readerTitle').textContent = data.bookTitle;
+                document.getElementById('readerAuthor').textContent = data.bookAuthor;
+                // Matnni kitob shaklida formatlash
+                pageContentEl.innerHTML = formatBookContent(data.content);
+                document.getElementById('pageNumberDisplay').textContent = `— ${pageNumber} —`;
+                document.getElementById('currentPage').textContent = pageNumber;
+                document.getElementById('totalPages').textContent = data.totalPages;
+                document.getElementById('prevBtn').disabled = !data.hasPreviousPage;
+                document.getElementById('nextBtn').disabled = !data.hasNextPage;
+                currentPageNumber = pageNumber;
+                totalPagesCount = data.totalPages;
+                const percent = Math.round((pageNumber / data.totalPages) * 100);
+                document.getElementById('readerProgressFill').style.width = percent + '%';
+                saveProgress(currentBook, pageNumber, data.totalPages);
+            } catch (error) { pageContentEl.innerHTML = `<p class="error">Xato: ${error.message}</p>`; }
+        }
+
+        async function flipAndLoad(newPageNumber) {
+            if (isFlipping) return;
+            isFlipping = true;
+            const pageEl = document.getElementById('page');
+            pageEl.classList.add('flipping');
+            setTimeout(async () => {
+                await loadPage(newPageNumber);
+                pageEl.classList.remove('flipping');
+                isFlipping = false;
+            }, 400);
+        }
+        async function nextPage() { if (currentPageNumber < totalPagesCount) await flipAndLoad(currentPageNumber + 1); }
+        async function previousPage() { if (currentPageNumber > 1) await flipAndLoad(currentPageNumber - 1); }
+
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 3000);
+        }
+
+        function openComments(bookId, title, author) {
+            modalBookId = bookId;
+            document.getElementById('modalBookTitle').textContent = title;
+            document.getElementById('modalBookAuthor').textContent = '✍️ ' + author;
+            document.getElementById('commentsModal').classList.add('active');
+            resetCommentForm();
+            loadComments(bookId);
+        }
+        function closeComments() {
+            document.getElementById('commentsModal').classList.remove('active');
+            modalBookId = null;
+        }
+        async function loadComments(bookId) {
+            const listEl = document.getElementById('commentsList');
+            listEl.innerHTML = '<div class="loading"><div class="spinner"></div></div>';
+            try {
+                const response = await fetch(`${API_BASE}/api/books/${bookId}/comments`);
+                if (!response.ok) throw new Error('Izohlarni yuklab bo\'lmadi');
+                const data = await response.json();
+                document.getElementById('avgRatingNum').textContent = data.averageRating.toFixed(1);
+                document.getElementById('avgRatingStars').textContent = renderStars(data.averageRating);
+                document.getElementById('commentCount').textContent = data.totalComments > 0 ? `${data.totalComments} ta izoh` : 'Hali izoh yo\'q';
+                if (data.comments.length === 0) {
+                    listEl.innerHTML = '<div class="message">Birinchi bo\'lib izoh qoldiring!</div>';
+                } else {
+                    listEl.innerHTML = data.comments.map(c => `
+                                <div class="comment-item">
+                                    <div class="comment-top">
+                                        <span class="comment-author">${escapeHtml(c.authorName)}</span>
+                                        <span class="comment-stars">${renderStars(c.rating)}</span>
+                                    </div>
+                                    <div class="comment-text">${escapeHtml(c.content)}</div>
+                                    <div class="comment-date">${formatDate(c.createdAt)}</div>
+                                    <button class="delete-comment" onclick="deleteComment(${c.id})">O'chirish</button>
+                                </div>`).join('');
+                }
+            } catch (error) { listEl.innerHTML = `<div class="message error">Xato: ${error.message}</div>`; }
+        }
+        document.querySelectorAll('.star-input').forEach(star => {
+            star.addEventListener('click', () => {
+                selectedRating = parseInt(star.dataset.value);
+                updateStarDisplay();
+            });
+        });
+        function updateStarDisplay() {
+            document.querySelectorAll('.star-input').forEach((star, i) => {
+                star.classList.toggle('filled', i < selectedRating);
+            });
+        }
+        function resetCommentForm() {
+            document.getElementById('commentName').value = '';
+            document.getElementById('commentText').value = '';
+            selectedRating = 0;
+            updateStarDisplay();
+            document.getElementById('formStatus').className = 'form-status';
+        }
+        async function submitComment() {
+            const name = document.getElementById('commentName').value.trim();
+            const text = document.getElementById('commentText').value.trim();
+            const statusEl = document.getElementById('formStatus');
+            if (!name) { statusEl.textContent = 'Ismingizni kiriting!'; statusEl.className = 'form-status error'; return; }
+            if (selectedRating < 1) { statusEl.textContent = 'Yulduz bahosini tanlang!'; statusEl.className = 'form-status error'; return; }
+            if (!text) { statusEl.textContent = 'Izoh matnini yozing!'; statusEl.className = 'form-status error'; return; }
+            const btn = document.getElementById('submitCommentBtn');
+            btn.disabled = true;
+            btn.textContent = 'Yuborilmoqda...';
+            try {
+                const response = await fetch(`${API_BASE}/api/books/${modalBookId}/comments`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ authorName: name, content: text, rating: selectedRating })
+                });
+                if (!response.ok) {
+                    const err = await response.text();
+                    throw new Error(err || `Status ${response.status}`);
+                }
+                resetCommentForm();
+                statusEl.textContent = '✅ Izohingiz qo\'shildi, rahmat!';
+                statusEl.className = 'form-status success';
+                await loadComments(modalBookId);
+                const cRes = await fetch(`${API_BASE}/api/books/${modalBookId}/comments`);
+                if (cRes.ok) {
+                    const cData = await cRes.json();
+                    bookStats[modalBookId] = { avgRating: cData.averageRating || 0, commentCount: cData.totalComments || 0 };
+                    renderBooks();
+                }
+            } catch (error) {
+                statusEl.textContent = 'Xato: ' + error.message;
+                statusEl.className = 'form-status error';
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Izohni yuborish';
+            }
+        async function deleteComment(commentId) {
+            if (!confirm('Bu izohni rostdan o\'chirmoqchimisiz?')) return;
+            try {
+                const response = await fetch(`${API_BASE}/api/books/${modalBookId}/comments/${commentId}`, {
+                    method: 'DELETE',
+                    headers: getAuthHeaders(false)
+                });
+                if (!response.ok) throw new Error('O\'chirib bo\'lmadi');
+                await loadComments(modalBookId);
+            } catch (error) { alert('Xato: ' + error.message); }
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (document.getElementById('commentsModal').classList.contains('active')) {
+                if (e.key === 'Escape') closeComments();
+                return;
+            }
+            if (!document.getElementById('reader').classList.contains('active')) return;
+            if (e.key === 'ArrowRight') nextPage();
+            if (e.key === 'ArrowLeft') previousPage();
+            if (e.key === 'Escape') closeReader();
+        });
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+        function escapeJs(text) {
+            return String(text).replace(/'/g, "\\'").replace(/"/g, '&quot;');
+        }
+        function formatDate(dateStr) {
+            const d = new Date(dateStr);
+            return d.toLocaleDateString('uz-UZ') + ' ' + d.toLocaleTimeString('uz-UZ', { hour: '2-digit', minute: '2-digit' });
+        }
+
+        loadInitial();
+    </script>
+</body>
+</html>
