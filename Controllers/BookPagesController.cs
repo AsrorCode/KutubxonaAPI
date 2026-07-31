@@ -1,8 +1,8 @@
-﻿using KutubxonaAPI.Data;
-using KutubxonaAPI.Models;
+﻿using KutubxonaAPI.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authorization;
+using KutubxonaAPI.Data;
 
 namespace KutubxonaAPI.Controllers;
 
