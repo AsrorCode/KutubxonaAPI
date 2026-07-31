@@ -1,4 +1,4 @@
-﻿using KutubxonaAPI.Controllers.Data;
+﻿using KutubxonaAPI.Data;
 using KutubxonaAPI.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;

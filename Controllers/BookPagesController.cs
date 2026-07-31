@@ -1,14 +1,14 @@
-﻿using KutubxonaAPI.Models;
+﻿using KutubxonaAPI.Data;
+using KutubxonaAPI.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Authorization;
-using KutubxonaAPI.Data;
+using System.Text;
 
 namespace KutubxonaAPI.Controllers;
 
 [ApiController]
-[Route("api/books/{bookId:int}/pages")]
-[Produces("application/json")]
+[Route("api/books/{bookId}/pages")]
 public class BookPagesController : ControllerBase
 {
     private readonly AppDbContext _context;
@@ -20,145 +20,163 @@ public class BookPagesController : ControllerBase
         _logger = logger;
     }
 
+    // ============================================
+    // GET: /api/books/{bookId}/pages
+    // Barcha sahifalar ro'yxati (kichik ma'lumot)
+    // ============================================
     [HttpGet]
     public async Task<IActionResult> GetPages(int bookId)
     {
-        var bookExists = await _context.Books.AnyAsync(b => b.Id == bookId);
-        if (!bookExists)
-        {
-            return NotFound(new { message = $"ID = {bookId} bo'lgan kitob topilmadi" });
-        }
+        var book = await _context.Books.FindAsync(bookId);
+        if (book == null)
+            return NotFound(new { message = "Kitob topilmadi" });
 
-        var pages = await _context.BookPages
+        var totalPages = await _context.BookPages
             .Where(p => p.BookId == bookId)
-            .OrderBy(p => p.PageNumber)
-            .Select(p => new
-            {
-                p.Id,
-                p.PageNumber,
-                ContentPreview = p.Content.Length > 100
-                    ? p.Content.Substring(0, 100) + "..."
-                    : p.Content
-            })
-            .ToListAsync();
+            .CountAsync();
 
         return Ok(new
         {
-            bookId,
-            totalPages = pages.Count,
-            pages
+            bookId = book.Id,
+            bookTitle = book.Title,
+            bookAuthor = book.Author,
+            totalPages
         });
     }
 
-    [HttpGet("{pageNumber:int}")]
+    // ============================================
+    // GET: /api/books/{bookId}/pages/{pageNumber}
+    // Bitta sahifa — to'liq matn
+    // ============================================
+    [HttpGet("{pageNumber}")]
     public async Task<IActionResult> GetPage(int bookId, int pageNumber)
     {
+        var book = await _context.Books.FindAsync(bookId);
+        if (book == null)
+            return NotFound(new { message = "Kitob topilmadi" });
+
+        var totalPages = await _context.BookPages
+            .Where(p => p.BookId == bookId)
+            .CountAsync();
+
+        if (totalPages == 0)
+            return NotFound(new { message = "Bu kitobda sahifalar yo'q" });
+
+        if (pageNumber < 1 || pageNumber > totalPages)
+            return BadRequest(new { message = $"Sahifa raqami 1 dan {totalPages} gacha bo'lishi kerak" });
+
         var page = await _context.BookPages
-            .Include(p => p.Book)
             .FirstOrDefaultAsync(p => p.BookId == bookId && p.PageNumber == pageNumber);
 
         if (page == null)
-        {
-            return NotFound(new
-            {
-                message = $"Kitob ID={bookId}, sahifa {pageNumber} topilmadi"
-            });
-        }
-
-        var totalPages = await _context.BookPages.CountAsync(p => p.BookId == bookId);
+            return NotFound(new { message = "Sahifa topilmadi" });
 
         return Ok(new
         {
-            page.Id,
-            page.PageNumber,
-            page.Content,
-            bookId = page.BookId,
-            bookTitle = page.Book?.Title,
-            bookAuthor = page.Book?.Author,
+            id = page.Id,
+            bookId = book.Id,
+            bookTitle = book.Title,
+            bookAuthor = book.Author,
+            pageNumber = page.PageNumber,
+            content = page.Content,
             totalPages,
             hasNextPage = pageNumber < totalPages,
             hasPreviousPage = pageNumber > 1
         });
     }
 
-    [Authorize(Roles = "Admin")]
+    // ============================================
+    // POST: /api/books/{bookId}/pages
+    // Bitta sahifa qo'shish (ADMIN)
+    // ============================================
     [HttpPost]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> CreatePage(int bookId, [FromBody] CreatePageDto dto)
     {
-        if (!ModelState.IsValid)
-            return BadRequest(ModelState);
+        var book = await _context.Books.FindAsync(bookId);
+        if (book == null)
+            return NotFound(new { message = "Kitob topilmadi" });
 
-        var bookExists = await _context.Books.AnyAsync(b => b.Id == bookId);
-        if (!bookExists)
-            return NotFound(new { message = $"ID = {bookId} bo'lgan kitob topilmadi" });
+        if (string.IsNullOrWhiteSpace(dto.Content))
+            return BadRequest(new { message = "Sahifa matni bo'sh bo'lmasligi kerak" });
 
-        var pageNumber = dto.PageNumber ?? (await _context.BookPages
+        // Keyingi sahifa raqami
+        var lastPageNumber = await _context.BookPages
             .Where(p => p.BookId == bookId)
-            .Select(p => (int?)p.PageNumber)
-            .MaxAsync() ?? 0) + 1;
+            .MaxAsync(p => (int?)p.PageNumber) ?? 0;
 
-        var newPage = new BookPage
+        var page = new BookPage
         {
             BookId = bookId,
-            PageNumber = pageNumber,
+            PageNumber = dto.PageNumber ?? lastPageNumber + 1,
             Content = dto.Content
         };
 
-        _context.BookPages.Add(newPage);
+        _context.BookPages.Add(page);
         await _context.SaveChangesAsync();
 
-        _logger.LogInformation("Yangi sahifa qo'shildi. Kitob: {BookId}, Sahifa: {PageNumber}",
-            bookId, pageNumber);
+        _logger.LogInformation("Sahifa qo'shildi: kitob {BookId}, sahifa {PageNumber}",
+            bookId, page.PageNumber);
 
         return CreatedAtAction(
             nameof(GetPage),
-            new { bookId, pageNumber = newPage.PageNumber },
-            newPage);
+            new { bookId, pageNumber = page.PageNumber },
+            new { page.Id, page.PageNumber, page.Content });
     }
 
-    [Authorize(Roles = "Admin")]
+    // ============================================
+    // POST: /api/books/{bookId}/pages/bulk
+    // Ko'p sahifa birdaniga (PDF matnidan) (ADMIN)
+    // ============================================
     [HttpPost("bulk")]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> CreatePagesBulk(int bookId, [FromBody] BulkPagesDto dto)
     {
-        var bookExists = await _context.Books.AnyAsync(b => b.Id == bookId);
-        if (!bookExists)
-            return NotFound(new { message = $"ID = {bookId} bo'lgan kitob topilmadi" });
+        var book = await _context.Books.FindAsync(bookId);
+        if (book == null)
+            return NotFound(new { message = "Kitob topilmadi" });
 
-        if (dto.ReplaceExisting)
+        if (string.IsNullOrWhiteSpace(dto.FullText))
+            return BadRequest(new { message = "Matn bo'sh" });
+
+        // Matnni chunk'larga bo'lish
+        var chunks = SplitIntoChunks(dto.FullText, dto.ChunkSize ?? 2500);
+
+        if (chunks.Count == 0)
+            return BadRequest(new { message = "Matndan sahifalar ajratib bo'lmadi" });
+
+        // Oldingi sahifalar bo'lsa — davom ettiramiz
+        var lastPageNumber = await _context.BookPages
+            .Where(p => p.BookId == bookId)
+            .MaxAsync(p => (int?)p.PageNumber) ?? 0;
+
+        var pages = chunks.Select((chunk, idx) => new BookPage
         {
-            var oldPages = await _context.BookPages
-                .Where(p => p.BookId == bookId)
-                .ToListAsync();
-            _context.BookPages.RemoveRange(oldPages);
-        }
+            BookId = bookId,
+            PageNumber = lastPageNumber + idx + 1,
+            Content = chunk
+        }).ToList();
 
-        int charsPerPage = dto.CharactersPerPage > 0 ? dto.CharactersPerPage : 1500;
-        var chunks = SplitIntoChunks(dto.FullText, charsPerPage);
-
-        var newPages = new List<BookPage>();
-        for (int i = 0; i < chunks.Count; i++)
-        {
-            newPages.Add(new BookPage
-            {
-                BookId = bookId,
-                PageNumber = i + 1,
-                Content = chunks[i]
-            });
-        }
-
-        await _context.BookPages.AddRangeAsync(newPages);
+        _context.BookPages.AddRange(pages);
         await _context.SaveChangesAsync();
 
-        return Created($"/api/books/{bookId}/pages", new
+        _logger.LogInformation("Bulk sahifalar qo'shildi: kitob {BookId}, {Count} ta sahifa",
+            bookId, pages.Count);
+
+        return Ok(new
         {
-            bookId,
-            totalPagesCreated = newPages.Count,
-            charactersPerPage = charsPerPage
+            message = $"{pages.Count} ta sahifa yaratildi",
+            count = pages.Count,
+            totalPages = lastPageNumber + pages.Count
         });
     }
 
+    // ============================================
+    // PUT: /api/books/{bookId}/pages/{pageNumber}
+    // Sahifani yangilash (ADMIN)
+    // ============================================
+    [HttpPut("{pageNumber}")]
     [Authorize(Roles = "Admin")]
-    [HttpPut("{pageNumber:int}")]
     public async Task<IActionResult> UpdatePage(int bookId, int pageNumber, [FromBody] UpdatePageDto dto)
     {
         var page = await _context.BookPages
@@ -167,14 +185,24 @@ public class BookPagesController : ControllerBase
         if (page == null)
             return NotFound(new { message = "Sahifa topilmadi" });
 
+        if (string.IsNullOrWhiteSpace(dto.Content))
+            return BadRequest(new { message = "Sahifa matni bo'sh bo'lmasligi kerak" });
+
         page.Content = dto.Content;
         await _context.SaveChangesAsync();
 
-        return Ok(page);
+        _logger.LogInformation("Sahifa yangilandi: kitob {BookId}, sahifa {PageNumber}",
+            bookId, pageNumber);
+
+        return NoContent();
     }
 
+    // ============================================
+    // DELETE: /api/books/{bookId}/pages/{pageNumber}
+    // Bitta sahifani o'chirish (ADMIN)
+    // ============================================
+    [HttpDelete("{pageNumber}")]
     [Authorize(Roles = "Admin")]
-    [HttpDelete("{pageNumber:int}")]
     public async Task<IActionResult> DeletePage(int bookId, int pageNumber)
     {
         var page = await _context.BookPages
@@ -184,37 +212,150 @@ public class BookPagesController : ControllerBase
             return NotFound(new { message = "Sahifa topilmadi" });
 
         _context.BookPages.Remove(page);
+
+        // Undan keyingi sahifalarning raqamini bir kamaytirish
+        var subsequentPages = await _context.BookPages
+            .Where(p => p.BookId == bookId && p.PageNumber > pageNumber)
+            .ToListAsync();
+
+        foreach (var p in subsequentPages)
+            p.PageNumber--;
+
         await _context.SaveChangesAsync();
+
+        _logger.LogInformation("Sahifa o'chirildi: kitob {BookId}, sahifa {PageNumber}",
+            bookId, pageNumber);
 
         return NoContent();
     }
 
-    private static List<string> SplitIntoChunks(string text, int chunkSize)
+    // ============================================
+    // DELETE: /api/books/{bookId}/pages
+    // Barcha sahifalarni o'chirish (ADMIN) — qayta yuklash uchun
+    // ============================================
+    [HttpDelete]
+    [Authorize(Roles = "Admin")]
+    public async Task<IActionResult> DeleteAllPages(int bookId)
+    {
+        var pages = await _context.BookPages
+            .Where(p => p.BookId == bookId)
+            .ToListAsync();
+
+        if (pages.Count == 0)
+            return NotFound(new { message = "O'chirish uchun sahifalar yo'q" });
+
+        _context.BookPages.RemoveRange(pages);
+        await _context.SaveChangesAsync();
+
+        _logger.LogWarning("BARCHA sahifalar o'chirildi: kitob {BookId}, {Count} ta",
+            bookId, pages.Count);
+
+        return Ok(new { message = $"{pages.Count} ta sahifa o'chirildi" });
+    }
+
+    // ============================================
+    // HELPER: Matnni chunk'larga bo'lish (yaxshilangan)
+    // ============================================
+    private static List<string> SplitIntoChunks(string text, int chunkSize = 2500)
     {
         var chunks = new List<string>();
-        if (string.IsNullOrEmpty(text)) return chunks;
+        if (string.IsNullOrWhiteSpace(text)) return chunks;
 
-        var words = text.Split(' ');
-        var currentChunk = new System.Text.StringBuilder();
+        // 1. Tozalash — ortiqcha bo'sh joylarni olib tashlash
+        text = text.Replace("\r\n", "\n").Trim();
 
-        foreach (var word in words)
+        // 2. Paragraflar bo'yicha bo'lish (bo'sh qatorlar orqali)
+        var paragraphs = text
+            .Split(new[] { "\n\n" }, StringSplitOptions.RemoveEmptyEntries)
+            .Select(p => p.Trim())
+            .Where(p => !string.IsNullOrEmpty(p))
+            .ToList();
+
+        if (paragraphs.Count == 0)
+            return chunks;
+
+        var currentChunk = new StringBuilder();
+
+        foreach (var paragraph in paragraphs)
         {
-            if (currentChunk.Length + word.Length + 1 > chunkSize && currentChunk.Length > 0)
+            // Agar bitta paragraf o'zi chunkSize dan katta bo'lsa —
+            // jumla bo'yicha bo'lamiz
+            if (paragraph.Length > chunkSize)
+            {
+                // Avval joriy chunk'ni saqlab qo'yamiz
+                if (currentChunk.Length > 0)
+                {
+                    chunks.Add(currentChunk.ToString().Trim());
+                    currentChunk.Clear();
+                }
+
+                // Katta paragrafni jumlalar bo'yicha bo'lamiz
+                var sentences = SplitBySentences(paragraph);
+                foreach (var sentence in sentences)
+                {
+                    if (currentChunk.Length + sentence.Length > chunkSize
+                        && currentChunk.Length > 0)
+                    {
+                        chunks.Add(currentChunk.ToString().Trim());
+                        currentChunk.Clear();
+                    }
+                    if (currentChunk.Length > 0)
+                        currentChunk.Append(' ');
+                    currentChunk.Append(sentence);
+                }
+                continue;
+            }
+
+            // Odatiy hol — paragraf sig'adimi tekshiramiz
+            if (currentChunk.Length + paragraph.Length + 2 > chunkSize
+                && currentChunk.Length > 0)
             {
                 chunks.Add(currentChunk.ToString().Trim());
                 currentChunk.Clear();
             }
-            currentChunk.Append(word).Append(' ');
+
+            if (currentChunk.Length > 0)
+                currentChunk.Append("\n\n");
+            currentChunk.Append(paragraph);
         }
 
+        // Oxirgi chunk
         if (currentChunk.Length > 0)
             chunks.Add(currentChunk.ToString().Trim());
 
         return chunks;
     }
+
+    // Katta paragrafni jumlalar bo'yicha bo'lish
+    private static List<string> SplitBySentences(string paragraph)
+    {
+        var sentences = new List<string>();
+        var current = new StringBuilder();
+
+        for (int i = 0; i < paragraph.Length; i++)
+        {
+            current.Append(paragraph[i]);
+
+            // Jumla oxiri
+            if ((paragraph[i] == '.' || paragraph[i] == '!' || paragraph[i] == '?')
+                && (i == paragraph.Length - 1 || char.IsWhiteSpace(paragraph[i + 1])))
+            {
+                sentences.Add(current.ToString().Trim());
+                current.Clear();
+            }
+        }
+
+        if (current.Length > 0)
+            sentences.Add(current.ToString().Trim());
+
+        return sentences.Where(s => !string.IsNullOrEmpty(s)).ToList();
+    }
 }
 
-// DTO klasslar
+// ============================================
+// DTO SINFLARI
+// ============================================
+
 public class CreatePageDto
 {
     public int? PageNumber { get; set; }
@@ -229,6 +370,5 @@ public class UpdatePageDto
 public class BulkPagesDto
 {
     public string FullText { get; set; } = string.Empty;
-    public int CharactersPerPage { get; set; } = 1500;
-    public bool ReplaceExisting { get; set; } = true;
+    public int? ChunkSize { get; set; }  // Ixtiyoriy — default 2500
 }

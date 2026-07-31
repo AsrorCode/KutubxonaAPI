@@ -3,794 +3,673 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin - Kutubxona boshqaruvi</title>
+    <title>Admin Panel — KutubxonaAPI</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
     <style>
+        :root {
+            --bg-base: #0a0a0f;
+            --bg-elevated: #14141b;
+            --bg-card: rgba(20, 20, 27, 0.6);
+            --bg-glass: rgba(255, 255, 255, 0.03);
+            --border: rgba(255, 255, 255, 0.08);
+            --border-hover: rgba(139, 92, 246, 0.4);
+            --primary: #8b5cf6;
+            --primary-glow: rgba(139, 92, 246, 0.4);
+            --secondary: #06b6d4;
+            --accent: #ec4899;
+            --text: #fafafa;
+            --text-dim: #a1a1aa;
+            --text-faint: #71717a;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+        }
+
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, sans-serif;
         }
 
         body {
             min-height: 100vh;
-            background: linear-gradient(135deg, #2c1810 0%, #5d3a1e 100%);
-            color: #f4ebd9;
-            padding: 30px 20px;
+            background: var(--bg-base);
+            background-image: radial-gradient(at 20% 0%, rgba(139, 92, 246, 0.15) 0px, transparent 50%), radial-gradient(at 80% 0%, rgba(6, 182, 212, 0.1) 0px, transparent 50%), radial-gradient(at 50% 100%, rgba(236, 72, 153, 0.08) 0px, transparent 50%);
+            background-attachment: fixed;
+            color: var(--text);
+            font-family: 'Inter', -apple-system, sans-serif;
+            padding: 24px;
         }
 
         .container {
-            max-width: 900px;
+            max-width: 1200px;
             margin: 0 auto;
         }
 
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--text);
+            text-decoration: none;
+            padding: 10px 18px;
+            background: var(--bg-glass);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 500;
+            backdrop-filter: blur(10px);
+            transition: all 0.2s;
+            margin-bottom: 24px;
+        }
+
+            .back-btn:hover {
+                border-color: var(--border-hover);
+                background: rgba(139, 92, 246, 0.1);
+            }
+
         header {
             text-align: center;
-            margin-bottom: 30px;
+            margin-bottom: 40px;
+        }
+
+        .header-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 64px;
+            height: 64px;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            border-radius: 16px;
+            font-size: 32px;
+            margin-bottom: 16px;
+            box-shadow: 0 12px 40px var(--primary-glow);
         }
 
         h1 {
-            font-size: 32px;
-            background: linear-gradient(45deg, #ffd700, #ff8c00);
+            font-size: 40px;
+            font-weight: 800;
+            letter-spacing: -0.03em;
+            background: linear-gradient(135deg, #fff, #c4b5fd 50%, #67e8f9);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
         }
 
         .subtitle {
-            color: #c8b89c;
-            font-style: italic;
+            color: var(--text-dim);
+            font-size: 15px;
         }
 
-        .nav-link {
-            display: inline-block;
-            color: #ffd700;
-            text-decoration: none;
-            margin-bottom: 20px;
-            padding: 8px 16px;
-            border: 2px solid #8b4513;
-            border-radius: 6px;
-        }
-
-            .nav-link:hover {
-                background: #8b4513;
-            }
-
-        .form-card {
-            background: rgba(0, 0, 0, 0.3);
-            border-radius: 12px;
-            padding: 30px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-            margin-bottom: 25px;
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 28px;
+            margin-bottom: 24px;
+            backdrop-filter: blur(20px);
         }
 
         .card-title {
-            font-size: 22px;
-            color: #ffd700;
+            font-size: 20px;
+            font-weight: 700;
             margin-bottom: 20px;
-            padding-bottom: 10px;
-            border-bottom: 2px solid #8b4513;
-        }
-
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        label {
-            display: block;
-            color: #ffd700;
-            font-weight: 600;
-            margin-bottom: 8px;
-            font-size: 15px;
-        }
-
-        select, input[type="text"], input[type="number"], textarea {
-            width: 100%;
-            padding: 12px 15px;
-            background: #faf3e0;
-            color: #2c1810;
-            border: 2px solid #8b4513;
-            border-radius: 6px;
-            font-size: 15px;
-            font-family: 'Georgia', serif;
-        }
-
-            select:focus, input:focus, textarea:focus {
-                outline: none;
-                border-color: #ffd700;
-            }
-
-        textarea {
-            min-height: 350px;
-            line-height: 1.7;
-            resize: vertical;
-        }
-
-        .hint {
-            color: #c8b89c;
-            font-size: 13px;
-            margin-top: 5px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            letter-spacing: -0.02em;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--border);
         }
 
         .form-row {
             display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
+            grid-template-columns: 1fr;
+            gap: 16px;
+            margin-bottom: 16px;
         }
 
-        .form-row-3 {
-            display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
-            gap: 15px;
-        }
-
-        .pdf-upload-section {
-            background: rgba(255, 215, 0, 0.05);
-            border: 2px dashed #8b4513;
-            border-radius: 10px;
-            padding: 25px;
-            text-align: center;
-            margin-bottom: 20px;
-            cursor: pointer;
-        }
-
-            .pdf-upload-section:hover {
-                background: rgba(255, 215, 0, 0.1);
-                border-color: #ffd700;
+            .form-row.cols-3 {
+                grid-template-columns: 1fr 1fr auto;
+                align-items: end;
             }
 
-            .pdf-upload-section.dragover {
-                background: rgba(255, 215, 0, 0.2);
-                border-color: #ffd700;
+        @media (max-width: 640px) {
+            .form-row.cols-3 {
+                grid-template-columns: 1fr;
             }
-
-        .pdf-icon {
-            font-size: 50px;
-            margin-bottom: 10px;
         }
 
-        .pdf-upload-text {
-            color: #ffd700;
-            font-size: 18px;
-            margin-bottom: 5px;
-        }
-
-        .pdf-upload-hint {
-            color: #c8b89c;
+        .form-field label {
+            display: block;
+            color: var(--text-dim);
             font-size: 13px;
+            margin-bottom: 6px;
+            font-weight: 500;
         }
 
-        #pdfInput {
-            display: none;
-        }
-
-        .pdf-file-name {
-            margin-top: 15px;
-            padding: 10px;
-            background: rgba(16, 185, 129, 0.1);
-            border-radius: 6px;
-            color: #6ee7b7;
-            font-size: 14px;
-            display: none;
-        }
-
-        .progress-container {
-            margin-top: 15px;
-            display: none;
-        }
-
-        .progress-bar {
+        .form-field input, .form-field textarea, .form-field select {
             width: 100%;
-            height: 8px;
-            background: rgba(0, 0, 0, 0.3);
-            border-radius: 4px;
-            overflow: hidden;
+            padding: 12px 14px;
+            background: var(--bg-glass);
+            color: var(--text);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            font-size: 14px;
+            font-family: inherit;
+            outline: none;
+            transition: all 0.2s;
         }
 
-        .progress-fill {
-            height: 100%;
-            background: linear-gradient(to right, #ffd700, #ff8c00);
-            width: 0%;
-            transition: width 0.3s;
+            .form-field input:focus, .form-field textarea:focus {
+                border-color: var(--primary);
+                box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
+            }
+
+        .form-field textarea {
+            resize: vertical;
+            min-height: 120px;
         }
 
-        .progress-text {
-            color: #ffd700;
-            font-size: 13px;
-            text-align: center;
-            margin-top: 5px;
-        }
-
-        .checkbox-group {
+        .checkbox-wrap {
             display: flex;
             align-items: center;
-            gap: 10px;
-            color: #f4ebd9;
-            cursor: pointer;
+            gap: 8px;
+            padding: 12px 14px;
+            background: var(--bg-glass);
+            border: 1px solid var(--border);
+            border-radius: 10px;
         }
 
-            .checkbox-group input {
-                width: auto;
+            .checkbox-wrap input {
+                width: 18px;
+                height: 18px;
+                accent-color: var(--primary);
             }
 
         .btn {
-            background: linear-gradient(135deg, #8b4513, #a0522d);
-            color: #f4ebd9;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 12px 20px;
             border: none;
-            padding: 14px 30px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 16px;
+            border-radius: 10px;
+            font-size: 14px;
             font-weight: 600;
-            width: 100%;
-            margin-top: 10px;
+            cursor: pointer;
+            font-family: inherit;
+            transition: all 0.2s;
         }
 
-            .btn:hover:not(:disabled) {
-                transform: translateY(-2px);
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            color: #fff;
+            width: 100%;
+            box-shadow: 0 4px 20px var(--primary-glow);
+        }
+
+            .btn-primary:hover {
+                transform: translateY(-1px);
+                box-shadow: 0 8px 30px var(--primary-glow);
             }
 
-            .btn:disabled {
+            .btn-primary:disabled {
                 opacity: 0.5;
                 cursor: not-allowed;
+                transform: none;
             }
 
-        .btn-green {
-            background: linear-gradient(135deg, #059669, #10b981);
+        .btn-secondary {
+            background: var(--bg-glass);
+            color: var(--text);
+            border: 1px solid var(--border);
         }
 
-        .status {
-            padding: 15px;
-            border-radius: 6px;
-            margin-top: 20px;
-            display: none;
+            .btn-secondary:hover {
+                border-color: var(--border-hover);
+                background: rgba(139, 92, 246, 0.08);
+            }
+
+        .btn-danger {
+            background: rgba(239, 68, 68, 0.15);
+            color: var(--danger);
+            border: 1px solid rgba(239, 68, 68, 0.3);
         }
 
-            .status.success {
-                background: rgba(16, 185, 129, 0.2);
-                border: 1px solid #10b981;
-                color: #6ee7b7;
-                display: block;
+            .btn-danger:hover {
+                background: rgba(239, 68, 68, 0.25);
             }
 
-            .status.error {
-                background: rgba(239, 68, 68, 0.2);
-                border: 1px solid #ef4444;
-                color: #fca5a5;
-                display: block;
-            }
+        .btn-success {
+            background: linear-gradient(135deg, var(--success), #34d399);
+            color: #fff;
+        }
 
-            .status.info {
-                background: rgba(59, 130, 246, 0.2);
-                border: 1px solid #3b82f6;
-                color: #93c5fd;
-                display: block;
-            }
-
-        .books-toolbar {
-            display: flex;
-            justify-content: space-between;
+        .book-item {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 16px;
             align-items: center;
-            margin-bottom: 15px;
-        }
-
-        .books-count {
-            color: #c8b89c;
-            font-size: 14px;
-        }
-
-        .refresh-btn {
-            background: rgba(255,215,0,0.15);
-            color: #ffd700;
-            border: 1px solid #8b4513;
-            padding: 8px 16px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 13px;
-        }
-
-            .refresh-btn:hover {
-                background: rgba(255,215,0,0.25);
-            }
-
-        .book-row {
-            background: rgba(0,0,0,0.2);
-            border: 1px solid #5d3a1e;
-            border-radius: 8px;
             padding: 16px;
             margin-bottom: 10px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 15px;
-            transition: all 0.3s;
+            background: var(--bg-glass);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            transition: all 0.2s;
         }
 
-            .book-row:hover {
-                border-color: #8b4513;
-                background: rgba(0,0,0,0.3);
+            .book-item:hover {
+                border-color: var(--border-hover);
             }
 
-        .book-info-block {
-            flex: 1;
-            min-width: 0;
-        }
-
-        .book-row-title {
-            color: #ffd700;
-            font-weight: 700;
+        .book-info h3 {
             font-size: 16px;
             margin-bottom: 4px;
         }
 
-        .book-row-author {
-            color: #c8b89c;
-            font-style: italic;
-            font-size: 13px;
+        .book-info .meta {
+            font-size: 12px;
+            color: var(--text-dim);
         }
 
-        .book-row-meta {
-            color: #8b7355;
-            font-size: 12px;
-            margin-top: 6px;
+        .book-actions {
             display: flex;
             gap: 8px;
-            flex-wrap: wrap;
         }
 
-            .book-row-meta span {
-                background: rgba(0,0,0,0.3);
-                padding: 2px 8px;
-                border-radius: 10px;
-            }
-
-        .delete-btn {
-            background: linear-gradient(135deg, #dc2626, #ef4444);
-            color: white;
-            border: none;
-            padding: 10px 18px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 13px;
-            font-weight: 600;
-            white-space: nowrap;
+        .badge {
+            display: inline-block;
+            padding: 3px 10px;
+            background: var(--bg-glass);
+            border: 1px solid var(--border);
+            border-radius: 999px;
+            font-size: 11px;
+            color: var(--text-dim);
         }
 
-            .delete-btn:hover {
-                background: linear-gradient(135deg, #b91c1c, #dc2626);
-                transform: translateY(-1px);
-            }
-
-            .delete-btn:disabled {
-                opacity: 0.5;
-                cursor: not-allowed;
-            }
-
-        .clear-all-btn {
-            background: rgba(239, 68, 68, 0.15);
-            color: #fca5a5;
-            border: 1px solid #ef4444;
-            padding: 10px 18px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 13px;
-            font-weight: 600;
-            margin-top: 15px;
-            width: 100%;
-        }
-
-            .clear-all-btn:hover {
-                background: rgba(239, 68, 68, 0.25);
-            }
-
-        .empty-state {
+        .upload-area {
+            border: 2px dashed rgba(139, 92, 246, 0.3);
+            border-radius: 12px;
+            padding: 40px;
             text-align: center;
-            padding: 30px;
-            color: #8b7355;
-            font-style: italic;
-            background: rgba(0,0,0,0.2);
-            border-radius: 8px;
+            transition: all 0.2s;
+            cursor: pointer;
+            background: rgba(139, 92, 246, 0.03);
         }
 
-        @media (max-width: 600px) {
-            .book-row {
-                flex-direction: column;
-                align-items: flex-start;
+            .upload-area:hover {
+                border-color: var(--primary);
+                background: rgba(139, 92, 246, 0.08);
             }
 
-            .delete-btn {
-                width: 100%;
-            }
+        .upload-icon {
+            font-size: 48px;
+            margin-bottom: 12px;
         }
+
+        .progress-bar {
+            height: 6px;
+            background: rgba(255, 255, 255, 0.06);
+            border-radius: 999px;
+            overflow: hidden;
+            margin-top: 12px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            border-radius: 999px;
+            transition: width 0.3s;
+            width: 0%;
+        }
+
+        .status-msg {
+            padding: 12px 16px;
+            border-radius: 10px;
+            margin-top: 12px;
+            font-size: 13px;
+            display: none;
+        }
+
+            .status-msg.success {
+                background: rgba(16, 185, 129, 0.1);
+                color: var(--success);
+                border: 1px solid rgba(16, 185, 129, 0.3);
+                display: block;
+            }
+
+            .status-msg.error {
+                background: rgba(239, 68, 68, 0.1);
+                color: var(--danger);
+                border: 1px solid rgba(239, 68, 68, 0.3);
+                display: block;
+            }
+
+            .status-msg.info {
+                background: rgba(6, 182, 212, 0.1);
+                color: var(--secondary);
+                border: 1px solid rgba(6, 182, 212, 0.3);
+                display: block;
+            }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .stat-card {
+            padding: 20px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            backdrop-filter: blur(20px);
+        }
+
+        .stat-value {
+            font-size: 32px;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: var(--text-dim);
+            margin-top: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .access-denied {
+            text-align: center;
+            padding: 60px;
+            background: var(--bg-card);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            border-radius: 16px;
+            backdrop-filter: blur(20px);
+        }
+
+            .access-denied h2 {
+                color: var(--danger);
+                font-size: 28px;
+                margin-bottom: 12px;
+            }
     </style>
 </head>
 <body>
     <div class="container">
-        <a href="/" class="nav-link">← Kutubxonaga qaytish</a>
+        <a href="/" class="back-btn">← Kutubxonaga qaytish</a>
 
         <header>
-            <h1>⚙️ Kutubxona Boshqaruvi</h1>
-            <p class="subtitle">Yangi kitob qo'shing, sahifalar yuklang, o'chiring</p>
+            <div class="header-icon">⚙️</div>
+            <h1>Admin Panel</h1>
+            <p class="subtitle">Kitoblarni boshqarish, sahifalar yuklash va o'chirish</p>
         </header>
 
-        <!-- 1. YANGI KITOB -->
-        <div class="form-card">
-            <div class="card-title">📕 1. Yangi kitob qo'shish</div>
-            <div class="form-group">
-                <label for="newTitle">Kitob nomi *</label>
-                <input type="text" id="newTitle" placeholder="Masalan: Kecha va kunduz">
-            </div>
-            <div class="form-group">
-                <label for="newAuthor">Muallif *</label>
-                <input type="text" id="newAuthor" placeholder="Masalan: Cho'lpon">
-            </div>
-            <div class="form-row-3">
-                <div class="form-group">
-                    <label for="newYear">Nashr yili</label>
-                    <input type="number" id="newYear" placeholder="1936" min="1000" max="2100">
+        <div id="content" style="display:none;">
+            <!-- STATISTIKA -->
+            <div class="stats-grid" id="statsGrid"></div>
+
+            <!-- YANGI KITOB -->
+            <div class="card">
+                <div class="card-title">📕 Yangi kitob qo'shish</div>
+                <div class="form-row cols-3">
+                    <div class="form-field">
+                        <label>Kitob nomi *</label>
+                        <input type="text" id="newTitle" placeholder="Masalan: O'tkan kunlar">
+                    </div>
+                    <div class="form-field">
+                        <label>Muallif *</label>
+                        <input type="text" id="newAuthor" placeholder="Abdulla Qodiriy">
+                    </div>
+                    <div class="checkbox-wrap">
+                        <input type="checkbox" id="newAvailable" checked>
+                        <label for="newAvailable" style="margin:0;">Mavjud</label>
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label for="newCategory">Kategoriya</label>
-                    <input type="text" id="newCategory" placeholder="Masalan: O'zbek romani" list="categoryList">
-                    <datalist id="categoryList">
-                        <option value="O'zbek romani">
-                        <option value="O'zbek hikoyasi">
-                        <option value="Chet el adabiyoti">
-                        <option value="Klassik adabiyot">
-                        <option value="Detektiv">
-                        <option value="Fantastika">
-                        <option value="Tarixiy">
-                        <option value="Bolalar uchun">
-                        <option value="She'r">
-                        <option value="Ilmiy">
-                        <option value="Falsafiy">
-                        <option value="Biografiya">
-                        <option value="Boshqa">
-                    </datalist>
+                <div class="form-row cols-3">
+                    <div class="form-field">
+                        <label>Nashr yili</label>
+                        <input type="number" id="newYear" placeholder="1925" min="1000" max="2100">
+                    </div>
+                    <div class="form-field">
+                        <label>Kategoriya</label>
+                        <input type="text" id="newCategory" placeholder="Klassika">
+                    </div>
+                    <button class="btn btn-primary" onclick="createBook()">+ Yaratish</button>
                 </div>
-                <div class="form-group">
-                    <label>&nbsp;</label>
-                    <label class="checkbox-group"><input type="checkbox" id="newAvailable" checked><span>Mavjud</span></label>
-                </div>
+                <div class="status-msg" id="createStatus"></div>
             </div>
-            <button class="btn btn-green" id="createBookBtn" onclick="createBook()">➕ Kitob yaratish</button>
-            <div id="bookStatus" class="status"></div>
+
+            <!-- PDF YUKLASH -->
+            <div class="card">
+                <div class="card-title">📄 PDF dan sahifalar yuklash</div>
+                <div class="form-field">
+                    <label>Kitobni tanlang</label>
+                    <select id="pdfBookSelect">
+                        <option value="">-- Kitob tanlang --</option>
+                    </select>
+                </div>
+                <label class="upload-area" for="pdfInput">
+                    <div class="upload-icon">📁</div>
+                    <div style="font-weight:600; margin-bottom:4px;">PDF faylni tanlang</div>
+                    <div style="color:var(--text-dim); font-size:13px;">Matn avtomatik ajratiladi va sahifalarga bo'linadi</div>
+                    <input type="file" id="pdfInput" accept=".pdf" style="display:none;" onchange="handlePdfSelected(event)">
+                </label>
+                <div class="progress-bar" id="pdfProgress" style="display:none;">
+                    <div class="progress-fill" id="pdfFill"></div>
+                </div>
+                <div class="status-msg" id="pdfStatus"></div>
+            </div>
+
+            <!-- KITOBLAR RO'YXATI -->
+            <div class="card">
+                <div class="card-title">📚 Barcha kitoblar</div>
+                <div id="booksList"></div>
+            </div>
         </div>
 
-        <!-- 2. SAHIFA QO'SHISH -->
-        <div class="form-card">
-            <div class="card-title">📄 2. Kitobga sahifalar qo'shish</div>
-            <div class="form-group">
-                <label for="bookSelect">Kitobni tanlang</label>
-                <select id="bookSelect"><option value="">Yuklanmoqda...</option></select>
-            </div>
-            <div class="form-group">
-                <label>PDF fayldan matn olish (ixtiyoriy)</label>
-                <div class="pdf-upload-section" id="pdfDropZone" onclick="document.getElementById('pdfInput').click()">
-                    <div class="pdf-icon">📁</div>
-                    <div class="pdf-upload-text">PDF faylni tanlang yoki bu yerga tashlang</div>
-                    <div class="pdf-upload-hint">Faqat matn-asosli PDF lar</div>
-                    <input type="file" id="pdfInput" accept=".pdf" onchange="handlePdfUpload(event)">
-                </div>
-                <div class="pdf-file-name" id="pdfFileName"></div>
-                <div class="progress-container" id="progressContainer">
-                    <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
-                    <div class="progress-text" id="progressText"></div>
-                </div>
-            </div>
-            <div class="form-group">
-                <label for="content">Kitob matni</label>
-                <textarea id="content" placeholder="Paragraflar uchun 2 marta ENTER bosing..."></textarea>
-                <div class="hint">📏 <span id="charCount">0</span> belgi (~<span id="pageEstimate">0</span> ta sahifa)</div>
-            </div>
-            <div class="form-row">
-                <div class="form-group">
-                    <label for="charsPerPage">Bir sahifada nechta belgi</label>
-                    <input type="number" id="charsPerPage" value="2800" min="100" max="10000" onchange="updatePageEstimate()">
-                </div>
-                <div class="form-group">
-                    <label>&nbsp;</label>
-                    <label class="checkbox-group"><input type="checkbox" id="replaceExisting" checked><span>Eski sahifalarni almashtirish</span></label>
-                </div>
-            </div>
-            <button class="btn" id="submitBtn" onclick="submitContent()">✅ Sahifalarni qo'shish</button>
-            <div id="status" class="status"></div>
-        </div>
-
-        <!-- 3. KITOBLARNI BOSHQARISH -->
-        <div class="form-card">
-            <div class="card-title">🗑️ 3. Kitoblarni boshqarish</div>
-            <div class="books-toolbar">
-                <span class="books-count" id="booksCount">0 ta kitob</span>
-                <button class="refresh-btn" onclick="loadBooksManagement()">🔄 Yangilash</button>
-            </div>
-            <div id="booksList"><div class="empty-state">Yuklanmoqda...</div></div>
-            <button class="clear-all-btn" onclick="deleteAllBooks()">⚠️ HAMMA KITOBLARNI O'CHIRISH</button>
-            <div id="deleteStatus" class="status"></div>
+        <!-- ACCESS DENIED -->
+        <div id="accessDenied" class="access-denied" style="display:none;">
+            <h2>🚫 Ruxsat yo'q</h2>
+            <p style="color:var(--text-dim); margin-bottom:20px;">Bu sahifa faqat administratorlar uchun</p>
+            <a href="/" class="btn btn-secondary" style="text-decoration:none;">← Bosh sahifaga qaytish</a>
         </div>
     </div>
 
     <script>
-        const API_BASE = window.location.origin;
+        const API = window.location.origin + '/api';
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 
-        // ============ AUTH HELPER ============
-        function getToken() {
-            return localStorage.getItem('auth_token');
+        function getToken() { return localStorage.getItem('auth_token'); }
+        function getUser() {
+            const s = localStorage.getItem('auth_user');
+            return s ? JSON.parse(s) : null;
         }
-        function getAuthHeaders(includeJson = true) {
-            const headers = {};
-            const token = getToken();
-            if (token) headers['Authorization'] = `Bearer ${token}`;
-            if (includeJson) headers['Content-Type'] = 'application/json';
-            return headers;
+        function authHeaders(json = true) {
+            const h = { 'Authorization': `Bearer ${getToken()}` };
+            if (json) h['Content-Type'] = 'application/json';
+            return h;
         }
+
         function checkAdmin() {
-            const userStr = localStorage.getItem('auth_user');
-            if (!userStr) {
-                alert('Avval tizimga kiring!');
-                window.location.href = '/login.html';
+            const user = getUser();
+            if (!user || user.role !== 'Admin') {
+                document.getElementById('accessDenied').style.display = 'block';
                 return false;
             }
-            const user = JSON.parse(userStr);
-            if (user.role !== 'Admin') {
-                alert('Bu sahifa faqat Admin uchun!');
-                window.location.href = '/';
-                return false;
-            }
+            document.getElementById('content').style.display = 'block';
             return true;
         }
-        // Sahifa ochilganda admin ekanligini tekshirish
-        if (!checkAdmin()) {
-            throw new Error('Admin emas');
-        }
 
-        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+        // ========== KITOBLAR ==========
+        async function loadBooks() {
+            try {
+                const res = await fetch(`${API}/books?pageSize=100`);
+                const data = await res.json();
+                const books = data.items || data;
+
+                // Statistika
+                const stats = document.getElementById('statsGrid');
+                stats.innerHTML = `
+                        <div class="stat-card">
+                            <div class="stat-value">${books.length}</div>
+                            <div class="stat-label">📚 Jami kitoblar</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value">${books.filter(b => b.isAvailable).length}</div>
+                            <div class="stat-label">✅ Mavjud</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value">${new Set(books.map(b => b.category)).size}</div>
+                            <div class="stat-label">🏷️ Kategoriyalar</div>
+                        </div>
+                    `;
+
+                // PDF select
+                const select = document.getElementById('pdfBookSelect');
+                select.innerHTML = '<option value="">-- Kitob tanlang --</option>' +
+                    books.map(b => `<option value="${b.id}">${b.title} — ${b.author}</option>`).join('');
+
+                // Kitoblar ro'yxati
+                const list = document.getElementById('booksList');
+                if (books.length === 0) {
+                    list.innerHTML = '<p style="color:var(--text-dim); text-align:center; padding:20px;">Hali kitoblar yo\'q</p>';
+                    return;
+                }
+                list.innerHTML = books.map(b => `
+                        <div class="book-item">
+                            <div class="book-info">
+                                <h3>${b.title}</h3>
+                                <div class="meta">
+                                    ✍️ ${b.author} • 📅 ${b.year} •
+                                    <span class="badge">${b.category}</span>
+                                    ${b.isAvailable ? '<span class="badge" style="color:var(--success);">Mavjud</span>' : '<span class="badge" style="color:var(--danger);">Yo\'q</span>'}
+                                </div>
+                            </div>
+                            <div class="book-actions">
+                                <button class="btn btn-danger" onclick="deleteBook(${b.id}, '${b.title.replace(/'/g, "\\'")}')">🗑️ O'chirish</button>
+                            </div>
+                        </div>
+                    `).join('');
+            } catch (err) {
+                console.error('Xato:', err);
+            }
+        }
 
         async function createBook() {
             const title = document.getElementById('newTitle').value.trim();
             const author = document.getElementById('newAuthor').value.trim();
-            const year = document.getElementById('newYear').value;
+            const year = parseInt(document.getElementById('newYear').value) || new Date().getFullYear();
             const category = document.getElementById('newCategory').value.trim() || 'Boshqa';
             const isAvailable = document.getElementById('newAvailable').checked;
-            if (!title || !author) { showBookStatus('Kitob nomi va muallif majburiy!', 'error'); return; }
-            const btn = document.getElementById('createBookBtn');
-            btn.disabled = true; btn.textContent = 'Yaratilmoqda...';
-            try {
-                const response = await fetch(`${API_BASE}/api/Books`, {
-                    method: 'POST',
-                    headers: getAuthHeaders(),
-                    body: JSON.stringify({ title, author, year: year ? parseInt(year) : null, category, isAvailable })
-                });
-                if (!response.ok) throw new Error(await response.text() || `Status ${response.status}`);
-                const book = await response.json();
-                showBookStatus(`✅ "${book.title}" yaratildi! (ID: ${book.id})`, 'success');
-                document.getElementById('newTitle').value = '';
-                document.getElementById('newAuthor').value = '';
-                document.getElementById('newYear').value = '';
-                await loadBooks();
-                await loadBooksManagement();
-                document.getElementById('bookSelect').value = book.id;
-            } catch (error) {
-                showBookStatus('Xato: ' + error.message, 'error');
-            } finally {
-                btn.disabled = false; btn.textContent = '➕ Kitob yaratish';
-            }
-        }
+            const status = document.getElementById('createStatus');
 
-        function showBookStatus(message, type) {
-            const el = document.getElementById('bookStatus');
-            el.textContent = message; el.className = `status ${type}`;
-        }
-
-        document.getElementById('content').addEventListener('input', updatePageEstimate);
-        function updatePageEstimate() {
-            const length = document.getElementById('content').value.length;
-            const charsPerPage = parseInt(document.getElementById('charsPerPage').value) || 1500;
-            document.getElementById('charCount').textContent = length.toLocaleString();
-            document.getElementById('pageEstimate').textContent = Math.ceil(length / charsPerPage);
-        }
-
-        const dropZone = document.getElementById('pdfDropZone');
-        dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('dragover'); });
-        dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
-        dropZone.addEventListener('drop', e => {
-            e.preventDefault(); dropZone.classList.remove('dragover');
-            const file = e.dataTransfer.files[0];
-            if (file && file.type === 'application/pdf') handlePdfFile(file);
-            else showStatus('Faqat PDF fayllar!', 'error');
-        });
-
-        function handlePdfUpload(event) { const file = event.target.files[0]; if (file) handlePdfFile(file); }
-
-        async function handlePdfFile(file) {
-            const fileNameEl = document.getElementById('pdfFileName');
-            fileNameEl.textContent = `📄 ${file.name} (${(file.size / 1024).toFixed(1)} KB)`;
-            fileNameEl.style.display = 'block';
-            const progressContainer = document.getElementById('progressContainer');
-            const progressFill = document.getElementById('progressFill');
-            const progressText = document.getElementById('progressText');
-            progressContainer.style.display = 'block';
-            progressFill.style.width = '0%';
-            progressText.textContent = 'PDF yuklanmoqda...';
-            try {
-                const arrayBuffer = await file.arrayBuffer();
-                const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
-                let fullText = '';
-                for (let i = 1; i <= pdf.numPages; i++) {
-                    const page = await pdf.getPage(i);
-                    const textContent = await page.getTextContent();
-                    fullText += textContent.items.map(item => item.str).join(' ') + '\n\n';
-                    const percent = Math.round((i / pdf.numPages) * 100);
-                    progressFill.style.width = percent + '%';
-                    progressText.textContent = `Sahifa ${i} / ${pdf.numPages}...`;
-                }
-                fullText = fullText.replace(/[ \t]+/g, ' ').replace(/\n{3,}/g, '\n\n').trim();
-                document.getElementById('content').value = fullText;
-                updatePageEstimate();
-                progressText.textContent = `✅ ${fullText.length.toLocaleString()} ta belgi chiqarildi`;
-                showStatus(`PDF o'qildi! ${pdf.numPages} ta sahifadan matn olindi.`, 'success');
-                setTimeout(() => progressContainer.style.display = 'none', 3000);
-            } catch (error) {
-                progressContainer.style.display = 'none';
-                showStatus('PDF xato: ' + error.message, 'error');
-            }
-        }
-
-        async function loadBooks() {
-            try {
-                const response = await fetch(`${API_BASE}/api/Books`);
-                if (!response.ok) throw new Error('Kitoblarni yuklab bo\'lmadi');
-                const books = await response.json();
-                const select = document.getElementById('bookSelect');
-                select.innerHTML = '<option value="">— Tanlang —</option>';
-                books.forEach(book => {
-                    const opt = document.createElement('option');
-                    opt.value = book.id;
-                    opt.textContent = `${book.id}. ${book.title} — ${book.author}`;
-                    select.appendChild(opt);
-                });
-            } catch (error) { showStatus('Xato: ' + error.message, 'error'); }
-        }
-
-        function showStatus(message, type) {
-            const el = document.getElementById('status');
-            el.textContent = message; el.className = `status ${type}`;
-        }
-
-        async function submitContent() {
-            const bookId = document.getElementById('bookSelect').value;
-            const content = document.getElementById('content').value.trim();
-            const charsPerPage = parseInt(document.getElementById('charsPerPage').value);
-            const replaceExisting = document.getElementById('replaceExisting').checked;
-            if (!bookId) { showStatus('Kitobni tanlang!', 'error'); return; }
-            if (!content || content.length < 50) { showStatus('Matn juda qisqa!', 'error'); return; }
-            const btn = document.getElementById('submitBtn');
-            btn.disabled = true; btn.textContent = 'Yuborilmoqda...';
-            showStatus('Sahifalar qo\'shilmoqda...', 'info');
-            try {
-                const response = await fetch(`${API_BASE}/api/books/${bookId}/pages/bulk`, {
-                    method: 'POST',
-                    headers: getAuthHeaders(),
-                    body: JSON.stringify({ fullText: content, charactersPerPage: charsPerPage, replaceExisting })
-                });
-                if (!response.ok) throw new Error(await response.text() || `Status ${response.status}`);
-                const data = await response.json();
-                showStatus(`✅ ${data.totalPagesCreated} ta sahifa qo'shildi.`, 'success');
-                await loadBooksManagement();
-            } catch (error) {
-                showStatus('Xato: ' + error.message, 'error');
-            } finally {
-                btn.disabled = false; btn.textContent = '✅ Sahifalarni qo\'shish';
-            }
-        }
-
-        async function loadBooksManagement() {
-            const listEl = document.getElementById('booksList');
-            const countEl = document.getElementById('booksCount');
-            listEl.innerHTML = '<div class="empty-state">Yuklanmoqda...</div>';
-            try {
-                const response = await fetch(`${API_BASE}/api/Books`);
-                if (!response.ok) throw new Error('Kitoblarni yuklab bo\'lmadi');
-                const books = await response.json();
-                countEl.textContent = `${books.length} ta kitob`;
-                if (books.length === 0) {
-                    listEl.innerHTML = '<div class="empty-state">Hozircha kitoblar yo\'q.</div>';
-                    return;
-                }
-                const enriched = await Promise.all(books.map(async book => {
-                    let pagesCount = 0, commentsCount = 0;
-                    try { const pRes = await fetch(`${API_BASE}/api/books/${book.id}/pages`); if (pRes.ok) { const p = await pRes.json(); pagesCount = p.totalPages || 0; } } catch (e) { }
-                    try { const cRes = await fetch(`${API_BASE}/api/books/${book.id}/comments`); if (cRes.ok) { const c = await cRes.json(); commentsCount = c.totalComments || 0; } } catch (e) { }
-                    return { ...book, pagesCount, commentsCount };
-                }));
-                listEl.innerHTML = enriched.map(book => `
-                        <div class="book-row" id="bookRow-${book.id}">
-                            <div class="book-info-block">
-                                <div class="book-row-title">${escapeHtml(book.title)}</div>
-                                <div class="book-row-author">✍️ ${escapeHtml(book.author)}</div>
-                                <div class="book-row-meta">
-                                    <span>ID: ${book.id}</span>
-                                    <span>${escapeHtml(book.category)}</span>
-                                    <span>${book.year || '—'}</span>
-                                    <span>📄 ${book.pagesCount} sahifa</span>
-                                    <span>💬 ${book.commentsCount} izoh</span>
-                                </div>
-                            </div>
-                            <button class="delete-btn" onclick="deleteBook(${book.id}, '${escapeJs(book.title)}')">🗑️ O'chirish</button>
-                        </div>`).join('');
-            } catch (error) {
-                listEl.innerHTML = `<div class="empty-state" style="color:#fca5a5;">Xato: ${error.message}</div>`;
-            }
-        }
-
-        async function deleteBook(bookId, title) {
-            if (!confirm(`"${title}" kitobini rostdan o'chirmoqchimisiz?\n\nDIQQAT: Sahifalar va izohlar ham o'chiriladi!`)) return;
-            const row = document.getElementById(`bookRow-${bookId}`);
-            const btn = row?.querySelector('.delete-btn');
-            if (btn) { btn.disabled = true; btn.textContent = 'O\'chirilmoqda...'; }
-            try {
-                const response = await fetch(`${API_BASE}/api/Books/${bookId}`, {
-                    method: 'DELETE',
-                    headers: getAuthHeaders(false)
-                });
-                if (!response.ok && response.status !== 204) throw new Error(await response.text() || `Status ${response.status}`);
-                showDeleteStatus(`✅ "${title}" o'chirildi.`, 'success');
-                await loadBooksManagement();
-                await loadBooks();
-            } catch (error) {
-                showDeleteStatus(`Xato: ${error.message}`, 'error');
-                if (btn) { btn.disabled = false; btn.textContent = '🗑️ O\'chirish'; }
-            }
-        }
-
-        async function deleteAllBooks() {
-            const confirmation = prompt('⚠️ DIQQAT! Bu hamma kitoblarni, sahifalarni va izohlarni butunlay o\'chiradi.\n\nTasdiqlash uchun "HAMMASINI O\'CHIR" deb yozing:');
-            if (confirmation !== "HAMMASINI O'CHIR") {
-                if (confirmation !== null) showDeleteStatus('Bekor qilindi.', 'info');
+            if (!title || !author) {
+                status.className = 'status-msg error';
+                status.textContent = '❌ Kitob nomi va muallif majburiy';
                 return;
             }
+
             try {
-                const listResp = await fetch(`${API_BASE}/api/Books`);
-                if (!listResp.ok) throw new Error('Kitoblarni olib bo\'lmadi');
-                const books = await listResp.json();
-                if (books.length === 0) { showDeleteStatus('Kitoblar yo\'q.', 'info'); return; }
-                showDeleteStatus(`O'chirilmoqda... 0/${books.length}`, 'info');
-                let deleted = 0;
-                for (const book of books) {
-                    try {
-                        await fetch(`${API_BASE}/api/Books/${book.id}`, {
-                            method: 'DELETE',
-                            headers: getAuthHeaders(false)
-                        });
-                        deleted++;
-                        showDeleteStatus(`O'chirilmoqda... ${deleted}/${books.length}`, 'info');
-                    } catch (e) { }
-                }
-                showDeleteStatus(`✅ ${deleted} ta kitob o'chirildi.`, 'success');
-                await loadBooksManagement();
+                const res = await fetch(`${API}/books`, {
+                    method: 'POST',
+                    headers: authHeaders(),
+                    body: JSON.stringify({ title, author, year, category, isAvailable })
+                });
+                if (!res.ok) throw new Error(`Xato: ${res.status}`);
+                status.className = 'status-msg success';
+                status.textContent = '✅ Kitob yaratildi!';
+                document.getElementById('newTitle').value = '';
+                document.getElementById('newAuthor').value = '';
+                document.getElementById('newCategory').value = '';
                 await loadBooks();
-            } catch (error) {
-                showDeleteStatus('Xato: ' + error.message, 'error');
+                setTimeout(() => status.className = 'status-msg', 3000);
+            } catch (err) {
+                status.className = 'status-msg error';
+                status.textContent = '❌ ' + err.message;
             }
         }
 
-        function showDeleteStatus(message, type) {
-            const el = document.getElementById('deleteStatus');
-            el.textContent = message; el.className = `status ${type}`;
+        async function deleteBook(id, title) {
+            if (!confirm(`"${title}" kitobini o'chirmoqchimisiz?`)) return;
+            try {
+                const res = await fetch(`${API}/books/${id}`, {
+                    method: 'DELETE',
+                    headers: authHeaders(false)
+                });
+                if (!res.ok) throw new Error(`Xato: ${res.status}`);
+                await loadBooks();
+            } catch (err) { alert('Xato: ' + err.message); }
         }
 
-        function escapeHtml(text) {
-            const div = document.createElement('div');
-            div.textContent = String(text);
-            return div.innerHTML;
-        }
-        function escapeJs(text) {
-            return String(text).replace(/\\/g, '\\\\').replace(/'/g, "\\'");
+        // ========== PDF UPLOAD ==========
+        async function handlePdfSelected(event) {
+            const file = event.target.files[0];
+            const bookId = document.getElementById('pdfBookSelect').value;
+            const status = document.getElementById('pdfStatus');
+            const progress = document.getElementById('pdfProgress');
+            const fill = document.getElementById('pdfFill');
+
+            if (!bookId) {
+                status.className = 'status-msg error';
+                status.textContent = '❌ Avval kitobni tanlang';
+                return;
+            }
+            if (!file) return;
+
+            status.className = 'status-msg info';
+            status.textContent = '📖 PDF o\'qilmoqda...';
+            progress.style.display = 'block';
+            fill.style.width = '10%';
+
+            try {
+                const reader = new FileReader();
+                reader.onload = async () => {
+                    const pdf = await pdfjsLib.getDocument(new Uint8Array(reader.result)).promise;
+                    let fullText = '';
+                    for (let i = 1; i <= pdf.numPages; i++) {
+                        const page = await pdf.getPage(i);
+                        const content = await page.getTextContent();
+                        fullText += content.items.map(it => it.str).join(' ') + '\n\n';
+                        fill.style.width = (10 + (i / pdf.numPages) * 70) + '%';
+                    }
+
+                    status.textContent = '💾 Serverga yuborilmoqda...';
+                    const res = await fetch(`${API}/books/${bookId}/pages/bulk`, {
+                        method: 'POST',
+                        headers: authHeaders(),
+                        body: JSON.stringify({ fullText })
+                    });
+                    if (!res.ok) throw new Error('Server xatosi');
+                    const data = await res.json();
+                    fill.style.width = '100%';
+                    status.className = 'status-msg success';
+                    status.textContent = `✅ ${data.count || 'Sahifalar'} muvaffaqiyatli yuklandi!`;
+                    document.getElementById('pdfInput').value = '';
+                    setTimeout(() => {
+                        progress.style.display = 'none';
+                        status.className = 'status-msg';
+                    }, 3000);
+                };
+                reader.readAsArrayBuffer(file);
+            } catch (err) {
+                status.className = 'status-msg error';
+                status.textContent = '❌ ' + err.message;
+                progress.style.display = 'none';
+            }
         }
 
-        loadBooks();
-        loadBooksManagement();
+        // ========== INIT ==========
+        if (checkAdmin()) {
+            loadBooks();
+        }
     </script>
 </body>
 </html>

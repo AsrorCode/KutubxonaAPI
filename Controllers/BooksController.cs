@@ -1,261 +1,185 @@
+using KutubxonaAPI.Data;
+using KutubxonaAPI.DTOs;
 using KutubxonaAPI.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Authorization;
-using KutubxonaAPI.Data;
 
 namespace KutubxonaAPI.Controllers;
 
-/// <summary>
-/// Kitoblar bilan ishlash uchun API Controller.
-///
-/// Route: /api/books
-///
-/// CRUD amallar:
-/// - GET    /api/books         → Barcha kitoblarni olish
-/// - GET    /api/books/{id}    → Bitta kitobni olish
-/// - GET    /api/books/search  → Qidiruv
-/// - POST   /api/books         → Yangi kitob qo'shish
-/// - PUT    /api/books/{id}    → Kitobni yangilash
-/// - DELETE /api/books/{id}    → Kitobni o'chirish
-/// </summary>
 [ApiController]
 [Route("api/[controller]")]
-[Produces("application/json")]
 public class BooksController : ControllerBase
 {
     private readonly AppDbContext _context;
     private readonly ILogger<BooksController> _logger;
 
-    /// <summary>
-    /// Constructor - DbContext va Logger DI orqali keladi.
-    /// </summary>
     public BooksController(AppDbContext context, ILogger<BooksController> logger)
     {
         _context = context;
         _logger = logger;
     }
 
-    // ==========================================
-    // READ - Barcha kitoblarni olish
-    // ==========================================
-
-    /// <summary>
-    /// Barcha kitoblarni qaytaradi.
-    /// </summary>
-    /// <returns>Kitoblar ro'yxati</returns>
-    /// <response code="200">Muvaffaqiyatli</response>
+    // ============================================
+    // GET: /api/books?page=1&pageSize=20&category=Klassika&search=Qodiriy
+    // ============================================
     [HttpGet]
-    [ProducesResponseType(typeof(IEnumerable<Book>), StatusCodes.Status200OK)]
-    public async Task<ActionResult<IEnumerable<Book>>> GetBooks()
+    public async Task<ActionResult<PagedResult<Book>>> GetBooks(
+        [FromQuery] int page = 1,
+        [FromQuery] int pageSize = 20,
+        [FromQuery] string? category = null,
+        [FromQuery] string? search = null)
     {
-        _logger.LogInformation("Barcha kitoblar so'ralmoqda");
+        // Pagination cheklovlari
+        if (page < 1) page = 1;
+        if (pageSize < 1) pageSize = 20;
+        if (pageSize > 100) pageSize = 100;
 
-        var books = await _context.Books
+        var query = _context.Books.AsQueryable();
+
+        // Filter — kategoriya
+        if (!string.IsNullOrWhiteSpace(category) && category != "all")
+            query = query.Where(b => b.Category == category);
+
+        // Filter — qidiruv
+        if (!string.IsNullOrWhiteSpace(search))
+        {
+            var searchLower = search.ToLower();
+            query = query.Where(b =>
+                b.Title.ToLower().Contains(searchLower) ||
+                b.Author.ToLower().Contains(searchLower));
+        }
+
+        var totalCount = await query.CountAsync();
+
+        var items = await query
             .OrderByDescending(b => b.CreatedAt)
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
             .ToListAsync();
 
-        return Ok(books);
+        return Ok(new PagedResult<Book>
+        {
+            Items = items,
+            TotalCount = totalCount,
+            Page = page,
+            PageSize = pageSize
+        });
     }
 
-    // ==========================================
-    // READ - Bitta kitobni ID bo'yicha olish
-    // ==========================================
-
-    /// <summary>
-    /// ID bo'yicha bitta kitobni qaytaradi.
-    /// </summary>
-    /// <param name="id">Kitob ID raqami</param>
-    /// <returns>Kitob obyekti</returns>
-    /// <response code="200">Kitob topildi</response>
-    /// <response code="404">Kitob topilmadi</response>
-    [HttpGet("{id:int}")]
-    [ProducesResponseType(typeof(Book), StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    // ============================================
+    // GET: /api/books/{id}
+    // ============================================
+    [HttpGet("{id}")]
     public async Task<ActionResult<Book>> GetBook(int id)
     {
         var book = await _context.Books.FindAsync(id);
 
         if (book == null)
-        {
-            _logger.LogWarning("Kitob topilmadi. ID: {Id}", id);
-            return NotFound(new { message = $"ID = {id} bo'lgan kitob topilmadi" });
-        }
+            return NotFound(new { message = "Kitob topilmadi" });
 
         return Ok(book);
     }
 
-    // ==========================================
-    // READ - Qidiruv
-    // ==========================================
-
-    /// <summary>
-    /// Kitob nomi yoki muallif bo'yicha qidiradi.
-    /// </summary>
-    /// <param name="query">Qidiruv so'zi</param>
-    /// <returns>Mos keladigan kitoblar</returns>
-    [HttpGet("search")]
-    [ProducesResponseType(typeof(IEnumerable<Book>), StatusCodes.Status200OK)]
-    public async Task<ActionResult<IEnumerable<Book>>> SearchBooks([FromQuery] string query)
+    // ============================================
+    // GET: /api/books/categories — barcha kategoriyalar
+    // ============================================
+    [HttpGet("categories")]
+    public async Task<ActionResult<IEnumerable<string>>> GetCategories()
     {
-        if (string.IsNullOrWhiteSpace(query))
-        {
-            return await GetBooks();
-        }
-
-        var lowerQuery = query.ToLower();
-
-        var books = await _context.Books
-            .Where(b => b.Title.ToLower().Contains(lowerQuery)
-                     || b.Author.ToLower().Contains(lowerQuery)
-                     || b.Category.ToLower().Contains(lowerQuery))
+        var categories = await _context.Books
+            .Select(b => b.Category)
+            .Distinct()
+            .OrderBy(c => c)
             .ToListAsync();
 
-        return Ok(books);
+        return Ok(categories);
     }
 
-    // ==========================================
-    // CREATE - Yangi kitob qo'shish
-    // ==========================================
-
-    /// <summary>
-    /// Yangi kitob qo'shadi.
-    /// </summary>
-    /// <param name="book">Yangi kitob ma'lumotlari</param>
-    /// <returns>Yaratilgan kitob (ID bilan)</returns>
-    /// <response code="201">Kitob muvaffaqiyatli yaratildi</response>
-    /// <response code="400">Noto'g'ri ma'lumot</response>
-    [Authorize(Roles = "Admin")]
+    // ============================================
+    // POST: /api/books — Yangi kitob (ADMIN)
+    // ============================================
     [HttpPost]
-    [ProducesResponseType(typeof(Book), StatusCodes.Status201Created)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<ActionResult<Book>> CreateBook([FromBody] Book book)
+    [Authorize(Roles = "Admin")]
+    public async Task<ActionResult<Book>> CreateBook(Book book)
     {
-        // Model validatsiyasi (DataAnnotations orqali)
         if (!ModelState.IsValid)
-        {
             return BadRequest(ModelState);
-        }
 
-        // ID'ni avtomatik berishi uchun 0 qilamiz
-        book.Id = 0;
         book.CreatedAt = DateTime.UtcNow;
-        book.UpdatedAt = null;
+        book.UpdatedAt = DateTime.UtcNow;
 
         _context.Books.Add(book);
         await _context.SaveChangesAsync();
 
         _logger.LogInformation("Yangi kitob qo'shildi: {Title}", book.Title);
 
-        // 201 Created javobini qaytaramiz, headerda yangi resurs URL'i bilan
         return CreatedAtAction(nameof(GetBook), new { id = book.Id }, book);
     }
 
-    // ==========================================
-    // UPDATE - Kitobni yangilash
-    // ==========================================
-
-    /// <summary>
-    /// Mavjud kitobni yangilaydi.
-    /// </summary>
-    /// <param name="id">Yangilanadigan kitob ID si</param>
-    /// <param name="updatedBook">Yangi ma'lumotlar</param>
+    // ============================================
+    // PUT: /api/books/{id} — To'liq yangilash (ADMIN)
+    // ============================================
+    [HttpPut("{id}")]
     [Authorize(Roles = "Admin")]
-    [HttpPut("{id:int}")]
-    [ProducesResponseType(typeof(Book), StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<ActionResult<Book>> UpdateBook(int id, [FromBody] Book updatedBook)
+    public async Task<IActionResult> UpdateBook(int id, Book updatedBook)
     {
-        if (!ModelState.IsValid)
-        {
-            return BadRequest(ModelState);
-        }
+        if (id != updatedBook.Id)
+            return BadRequest(new { message = "ID mos kelmayapti" });
 
-        var existingBook = await _context.Books.FindAsync(id);
-
-        if (existingBook == null)
-        {
-            return NotFound(new { message = $"ID = {id} bo'lgan kitob topilmadi" });
-        }
-
-        // Maydonlarni yangilash
-        existingBook.Title = updatedBook.Title;
-        existingBook.Author = updatedBook.Author;
-        existingBook.Year = updatedBook.Year;
-        existingBook.Category = updatedBook.Category;
-        existingBook.IsAvailable = updatedBook.IsAvailable;
-        existingBook.UpdatedAt = DateTime.UtcNow;
-
-        try
-        {
-            await _context.SaveChangesAsync();
-            _logger.LogInformation("Kitob yangilandi. ID: {Id}", id);
-        }
-        catch (DbUpdateConcurrencyException)
-        {
-            // Bir vaqtda bir nechta o'zgartirish bo'lsa
-            return Conflict(new { message = "Kitob boshqa joyda o'zgartirilgan" });
-        }
-
-        return Ok(existingBook);
-    }
-
-    // ==========================================
-    // DELETE - Kitobni o'chirish
-    // ==========================================
-
-    /// <summary>
-    /// Kitobni o'chiradi.
-    /// </summary>
-    /// <param name="id">O'chiriladigan kitob ID si</param>
-    [Authorize(Roles = "Admin")]
-    [HttpDelete("{id:int}")]
-    [ProducesResponseType(StatusCodes.Status204NoContent)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> DeleteBook(int id)
-    {
         var book = await _context.Books.FindAsync(id);
-
         if (book == null)
-        {
-            return NotFound(new { message = $"ID = {id} bo'lgan kitob topilmadi" });
-        }
+            return NotFound(new { message = "Kitob topilmadi" });
 
-        _context.Books.Remove(book);
+        book.Title = updatedBook.Title;
+        book.Author = updatedBook.Author;
+        book.Year = updatedBook.Year;
+        book.Category = updatedBook.Category;
+        book.IsAvailable = updatedBook.IsAvailable;
+        book.UpdatedAt = DateTime.UtcNow;
+
         await _context.SaveChangesAsync();
 
-        _logger.LogInformation("Kitob o'chirildi. ID: {Id}, Nomi: {Title}", id, book.Title);
+        _logger.LogInformation("Kitob yangilandi: {Id}", id);
 
-        // 204 No Content - muvaffaqiyatli o'chirildi, qaytariladigan ma'lumot yo'q
         return NoContent();
     }
 
-    // ==========================================
-    // PARTIAL UPDATE - Faqat holat (status) ni yangilash
-    // ==========================================
-
-    /// <summary>
-    /// Faqat kitob holatini (mavjud/olingan) o'zgartiradi.
-    /// </summary>
+    // ============================================
+    // PATCH: /api/books/{id}/status — Faqat status (ADMIN)
+    // ============================================
+    [HttpPatch("{id}/status")]
     [Authorize(Roles = "Admin")]
-    [HttpPatch("{id:int}/status")]
-    [ProducesResponseType(typeof(Book), StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<Book>> UpdateStatus(int id, [FromQuery] bool isAvailable)
+    public async Task<IActionResult> UpdateStatus(int id, [FromBody] bool isAvailable)
     {
         var book = await _context.Books.FindAsync(id);
-
         if (book == null)
-        {
-            return NotFound(new { message = $"ID = {id} bo'lgan kitob topilmadi" });
-        }
+            return NotFound(new { message = "Kitob topilmadi" });
 
         book.IsAvailable = isAvailable;
         book.UpdatedAt = DateTime.UtcNow;
 
         await _context.SaveChangesAsync();
 
-        return Ok(book);
+        return Ok(new { message = "Status yangilandi", isAvailable });
+    }
+
+    // ============================================
+    // DELETE: /api/books/{id} — O'chirish (ADMIN)
+    // ============================================
+    [HttpDelete("{id}")]
+    [Authorize(Roles = "Admin")]
+    public async Task<IActionResult> DeleteBook(int id)
+    {
+        var book = await _context.Books.FindAsync(id);
+        if (book == null)
+            return NotFound(new { message = "Kitob topilmadi" });
+
+        _context.Books.Remove(book);
+        await _context.SaveChangesAsync();
+
+        _logger.LogInformation("Kitob o'chirildi: {Id}", id);
+
+        return NoContent();
     }
 }
