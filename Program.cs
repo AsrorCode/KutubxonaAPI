@@ -1,4 +1,4 @@
-using KutubxonaAPI.Data;
+using KutubxonaAPI.Controllers.Data;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;

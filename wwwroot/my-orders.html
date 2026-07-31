@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mening buyurtmalarim — Kutubxona</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-base: #0a0a0f;
+            --bg-elevated: #14141b;
+            --bg-card: rgba(20, 20, 27, 0.6);
+            --bg-glass: rgba(255, 255, 255, 0.03);
+            --border: rgba(255, 255, 255, 0.08);
+            --border-hover: rgba(139, 92, 246, 0.4);
+            --primary: #8b5cf6;
+            --primary-glow: rgba(139, 92, 246, 0.4);
+            --secondary: #06b6d4;
+            --accent: #ec4899;
+            --warning: #f59e0b;
+            --success: #10b981;
+            --danger: #ef4444;
+            --info: #3b82f6;
+            --text: #fafafa;
+            --text-dim: #a1a1aa;
+            --text-faint: #71717a;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            min-height: 100vh;
+            background: var(--bg-base);
+            background-image: radial-gradient(at 20% 0%, rgba(139, 92, 246, 0.15) 0px, transparent 50%), radial-gradient(at 80% 0%, rgba(6, 182, 212, 0.1) 0px, transparent 50%);
+            background-attachment: fixed;
+            color: var(--text);
+            font-family: 'Inter', sans-serif;
+            line-height: 1.5;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 24px 24px 80px;
+        }
+
+        header {
+            text-align: center;
+            padding: 40px 0 32px;
+        }
+
+        .logo-icon {
+            display: inline-flex;
+            width: 56px;
+            height: 56px;
+            background: linear-gradient(135deg, var(--secondary), var(--primary));
+            border-radius: 14px;
+            align-items: center;
+            justify-content: center;
+            font-size: 30px;
+            box-shadow: 0 8px 32px var(--primary-glow);
+            margin-bottom: 12px;
+        }
+
+        h1 {
+            font-size: 42px;
+            font-weight: 800;
+            letter-spacing: -0.03em;
+            background: linear-gradient(135deg, #fff, #c4b5fd, #67e8f9);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .subtitle {
+            color: var(--text-dim);
+            font-size: 15px;
+            margin-bottom: 20px;
+        }
+
+        .top-nav {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .nav-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--text);
+            text-decoration: none;
+            padding: 10px 18px;
+            background: var(--bg-glass);
+            border: 1px solid var(--border);
+            border-radius: 999px;
+            font-size: 14px;
+            font-weight: 500;
+            backdrop-filter: blur(10px);
+            transition: all 0.2s;
+        }
+
+            .nav-pill:hover {
+                border-color: var(--border-hover);
+            }
+
+        .auth-bar {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 9999;
+            display: flex;
+            gap: 10px;
+        }
+
+        .user-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--bg-glass);
+            border: 1px solid var(--border);
+            padding: 8px 14px;
+            border-radius: 999px;
+            font-size: 13px;
+            backdrop-filter: blur(10px);
+        }
+
+        .admin-tag {
+            background: linear-gradient(135deg, var(--accent), var(--warning));
+            color: #fff;
+            padding: 2px 8px;
+            border-radius: 6px;
+            font-size: 10px;
+            font-weight: 700;
+        }
+
+        .auth-btn {
+            color: var(--text);
+            background: var(--bg-glass);
+            border: 1px solid var(--border);
+            padding: 8px 14px;
+            border-radius: 8px;
+            font-size: 13px;
+            cursor: pointer;
+            font-family: inherit;
+            backdrop-filter: blur(10px);
+        }
+
+        /* Stats summary */
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 14px;
+            margin-bottom: 32px;
+        }
+
+        .stat-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 20px;
+            backdrop-filter: blur(20px);
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 6px;
+            font-weight: 600;
+        }
+
+        .stat-value {
+            font-size: 28px;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+        }
+
+            .stat-value.purple {
+                color: var(--primary);
+            }
+
+            .stat-value.gold {
+                background: linear-gradient(135deg, var(--warning), var(--accent));
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+            }
+
+        /* Orders list */
+        .orders-list {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .order-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 22px;
+            backdrop-filter: blur(20px);
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+            .order-card::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                height: 1px;
+                background: linear-gradient(90deg, transparent, var(--primary), transparent);
+                opacity: 0;
+                transition: opacity 0.3s;
+            }
+
+            .order-card:hover {
+                border-color: var(--border-hover);
+                transform: translateY(-2px);
+            }
+
+                .order-card:hover::before {
+                    opacity: 1;
+                }
+
+        .order-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            padding-bottom: 14px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .order-id {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text);
+        }
+
+            .order-id .id-num {
+                color: var(--primary);
+            }
+
+        .order-date {
+            font-size: 12px;
+            color: var(--text-faint);
+            margin-top: 4px;
+        }
+
+        .order-status {
+            padding: 6px 14px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+        }
+
+        .status-Pending {
+            background: rgba(245, 158, 11, 0.15);
+            color: var(--warning);
+            border: 1px solid rgba(245, 158, 11, 0.3);
+        }
+
+        .status-Paid {
+            background: rgba(59, 130, 246, 0.15);
+            color: var(--info);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+        }
+
+        .status-Shipped {
+            background: rgba(139, 92, 246, 0.15);
+            color: var(--primary);
+            border: 1px solid rgba(139, 92, 246, 0.3);
+        }
+
+        .status-Delivered {
+            background: rgba(16, 185, 129, 0.15);
+            color: var(--success);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+
+        .status-Cancelled {
+            background: rgba(239, 68, 68, 0.15);
+            color: var(--danger);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+
+        .order-items {
+            margin-bottom: 16px;
+        }
+
+        .order-item-row {
+            display: grid;
+            grid-template-columns: 1fr auto auto;
+            gap: 12px;
+            padding: 10px 0;
+            font-size: 14px;
+            border-bottom: 1px dashed rgba(255, 255, 255, 0.05);
+        }
+
+            .order-item-row:last-child {
+                border-bottom: none;
+            }
+
+        .order-item-info {
+            min-width: 0;
+        }
+
+        .order-item-title {
+            color: var(--text);
+            font-weight: 600;
+        }
+
+        .order-item-author {
+            color: var(--text-dim);
+            font-size: 12px;
+            margin-top: 2px;
+        }
+
+        .order-item-qty {
+            color: var(--text-dim);
+            font-size: 13px;
+        }
+
+        .order-item-price {
+            color: var(--warning);
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .order-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 14px;
+            border-top: 1px solid var(--border);
+        }
+
+        .order-meta {
+            font-size: 12px;
+            color: var(--text-faint);
+        }
+
+        .order-total {
+            font-size: 22px;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--warning), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -0.02em;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 80px 30px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            backdrop-filter: blur(20px);
+        }
+
+        .empty-emoji {
+            font-size: 64px;
+            margin-bottom: 16px;
+        }
+
+        .empty-title {
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .empty-text {
+            color: var(--text-dim);
+            margin-bottom: 24px;
+        }
+
+        .empty-btn {
+            display: inline-block;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            color: #fff;
+            padding: 12px 28px;
+            border-radius: 10px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 14px;
+            transition: transform 0.2s;
+        }
+
+            .empty-btn:hover {
+                transform: translateY(-2px);
+            }
+
+        .loading {
+            text-align: center;
+            padding: 60px;
+            color: var(--text-dim);
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 32px;
+            height: 32px;
+            border: 2px solid var(--border);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin-bottom: 12px;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        @media (max-width: 600px) {
+            h1 {
+                font-size: 32px;
+            }
+
+            .order-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 8px;
+            }
+
+            .auth-bar {
+                top: 15px;
+                right: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="auth-bar" id="authBar"></div>
+
+    <div class="container">
+        <header>
+            <div class="logo-icon">📦</div>
+            <h1>Mening buyurtmalarim</h1>
+            <p class="subtitle">Sotib olgan kitoblaringiz tarixi va holati</p>
+            <div class="top-nav">
+                <a href="/" class="nav-pill">📚 O'qish bo'limi</a>
+                <a href="/market.html" class="nav-pill">🛒 Marketplace</a>
+            </div>
+        </header>
+
+        <div id="content">
+            <div class="loading"><div class="spinner"></div><p>Buyurtmalar yuklanmoqda...</p></div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = window.location.origin;
+
+        function getCurrentUser() {
+            const userStr = localStorage.getItem('auth_user');
+            return userStr ? JSON.parse(userStr) : null;
+        }
+        function getToken() { return localStorage.getItem('auth_token'); }
+        function logout() {
+            if (!confirm('Tizimdan chiqmoqchimisiz?')) return;
+            localStorage.removeItem('auth_token');
+            localStorage.removeItem('auth_user');
+            window.location.href = '/';
+        }
+
+        function renderAuthBar() {
+            const user = getCurrentUser();
+            const bar = document.getElementById('authBar');
+            if (user) {
+                const isAdmin = user.role === 'Admin';
+                const badge = isAdmin ? '<span class="admin-tag">ADMIN</span>' : '';
+                bar.innerHTML = `
+                    <span class="user-pill">👤 ${escapeHtml(user.firstName)} ${badge}</span>
+                    <button class="auth-btn" onclick="logout()">Chiqish</button>
+                `;
+            } else {
+                bar.innerHTML = `
+                    <a href="/login.html" class="auth-btn">Kirish</a>
+                    <a href="/register.html" class="auth-btn">Ro'yxatdan o'tish</a>
+                `;
+            }
+        }
+
+        const STATUS_LABELS = {
+            'Pending': 'Kutilmoqda',
+            'Paid': 'To\'langan',
+            'Shipped': 'Yuborildi',
+            'Delivered': 'Yetkazildi',
+            'Cancelled': 'Bekor qilindi'
+        };
+
+        async function loadOrders() {
+            const user = getCurrentUser();
+            const token = getToken();
+            const contentEl = document.getElementById('content');
+
+            if (!user || !token) {
+                contentEl.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-emoji">🔒</div>
+                        <div class="empty-title">Tizimga kirish kerak</div>
+                        <p class="empty-text">Buyurtmalaringizni ko'rish uchun avval ro'yxatdan o'ting yoki kiring.</p>
+                        <a href="/login.html" class="empty-btn">Kirish →</a>
+                    </div>`;
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}/api/orders/my`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (response.status === 401) {
+                    contentEl.innerHTML = `
+                        <div class="empty-state">
+                            <div class="empty-emoji">⏱️</div>
+                            <div class="empty-title">Sessiya tugagan</div>
+                            <p class="empty-text">Iltimos, qayta kiring.</p>
+                            <a href="/login.html" class="empty-btn">Kirish →</a>
+                        </div>`;
+                    return;
+                }
+
+                if (!response.ok) throw new Error(`Status ${response.status}`);
+                const orders = await response.json();
+
+                if (orders.length === 0) {
+                    contentEl.innerHTML = `
+                        <div class="empty-state">
+                            <div class="empty-emoji">📦</div>
+                            <div class="empty-title">Hali buyurtmalar yo'q</div>
+                            <p class="empty-text">Marketplace bo'limiga o'tib, birinchi buyurtmangizni bering!</p>
+                            <a href="/market.html" class="empty-btn">🛒 Marketplace'ga →</a>
+                        </div>`;
+                    return;
+                }
+
+                // Statistika
+                const totalOrders = orders.length;
+                const totalSpent = orders.reduce((sum, o) => sum + o.totalAmount, 0);
+                const totalBooks = orders.reduce((sum, o) => sum + (o.items?.length || o.itemsCount || 0), 0);
+
+                let html = `
+                    <div class="stats-row">
+                        <div class="stat-card">
+                            <div class="stat-label">📦 Jami buyurtmalar</div>
+                            <div class="stat-value purple">${totalOrders}</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label">📚 Sotib olingan kitoblar</div>
+                            <div class="stat-value purple">${totalBooks}</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label">💰 Jami sarflangan</div>
+                            <div class="stat-value gold">${formatPrice(totalSpent)} so'm</div>
+                        </div>
+                    </div>
+
+                    <div class="orders-list">
+                `;
+
+                html += orders.map(order => {
+                    const items = (order.items || []).map(item => `
+                        <div class="order-item-row">
+                            <div class="order-item-info">
+                                <div class="order-item-title">${escapeHtml(item.bookTitle || 'Kitob')}</div>
+                                <div class="order-item-author">${escapeHtml(item.bookAuthor || '')}</div>
+                            </div>
+                            <div class="order-item-qty">×${item.quantity}</div>
+                            <div class="order-item-price">${formatPrice(item.subtotal || item.priceAtOrder * item.quantity)} so'm</div>
+                        </div>
+                    `).join('');
+
+                    const statusLabel = STATUS_LABELS[order.status] || order.status;
+                    return `
+                        <div class="order-card">
+                            <div class="order-header">
+                                <div>
+                                    <div class="order-id">Buyurtma <span class="id-num">#${order.id}</span></div>
+                                    <div class="order-date">${formatDate(order.createdAt)}</div>
+                                </div>
+                                <span class="order-status status-${order.status}">${statusLabel}</span>
+                            </div>
+                            <div class="order-items">${items}</div>
+                            <div class="order-footer">
+                                <div class="order-meta">${(order.items || []).length} ta kitob</div>
+                                <div class="order-total">${formatPrice(order.totalAmount)} so'm</div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+
+                html += '</div>';
+                contentEl.innerHTML = html;
+
+            } catch (error) {
+                contentEl.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-emoji">⚠️</div>
+                        <div class="empty-title">Xato yuz berdi</div>
+                        <p class="empty-text">${escapeHtml(error.message)}</p>
+                    </div>`;
+            }
+        }
+
+        function formatPrice(n) { return Number(n).toLocaleString('uz-UZ'); }
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = String(text ?? '');
+            return div.innerHTML;
+        }
+        function formatDate(dateStr) {
+            if (!dateStr) return '';
+            const d = new Date(dateStr);
+            return d.toLocaleDateString('uz-UZ', { day: '2-digit', month: 'long', year: 'numeric' }) +
+                   ' ' + d.toLocaleTimeString('uz-UZ', { hour: '2-digit', minute: '2-digit' });
+        }
+
+        renderAuthBar();
+        loadOrders();
+    </script>
+</body>
+</html>

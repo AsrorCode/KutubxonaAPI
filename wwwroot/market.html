@@ -1,0 +1,1102 @@
+﻿<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Marketplace — Kutubxona</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-base: #0a0a0f;
+            --bg-elevated: #14141b;
+            --bg-card: rgba(20, 20, 27, 0.6);
+            --bg-glass: rgba(255, 255, 255, 0.03);
+            --border: rgba(255, 255, 255, 0.08);
+            --border-hover: rgba(139, 92, 246, 0.4);
+            --primary: #8b5cf6;
+            --primary-glow: rgba(139, 92, 246, 0.4);
+            --secondary: #06b6d4;
+            --accent: #ec4899;
+            --warning: #f59e0b;
+            --success: #10b981;
+            --danger: #ef4444;
+            --text: #fafafa;
+            --text-dim: #a1a1aa;
+            --text-faint: #71717a;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            min-height: 100vh;
+            background: var(--bg-base);
+            background-image: radial-gradient(at 20% 0%, rgba(139, 92, 246, 0.15) 0px, transparent 50%), radial-gradient(at 80% 0%, rgba(6, 182, 212, 0.1) 0px, transparent 50%), radial-gradient(at 50% 100%, rgba(236, 72, 153, 0.08) 0px, transparent 50%);
+            background-attachment: fixed;
+            color: var(--text);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            line-height: 1.5;
+        }
+
+        .container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 24px 24px 80px;
+        }
+
+        header {
+            text-align: center;
+            padding: 40px 0 32px;
+            position: relative;
+        }
+
+        .logo-icon {
+            display: inline-flex;
+            width: 56px;
+            height: 56px;
+            background: linear-gradient(135deg, var(--accent), var(--warning));
+            border-radius: 14px;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            box-shadow: 0 8px 32px rgba(236, 72, 153, 0.4);
+            margin-bottom: 12px;
+        }
+
+        h1 {
+            font-size: 48px;
+            font-weight: 800;
+            letter-spacing: -0.03em;
+            background: linear-gradient(135deg, #fff 0%, #f9a8d4 50%, #fbbf24 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .subtitle {
+            font-size: 16px;
+            color: var(--text-dim);
+            margin-bottom: 24px;
+        }
+
+        .top-nav {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 20px;
+        }
+
+        .nav-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--text);
+            text-decoration: none;
+            padding: 10px 18px;
+            background: var(--bg-glass);
+            border: 1px solid var(--border);
+            border-radius: 999px;
+            font-size: 14px;
+            font-weight: 500;
+            backdrop-filter: blur(10px);
+            transition: all 0.2s;
+        }
+
+            .nav-pill:hover {
+                border-color: var(--border-hover);
+                background: rgba(139, 92, 246, 0.1);
+                transform: translateY(-1px);
+            }
+
+            .nav-pill.primary {
+                background: linear-gradient(135deg, var(--primary), var(--accent));
+                border-color: transparent;
+            }
+
+        .auth-bar {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 9999;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .user-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--text);
+            background: var(--bg-glass);
+            border: 1px solid var(--border);
+            padding: 8px 14px;
+            border-radius: 999px;
+            font-size: 13px;
+            font-weight: 500;
+            backdrop-filter: blur(10px);
+        }
+
+        .admin-tag {
+            background: linear-gradient(135deg, var(--accent), var(--warning));
+            color: #fff;
+            padding: 2px 8px;
+            border-radius: 6px;
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+        }
+
+        .auth-btn {
+            color: var(--text);
+            text-decoration: none;
+            padding: 8px 14px;
+            background: var(--bg-glass);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            backdrop-filter: blur(10px);
+            font-family: inherit;
+            transition: all 0.2s;
+        }
+
+            .auth-btn:hover {
+                border-color: var(--border-hover);
+                background: rgba(139, 92, 246, 0.1);
+            }
+
+        .cart-icon {
+            position: fixed;
+            top: 20px;
+            right: 200px;
+            z-index: 9999;
+            background: linear-gradient(135deg, var(--accent), var(--warning));
+            color: #fff;
+            padding: 10px 18px;
+            border-radius: 999px;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            font-family: inherit;
+            box-shadow: 0 8px 24px rgba(236, 72, 153, 0.4);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+        }
+
+            .cart-icon:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 12px 32px rgba(236, 72, 153, 0.5);
+            }
+
+        .cart-badge {
+            background: #fff;
+            color: var(--accent);
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .search-wrap {
+            max-width: 640px;
+            margin: 0 auto 32px;
+            position: relative;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 14px 48px 14px 48px;
+            background: var(--bg-glass);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            color: var(--text);
+            font-size: 15px;
+            font-family: inherit;
+            outline: none;
+            backdrop-filter: blur(20px);
+            transition: all 0.2s;
+        }
+
+            .search-input::placeholder {
+                color: var(--text-faint);
+            }
+
+            .search-input:focus {
+                border-color: var(--primary);
+                box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.1);
+            }
+
+        .search-icon-left {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-dim);
+            font-size: 18px;
+            pointer-events: none;
+        }
+
+        .categories {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 32px;
+            justify-content: center;
+        }
+
+        .cat-chip {
+            background: var(--bg-glass);
+            color: var(--text);
+            border: 1px solid var(--border);
+            padding: 8px 18px;
+            border-radius: 999px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 500;
+            font-family: inherit;
+            backdrop-filter: blur(10px);
+            transition: all 0.2s;
+        }
+
+            .cat-chip:hover {
+                border-color: var(--border-hover);
+                background: rgba(139, 92, 246, 0.08);
+            }
+
+            .cat-chip.active {
+                background: linear-gradient(135deg, var(--primary), var(--accent));
+                border-color: transparent;
+                color: #fff;
+                font-weight: 600;
+            }
+
+        .book-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 20px;
+        }
+
+        .book-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 18px;
+            display: flex;
+            flex-direction: column;
+            backdrop-filter: blur(20px);
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+            .book-card::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                height: 1px;
+                background: linear-gradient(90deg, transparent, var(--primary), transparent);
+                opacity: 0;
+                transition: opacity 0.3s;
+            }
+
+            .book-card:hover {
+                border-color: var(--border-hover);
+                transform: translateY(-3px);
+                box-shadow: 0 16px 40px rgba(139, 92, 246, 0.15);
+            }
+
+                .book-card:hover::before {
+                    opacity: 1;
+                }
+
+        .book-image {
+            width: 100%;
+            height: 220px;
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.1), rgba(6, 182, 212, 0.05));
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 56px;
+            margin-bottom: 14px;
+            overflow: hidden;
+        }
+
+            .book-image img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+            }
+
+        .book-title {
+            font-size: 17px;
+            font-weight: 700;
+            margin-bottom: 4px;
+            letter-spacing: -0.01em;
+        }
+
+        .book-author {
+            color: var(--text-dim);
+            font-size: 13px;
+            margin-bottom: 10px;
+        }
+
+        .book-meta {
+            display: flex;
+            justify-content: space-between;
+            font-size: 11px;
+            color: var(--text-faint);
+            margin-bottom: 10px;
+        }
+
+        .badge {
+            background: var(--bg-glass);
+            border: 1px solid var(--border);
+            padding: 3px 10px;
+            border-radius: 999px;
+            color: var(--text-dim);
+            font-size: 11px;
+        }
+
+        .book-price {
+            font-size: 22px;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--warning), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 6px;
+            letter-spacing: -0.02em;
+        }
+
+        .book-stock {
+            font-size: 12px;
+            color: var(--success);
+            margin-bottom: 12px;
+            font-weight: 500;
+        }
+
+            .book-stock.low {
+                color: var(--warning);
+            }
+
+            .book-stock.out {
+                color: var(--danger);
+            }
+
+        .add-cart-btn {
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            color: #fff;
+            border: none;
+            padding: 11px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            font-family: inherit;
+            margin-top: auto;
+            transition: all 0.2s;
+        }
+
+            .add-cart-btn:hover:not(:disabled) {
+                transform: translateY(-1px);
+                box-shadow: 0 8px 20px var(--primary-glow);
+            }
+
+            .add-cart-btn:disabled {
+                opacity: 0.4;
+                cursor: not-allowed;
+            }
+
+        .admin-image-btn, .admin-delete-btn {
+            background: var(--bg-glass);
+            border: 1px solid var(--border);
+            padding: 8px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 11px;
+            font-weight: 500;
+            font-family: inherit;
+            margin-top: 6px;
+            width: 100%;
+            transition: all 0.2s;
+        }
+
+        .admin-image-btn {
+            color: var(--secondary);
+        }
+
+            .admin-image-btn:hover {
+                border-color: var(--secondary);
+                background: rgba(6, 182, 212, 0.1);
+            }
+
+        .admin-delete-btn {
+            color: var(--danger);
+        }
+
+            .admin-delete-btn:hover {
+                border-color: var(--danger);
+                background: rgba(239, 68, 68, 0.1);
+            }
+
+        /* Cart Modal */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(10, 10, 15, 0.8);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 40px 20px;
+            overflow-y: auto;
+        }
+
+            .modal-overlay.active {
+                display: flex;
+            }
+
+        .modal {
+            background: var(--bg-elevated);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            max-width: 600px;
+            width: 100%;
+            padding: 28px;
+            box-shadow: 0 24px 60px rgba(0, 0, 0, 0.6);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--border);
+        }
+
+            .modal-header h2 {
+                font-size: 20px;
+                font-weight: 700;
+                letter-spacing: -0.02em;
+            }
+
+        .close-modal {
+            background: var(--bg-glass);
+            border: 1px solid var(--border);
+            color: var(--text);
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            font-size: 18px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .cart-item {
+            background: var(--bg-glass);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 14px;
+            margin-bottom: 10px;
+            display: grid;
+            grid-template-columns: 1fr auto auto;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .cart-item-title {
+            color: var(--text);
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .cart-item-price {
+            color: var(--warning);
+            font-size: 12px;
+            margin-top: 4px;
+        }
+
+        .qty-controls {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .qty-btn {
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            color: #fff;
+            border: none;
+            width: 28px;
+            height: 28px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 700;
+            font-family: inherit;
+        }
+
+        .qty-num {
+            color: var(--text);
+            font-weight: 700;
+            min-width: 25px;
+            text-align: center;
+        }
+
+        .remove-btn {
+            background: none;
+            border: none;
+            color: var(--danger);
+            cursor: pointer;
+            font-size: 18px;
+        }
+
+        .cart-total {
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.1), rgba(236, 72, 153, 0.08));
+            border: 1px solid rgba(245, 158, 11, 0.3);
+            border-radius: 12px;
+            padding: 18px;
+            margin: 16px 0;
+            text-align: center;
+        }
+
+            .cart-total .label {
+                color: var(--text-dim);
+                font-size: 12px;
+            }
+
+            .cart-total .amount {
+                font-size: 32px;
+                font-weight: 800;
+                background: linear-gradient(135deg, var(--warning), var(--accent));
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                margin-top: 4px;
+                letter-spacing: -0.02em;
+            }
+
+        .checkout-form {
+            margin-top: 16px;
+        }
+
+        .form-field {
+            margin-bottom: 12px;
+        }
+
+            .form-field label {
+                display: block;
+                color: var(--text-dim);
+                font-size: 12px;
+                margin-bottom: 6px;
+                font-weight: 500;
+            }
+
+            .form-field input, .form-field textarea {
+                width: 100%;
+                padding: 10px 14px;
+                background: var(--bg-base);
+                color: var(--text);
+                border: 1px solid var(--border);
+                border-radius: 8px;
+                font-size: 14px;
+                font-family: inherit;
+                outline: none;
+            }
+
+                .form-field input:focus, .form-field textarea:focus {
+                    border-color: var(--primary);
+                }
+
+            .form-field textarea {
+                min-height: 60px;
+                resize: vertical;
+            }
+
+        .checkout-btn {
+            background: linear-gradient(135deg, var(--success), #34d399);
+            color: #fff;
+            border: none;
+            padding: 14px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            font-family: inherit;
+            width: 100%;
+            margin-top: 10px;
+            transition: transform 0.2s;
+        }
+
+            .checkout-btn:hover:not(:disabled) {
+                transform: translateY(-1px);
+            }
+
+            .checkout-btn:disabled {
+                opacity: 0.5;
+                cursor: not-allowed;
+            }
+
+        .empty-cart {
+            text-align: center;
+            padding: 30px;
+            color: var(--text-faint);
+            font-size: 14px;
+        }
+
+        .message {
+            text-align: center;
+            padding: 40px;
+            color: var(--text-dim);
+            background: var(--bg-glass);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            margin: 20px 0;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 60px;
+            color: var(--text-dim);
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 32px;
+            height: 32px;
+            border: 2px solid var(--border);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin-bottom: 12px;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: var(--bg-elevated);
+            color: var(--text);
+            padding: 12px 24px;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 500;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+            border: 1px solid var(--border);
+            opacity: 0;
+            transition: all 0.3s;
+            z-index: 2000;
+            backdrop-filter: blur(20px);
+        }
+
+            .toast.show {
+                transform: translateX(-50%) translateY(0);
+                opacity: 1;
+            }
+
+            .toast.success {
+                border-color: var(--success);
+            }
+
+            .toast.error {
+                border-color: var(--danger);
+            }
+
+        @media (max-width: 600px) {
+            .cart-icon {
+                right: 10px;
+                top: 70px;
+            }
+
+            .auth-bar {
+                top: 15px;
+                right: 10px;
+            }
+
+            h1 {
+                font-size: 36px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="auth-bar" id="authBar"></div>
+    <button class="cart-icon" id="cartIcon" onclick="openCart()">
+        🛒 Savatcha <span class="cart-badge" id="cartBadge">0</span>
+    </button>
+
+    <div class="container">
+        <header>
+            <div class="logo-icon">🛒</div>
+            <h1>Marketplace</h1>
+            <p class="subtitle">Kitoblarni xarid qiling — uyga yetkazib beriladi</p>
+            <div class="top-nav">
+                <a href="/" class="nav-pill">📚 O'qish bo'limi</a>
+                <a href="/my-orders.html" class="nav-pill">📦 Mening buyurtmalarim</a>
+            </div>
+        </header>
+
+        <div class="search-wrap">
+            <span class="search-icon-left">🔍</span>
+            <input type="text" id="searchInput" class="search-input" placeholder="Kitob nomi yoki muallifni qidiring..." oninput="onSearchInput()">
+        </div>
+
+        <div class="categories" id="categoriesBar"></div>
+
+        <div id="bookGrid" class="book-grid">
+            <div class="loading"><div class="spinner"></div><p>Kitoblar yuklanmoqda...</p></div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="cartModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h2>🛒 Savatcha</h2>
+                <button class="close-modal" onclick="closeCart()">×</button>
+            </div>
+            <div id="cartItems"></div>
+            <div class="cart-total">
+                <div class="label">Umumiy summa</div>
+                <div class="amount"><span id="cartTotal">0</span> so'm</div>
+            </div>
+            <div class="checkout-form" id="checkoutForm" style="display:none;">
+                <h3 style="color:var(--text);margin-bottom:12px;font-size:15px;">📦 Yetkazib berish ma'lumotlari</h3>
+                <div class="form-field">
+                    <label>Ismingiz</label>
+                    <input type="text" id="customerName" placeholder="Asror Haydarov">
+                </div>
+                <div class="form-field">
+                    <label>Telefon raqam</label>
+                    <input type="text" id="customerPhone" placeholder="+998 90 123 45 67">
+                </div>
+                <div class="form-field">
+                    <label>Manzil</label>
+                    <textarea id="deliveryAddress" placeholder="Toshkent shahri, Yunusobod tumani..."></textarea>
+                </div>
+                <div class="form-field">
+                    <label>Qo'shimcha izoh (ixtiyoriy)</label>
+                    <textarea id="orderNotes" placeholder="Qachon yetkazib berishni xohlasangiz..."></textarea>
+                </div>
+                <button class="checkout-btn" id="checkoutBtn" onclick="submitOrder()">✅ Buyurtma berish</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <script>
+        const API_BASE = window.location.origin;
+        let allBooks = [];
+        let selectedCategory = null;
+        let searchQuery = '';
+
+        function getCurrentUser() {
+            const userStr = localStorage.getItem('auth_user');
+            return userStr ? JSON.parse(userStr) : null;
+        }
+        function getToken() { return localStorage.getItem('auth_token'); }
+        function logout() {
+            if (!confirm('Tizimdan chiqmoqchimisiz?')) return;
+            localStorage.removeItem('auth_token');
+            localStorage.removeItem('auth_user');
+            window.location.reload();
+        }
+        function renderAuthBar() {
+            const user = getCurrentUser();
+            const bar = document.getElementById('authBar');
+            if (user) {
+                const isAdmin = user.role === 'Admin';
+                const badge = isAdmin ? '<span class="admin-tag">ADMIN</span>' : '';
+                bar.innerHTML = `
+                        <span class="user-pill">👤 ${escapeHtml(user.firstName)} ${badge}</span>
+                        <button class="auth-btn" onclick="logout()">Chiqish</button>
+                    `;
+            } else {
+                bar.innerHTML = `
+                        <a href="/login.html" class="auth-btn">Kirish</a>
+                        <a href="/register.html" class="auth-btn">Ro'yxatdan o'tish</a>
+                    `;
+            }
+        }
+
+        function getCart() { return JSON.parse(localStorage.getItem('cart') || '[]'); }
+        function saveCart(cart) {
+            localStorage.setItem('cart', JSON.stringify(cart));
+            updateCartBadge();
+        }
+        function updateCartBadge() {
+            const cart = getCart();
+            const count = cart.reduce((sum, item) => sum + item.quantity, 0);
+            document.getElementById('cartBadge').textContent = count;
+        }
+        function addToCart(book) {
+            const cart = getCart();
+            const existing = cart.find(i => i.id === book.id);
+            if (existing) {
+                if (existing.quantity < book.stock) {
+                    existing.quantity++;
+                    showToast(`"${book.title}" — savatchada ${existing.quantity} ta`, 'success');
+                } else {
+                    showToast(`Zaxira yetmaydi (faqat ${book.stock} dona)`, 'error');
+                    return;
+                }
+            } else {
+                cart.push({ id: book.id, title: book.title, author: book.author, price: book.price, stock: book.stock, quantity: 1 });
+                showToast(`"${book.title}" savatchaga qo'shildi!`, 'success');
+            }
+            saveCart(cart);
+        }
+        function changeQty(bookId, delta) {
+            const cart = getCart();
+            const item = cart.find(i => i.id === bookId);
+            if (!item) return;
+            item.quantity += delta;
+            if (item.quantity <= 0) cart.splice(cart.indexOf(item), 1);
+            else if (item.quantity > item.stock) { item.quantity = item.stock; showToast(`Zaxira faqat ${item.stock} dona`, 'error'); }
+            saveCart(cart);
+            renderCart();
+        }
+        function removeFromCart(bookId) {
+            saveCart(getCart().filter(i => i.id !== bookId));
+            renderCart();
+        }
+
+        async function deleteSaleBook(bookId, title) {
+            if (!confirm(`"${title}" kitobini sotuvdan o'chirmoqchimisiz?`)) return;
+            const token = getToken();
+            if (!token) { showToast('Avval tizimga kiring', 'error'); return; }
+            try {
+                const response = await fetch(`${API_BASE}/api/salebooks/${bookId}`, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (response.status === 403 || response.status === 401) { showToast('Faqat Admin o\'chira oladi', 'error'); return; }
+                if (!response.ok && response.status !== 204) throw new Error(`Status ${response.status}`);
+                showToast(`✅ "${title}" o'chirildi`, 'success');
+                await loadBooks();
+            } catch (error) { showToast('Xato: ' + error.message, 'error'); }
+        }
+
+        async function updateImage(bookId) {
+            const book = allBooks.find(b => b.id === bookId);
+            if (!book) return;
+            const newUrl = prompt(`"${book.title}" uchun rasm URL'i:`, book.imageUrl || '');
+            if (newUrl === null) return;
+            const token = getToken();
+            if (!token) { showToast('Avval tizimga kiring', 'error'); return; }
+            try {
+                const response = await fetch(`${API_BASE}/api/salebooks/${bookId}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                    body: JSON.stringify({
+                        title: book.title, author: book.author, description: book.description,
+                        price: book.price, stock: book.stock, imageUrl: newUrl.trim(),
+                        category: book.category, year: book.year
+                    })
+                });
+                if (!response.ok) throw new Error(`Status ${response.status}`);
+                showToast(`✅ Rasm yangilandi`, 'success');
+                await loadBooks();
+            } catch (error) { showToast('Xato: ' + error.message, 'error'); }
+        }
+
+        async function loadBooks() {
+            try {
+                const response = await fetch(`${API_BASE}/api/salebooks`);
+                if (!response.ok) throw new Error('Kitoblarni yuklab bo\'lmadi');
+                allBooks = await response.json();
+                renderCategories();
+                renderBooks();
+            } catch (error) {
+                document.getElementById('bookGrid').innerHTML = `<div class="message">Xato: ${error.message}</div>`;
+            }
+        }
+
+        function renderCategories() {
+            const bar = document.getElementById('categoriesBar');
+            const cats = [...new Set(allBooks.map(b => b.category || 'Boshqa'))].sort();
+            bar.innerHTML = `<button class="cat-chip ${!selectedCategory ? 'active' : ''}" onclick="selectCategory(null)">Hammasi</button>` +
+                cats.map(c => `<button class="cat-chip ${selectedCategory === c ? 'active' : ''}" onclick="selectCategory('${escapeJs(c)}')">${escapeHtml(c)}</button>`).join('');
+        }
+
+        function selectCategory(c) { selectedCategory = c; renderCategories(); renderBooks(); }
+
+        let searchTimeout;
+        function onSearchInput() {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => {
+                searchQuery = document.getElementById('searchInput').value.trim().toLowerCase();
+                renderBooks();
+            }, 300);
+        }
+
+        function renderBooks() {
+            const grid = document.getElementById('bookGrid');
+            const user = getCurrentUser();
+            const isAdmin = user && user.role === 'Admin';
+
+            let filtered = allBooks;
+            if (selectedCategory) filtered = filtered.filter(b => b.category === selectedCategory);
+            if (searchQuery) filtered = filtered.filter(b =>
+                b.title.toLowerCase().includes(searchQuery) ||
+                b.author.toLowerCase().includes(searchQuery)
+            );
+
+            if (filtered.length === 0) { grid.innerHTML = '<div class="message">Kitoblar topilmadi</div>'; return; }
+
+            grid.innerHTML = filtered.map(book => {
+                const stockClass = book.stock === 0 ? 'out' : (book.stock < 5 ? 'low' : '');
+                const stockText = book.stock === 0 ? '❌ Tugagan' : (book.stock < 5 ? `⚠️ ${book.stock} ta qoldi` : `✅ ${book.stock} ta mavjud`);
+                const imageBlock = book.imageUrl
+                    ? `<div class="book-image"><img src="${escapeHtml(book.imageUrl)}" alt="${escapeHtml(book.title)}" onerror="this.parentElement.innerHTML='📚'"></div>`
+                    : `<div class="book-image">📚</div>`;
+                const adminBtns = isAdmin
+                    ? `<button class="admin-image-btn" onclick="updateImage(${book.id})">📷 Rasm</button>
+                           <button class="admin-delete-btn" onclick="deleteSaleBook(${book.id}, '${escapeJs(book.title)}')">🗑️ O'chirish</button>`
+                    : '';
+                return `
+                        <div class="book-card">
+                            ${imageBlock}
+                            <div class="book-title">${escapeHtml(book.title)}</div>
+                            <div class="book-author">✍️ ${escapeHtml(book.author)}</div>
+                            <div class="book-meta">
+                                <span class="badge">${escapeHtml(book.category)}</span>
+                                <span>${book.year || '—'}</span>
+                            </div>
+                            <div class="book-price">${formatPrice(book.price)} so'm</div>
+                            <div class="book-stock ${stockClass}">${stockText}</div>
+                            <button class="add-cart-btn" onclick='addToCart(${JSON.stringify(book).replace(/'/g, "&#39;")})' ${book.stock === 0 ? 'disabled' : ''}>
+                                ${book.stock === 0 ? 'Tugagan' : "🛒 Savatchaga qo'shish"}
+                            </button>
+                            ${adminBtns}
+                        </div>`;
+            }).join('');
+        }
+
+        function openCart() { renderCart(); document.getElementById('cartModal').classList.add('active'); }
+        function closeCart() { document.getElementById('cartModal').classList.remove('active'); }
+        function renderCart() {
+            const cart = getCart();
+            const itemsEl = document.getElementById('cartItems');
+            const formEl = document.getElementById('checkoutForm');
+            if (cart.length === 0) {
+                itemsEl.innerHTML = '<div class="empty-cart">Savatcha bo\'sh — kitob qo\'shing!</div>';
+                document.getElementById('cartTotal').textContent = '0';
+                formEl.style.display = 'none';
+                return;
+            }
+            itemsEl.innerHTML = cart.map(item => `
+                    <div class="cart-item">
+                        <div>
+                            <div class="cart-item-title">${escapeHtml(item.title)}</div>
+                            <div class="cart-item-price">${formatPrice(item.price)} × ${item.quantity} = <strong>${formatPrice(item.price * item.quantity)} so'm</strong></div>
+                        </div>
+                        <div class="qty-controls">
+                            <button class="qty-btn" onclick="changeQty(${item.id}, -1)">−</button>
+                            <span class="qty-num">${item.quantity}</span>
+                            <button class="qty-btn" onclick="changeQty(${item.id}, 1)">+</button>
+                        </div>
+                        <button class="remove-btn" onclick="removeFromCart(${item.id})">🗑️</button>
+                    </div>
+                `).join('');
+            const total = cart.reduce((sum, i) => sum + i.price * i.quantity, 0);
+            document.getElementById('cartTotal').textContent = formatPrice(total);
+            formEl.style.display = 'block';
+            const user = getCurrentUser();
+            if (user) {
+                const nameEl = document.getElementById('customerName');
+                if (!nameEl.value) nameEl.value = `${user.firstName} ${user.lastName}`;
+            }
+        }
+
+        async function submitOrder() {
+            const user = getCurrentUser();
+            if (!user) { alert('Buyurtma berish uchun tizimga kirish kerak!'); window.location.href = '/login.html'; return; }
+            const name = document.getElementById('customerName').value.trim();
+            const phone = document.getElementById('customerPhone').value.trim();
+            const address = document.getElementById('deliveryAddress').value.trim();
+            const notes = document.getElementById('orderNotes').value.trim();
+            if (!name || !phone || !address) { showToast('Ism, telefon va manzilni to\'ldiring!', 'error'); return; }
+            const cart = getCart();
+            if (cart.length === 0) { showToast('Savatcha bo\'sh', 'error'); return; }
+
+            const btn = document.getElementById('checkoutBtn');
+            btn.disabled = true; btn.textContent = 'Yuborilmoqda...';
+            try {
+                const response = await fetch(`${API_BASE}/api/orders`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${getToken()}` },
+                    body: JSON.stringify({
+                        customerName: name, customerPhone: phone, deliveryAddress: address,
+                        notes: notes || null,
+                        items: cart.map(i => ({ saleBookId: i.id, quantity: i.quantity }))
+                    })
+                });
+                if (response.status === 401) { alert('Sizning sessiya tugagan, qayta kiring'); window.location.href = '/login.html'; return; }
+                if (!response.ok) { const err = await response.json().catch(() => ({})); throw new Error(err.message || `Xato: ${response.status}`); }
+                const data = await response.json();
+                showToast(`✅ Buyurtma yaratildi! ID: ${data.id}, Summa: ${formatPrice(data.totalAmount)} so'm`, 'success');
+                localStorage.removeItem('cart');
+                updateCartBadge();
+                closeCart();
+                setTimeout(() => { window.location.href = '/my-orders.html'; }, 2000);
+            } catch (error) {
+                showToast('Xato: ' + error.message, 'error');
+            } finally {
+                btn.disabled = false;
+                btn.textContent = '✅ Buyurtma berish';
+            }
+        }
+
+        function formatPrice(n) { return Number(n).toLocaleString('uz-UZ'); }
+        function showToast(msg, type = '') {
+            const t = document.getElementById('toast');
+            t.textContent = msg;
+            t.className = `toast show ${type}`;
+            setTimeout(() => t.classList.remove('show'), 3000);
+        }
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = String(text ?? '');
+            return div.innerHTML;
+        }
+        function escapeJs(text) { return String(text).replace(/\\/g, '\\\\').replace(/'/g, "\\'"); }
+
+        renderAuthBar();
+        updateCartBadge();
+        loadBooks();
+
+        document.addEventListener('keydown', e => { if (e.key === 'Escape') closeCart(); });
+    </script>
+</body>
+</html>
