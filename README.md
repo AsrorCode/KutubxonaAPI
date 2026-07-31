@@ -1,212 +1,314 @@
-# Kutubxona API — .NET CRUD Loyihasi
+# 📚 KutubxonaAPI — O'zbek Onlayn Kutubxona
 
-Bu loyiha **ASP.NET Core Web API** asosida yaratilgan oddiy CRUD ilovasidir. Kitoblar kutubxonasini boshqarish uchun mo'ljallangan.
+<div align="center">
 
-## Texnologiyalar
+![.NET](https://img.shields.io/badge/.NET-10.0-512BD4?style=for-the-badge&logo=dotnet)
+![C#](https://img.shields.io/badge/C%23-239120?style=for-the-badge&logo=c-sharp&logoColor=white)
+![EF Core](https://img.shields.io/badge/EF_Core-10.0-blue?style=for-the-badge)
+![SQL Server](https://img.shields.io/badge/SQL_Server-CC2927?style=for-the-badge&logo=microsoft-sql-server&logoColor=white)
+![JWT](https://img.shields.io/badge/JWT-000000?style=for-the-badge&logo=json-web-tokens&logoColor=white)
 
-- .NET 8
-- ASP.NET Core Web API
-- Entity Framework Core 8
-- SQL Server (LocalDB)
-- Scalar (zamonaviy API hujjatlari UI)
-- OpenAPI / Swagger spec
+**To'liq funksional o'zbek onlayn kutubxona platformasi**  
+Kitob o'qish · Sotib olish · Izohlar · 3D varaqlash · Admin panel
 
-## Loyiha tuzilishi
+[Xususiyatlar](#-xususiyatlar) · [Texnologiyalar](#-texnologiyalar) · [O'rnatish](#-ornatish) · [API](#-api-endpointlar) · [Ekran suratlar](#-ekran-suratlar)
 
-```
-KutubxonaAPI/
-├── Controllers/
-│   └── BooksController.cs      ← API endpointlar (GET, POST, PUT, DELETE)
-├── Models/
-│   └── Book.cs                 ← Kitob modeli (ma'lumotlar bazasi entity'si)
-├── Data/
-│   └── AppDbContext.cs         ← EF Core DbContext
-├── Properties/
-│   └── launchSettings.json     ← Ishga tushirish sozlamalari
-├── appsettings.json            ← Konfiguratsiya (connection string)
-├── Program.cs                  ← Asosiy entry point
-└── KutubxonaAPI.csproj         ← Loyiha fayli (NuGet paketlari)
-```
+</div>
 
-## Talablar
+---
 
-Loyihani ishga tushirish uchun quyidagilar o'rnatilgan bo'lishi kerak:
+## 📖 Loyiha haqida
 
-1. **.NET 8 SDK** — https://dotnet.microsoft.com/download
-2. **SQL Server LocalDB** — Visual Studio bilan birga keladi, yoki alohida o'rnatish mumkin
-3. **Visual Studio 2022** yoki **VS Code** (ixtiyoriy, lekin tavsiya etiladi)
+**KutubxonaAPI** — bu o'zbek adabiyotini onlayn o'qish va sotib olish uchun mo'ljallangan zamonaviy web platforma. Foydalanuvchilar bepul kitoblarni **3D varaqlash effekti** bilan o'qishlari, sevimlilariga izoh va reyting qoldirishlari, hamda kitob **sotib olish** imkoniyatlariga ega.
 
-## Loyihani ishga tushirish
+Loyiha **.NET 10** va **ASP.NET Core** asosida qurilgan, JWT autentifikatsiya va role-based avtorizatsiya bilan ta'minlangan.
 
-### 1. Loyiha papkasiga kirish
+---
 
+## ✨ Xususiyatlar
+
+### 👥 Foydalanuvchilar uchun
+- 📚 **Bepul o'qish** — Kitoblarni onlayn o'qish (3D varaqlash effekti)
+- 🔍 **Qidiruv va filtrlash** — Nom, muallif, kategoriya bo'yicha
+- 💬 **Izoh va reyting** — 1-5 yulduzli baholash tizimi
+- ❤️ **O'qish davom etishi** — Har kitob uchun progress avtomatik saqlanadi
+- 🛒 **Marketplace** — Kitoblarni sotib olish
+- 📦 **Buyurtmalar tarixi** — O'z buyurtmalarni kuzatish
+- 🌅 **Salomlashuv** — Vaqtga qarab shaxsiy salomlashuv (tong/kun/kech/tun)
+
+### 🛡️ Admin uchun
+- ⚙️ **Kitoblarni boshqarish** — Qo'shish, tahrirlash, o'chirish
+- 📄 **PDF yuklash** — PDF'dan matn avtomatik ajratiladi va sahifalarga bo'linadi (PDF.js)
+- 💼 **Sotuv boshqaruvi** — SaleBooks bilan ishlash
+- 📊 **Statistika** — Kitoblar, kategoriyalar, buyurtmalar
+- 🗑️ **Izoh moderatsiya** — Nomaqbul izohlarni o'chirish
+
+### 🔒 Xavfsizlik
+- 🔐 **JWT Bearer autentifikatsiya** — 7 kun amal qiladigan tokenlar
+- 🔑 **BCrypt parol hash** — Salt bilan xavfsiz saqlash
+- 👮 **Role-based avtorizatsiya** — User / Admin rollari
+- 🚫 **Rate Limiting** — Brute force hujumlaridan himoya (5 so'rov/daqiqa)
+- ✅ **Kuchli parol validatsiya** — Minimum 8 belgi, katta+kichik harf+raqam
+- 🛡️ **Global Exception Handler** — Xatolar xavfsiz ushlanadi
+- 🌐 **CORS boshqaruvi** — Faqat ruxsat berilgan domenlar
+
+---
+
+## 🛠️ Texnologiyalar
+
+### Backend
+| Texnologiya | Versiya | Vazifasi |
+|-------------|---------|----------|
+| **.NET** | 10.0 | Framework |
+| **ASP.NET Core Web API** | 10.0 | REST API |
+| **Entity Framework Core** | 10.0 | ORM |
+| **SQL Server LocalDB** | — | Ma'lumotlar bazasi |
+| **JWT Bearer** | 10.0 | Autentifikatsiya |
+| **BCrypt.Net-Next** | 4.2 | Parol hashing |
+| **Scalar** | Latest | API dokumentatsiya |
+| **Serilog** | Latest | Logging |
+
+### Frontend
+| Texnologiya | Vazifasi |
+|-------------|----------|
+| **Vanilla HTML/CSS/JS** | UI |
+| **Inter Font** | Typography |
+| **Glassmorphism Design** | Zamonaviy dizayn |
+| **PDF.js** | PDF matn ajratish |
+| **LocalStorage** | Progress saqlash, auth token |
+
+### Dizayn
+- 🎨 **Dark Premium tema** — Glassmorphism, purple/cyan gradient
+- 📱 **Responsive** — Mobile-friendly
+- ✨ **Animatsiyalar** — Silliq o'tishlar, 3D varaqlash
+
+---
+
+## 🚀 O'rnatish
+
+### Talablar
+- **.NET 10 SDK** — [Yuklab olish](https://dotnet.microsoft.com/download)
+- **SQL Server LocalDB** (Visual Studio bilan keladi)
+- **Visual Studio 2022** yoki **VS Code**
+
+### Qadamma-qadam
+
+**1. Loyihani klon qiling:**
 ```bash
+git clone https://github.com/AsrorCode/KutubxonaAPI.git
 cd KutubxonaAPI
 ```
 
-### 2. NuGet paketlarini tiklash
-
+**2. Paketlarni tiklang:**
 ```bash
 dotnet restore
 ```
 
-### 3. Loyihani build qilish
-
+**3. Ma'lumotlar bazasini yarating:**
 ```bash
-dotnet build
+dotnet ef database update
 ```
 
-### 4. Ishga tushirish
-
+**4. Loyihani ishga tushiring:**
 ```bash
 dotnet run
 ```
 
-Ilova ishga tushgandan so'ng brauzeringizda quyidagi manzilni oching:
-
-```
-https://localhost:5001/scalar/v1
-```
-
-Bu yerda **Scalar UI** orqali barcha endpointlarni ko'rishingiz va sinab ko'rishingiz mumkin. Scalar — Swagger'dan ko'ra zamonaviy va qulay interfeys.
-
-## Migratsiya (ixtiyoriy, lekin professional usul)
-
-Loyiha hozir `EnsureCreated()` orqali DB'ni avtomatik yaratadi. Lekin haqiqiy loyihalarda **EF Core Migrations** ishlatish kerak.
-
-Migratsiyani sozlash:
-
-```bash
-# EF tools'ni o'rnatish (faqat bir marta)
-dotnet tool install --global dotnet-ef
-
-# Birinchi migratsiya yaratish
-dotnet ef migrations add InitialCreate
-
-# Migratsiyani ma'lumotlar bazasiga qo'llash
-dotnet ef database update
-```
-
-> Eslatma: Migratsiyadan foydalansangiz, `Program.cs`'dagi `EnsureCreated()` o'rniga `Migrate()` ishlatishingiz kerak.
-
-## API Endpointlar
-
-| Metod  | URL                                | Tavsifi                            |
-|--------|------------------------------------|------------------------------------|
-| GET    | `/api/books`                       | Barcha kitoblarni olish            |
-| GET    | `/api/books/{id}`                  | Bitta kitobni ID bo'yicha olish    |
-| GET    | `/api/books/search?query=...`      | Qidiruv (nomi yoki muallif bo'yicha) |
-| POST   | `/api/books`                       | Yangi kitob qo'shish               |
-| PUT    | `/api/books/{id}`                  | Kitobni to'liq yangilash           |
-| PATCH  | `/api/books/{id}/status`           | Faqat holatni o'zgartirish         |
-| DELETE | `/api/books/{id}`                  | Kitobni o'chirish                  |
-
-### Misol: Yangi kitob qo'shish (POST)
-
-**URL:** `POST /api/books`
-
-**Body (JSON):**
-```json
-{
-  "title": "Sariq devni minib",
-  "author": "Xudoyberdi To'xtaboyev",
-  "year": 1971,
-  "category": "Bolalar",
-  "isAvailable": true
-}
-```
-
-**Javob (201 Created):**
-```json
-{
-  "id": 4,
-  "title": "Sariq devni minib",
-  "author": "Xudoyberdi To'xtaboyev",
-  "year": 1971,
-  "category": "Bolalar",
-  "isAvailable": true,
-  "createdAt": "2026-05-09T12:34:56Z",
-  "updatedAt": null
-}
-```
-
-### Misol: Kitobni yangilash (PUT)
-
-**URL:** `PUT /api/books/4`
-
-**Body (JSON):**
-```json
-{
-  "title": "Sariq devni minib",
-  "author": "Xudoyberdi To'xtaboyev",
-  "year": 1971,
-  "category": "Bolalar",
-  "isAvailable": false
-}
-```
-
-## CRUD nima?
-
-CRUD — bu har qanday ma'lumot bilan ishlovchi ilovaning 4 ta asosiy amalini bildiradi:
-
-| Harf | Ma'nosi | HTTP metod | Misol |
-|------|---------|------------|-------|
-| **C** | Create (Yaratish) | POST | Yangi kitob qo'shish |
-| **R** | Read (O'qish) | GET | Kitoblarni ko'rish |
-| **U** | Update (Yangilash) | PUT/PATCH | Kitob ma'lumotini o'zgartirish |
-| **D** | Delete (O'chirish) | DELETE | Kitobni o'chirish |
-
-## Test qilish (Postman / Swagger orqali)
-
-### Scalar orqali:
-1. `dotnet run` ishga tushiring
-2. `https://localhost:5001/scalar/v1` ochiling
-3. Chap tomondagi endpoint ro'yxatidan birini tanlang
-4. O'ng panelda "Test Request" qismida ma'lumot kiriting
-5. "Send" tugmasini bosing va javobni ko'ring
-
-### Postman orqali:
-1. Postman'ni oching
-2. Yangi request yarating
-3. URL'ni kiriting (masalan: `https://localhost:5001/api/books`)
-4. Metodni tanlang (GET, POST, va h.k.)
-5. POST/PUT uchun Body → raw → JSON tanlang va ma'lumotni kiriting
-6. "Send" bosing
-
-## Keyingi qadamlar — loyihani rivojlantirish
-
-Bu loyihani yanada yaxshilash uchun quyidagilarni qo'shing:
-
-1. **Authentication / Authorization** — JWT token bilan
-2. **DTO (Data Transfer Objects)** — API uchun alohida modellar
-3. **Repository Pattern** — Database mantig'ini ajratish
-4. **Service Layer** — Biznes mantiq uchun alohida qatlam
-5. **AutoMapper** — Modellar orasida avtomatik konversiya
-6. **FluentValidation** — Murakkab validatsiya qoidalari
-7. **Pagination** — Ko'p ma'lumotlarni sahifalab ko'rsatish
-8. **Logging (Serilog)** — Professional loglar
-9. **Unit Tests (xUnit)** — Testlar yozish
-10. **Frontend** — React, Angular yoki Blazor bilan UI
-
-## Foydali havolalar
-
-- [.NET hujjatlari](https://learn.microsoft.com/dotnet/)
-- [ASP.NET Core](https://learn.microsoft.com/aspnet/core/)
-- [Entity Framework Core](https://learn.microsoft.com/ef/core/)
-- [Swagger](https://swagger.io/)
-
-## Muammolar
-
-### "Cannot connect to database" xatosi
-- SQL Server LocalDB o'rnatilganini tekshiring: `sqllocaldb info`
-- Agar yo'q bo'lsa: `sqllocaldb create MSSQLLocalDB` buyrug'ini bajaring
-
-### Port band xatosi
-- `Properties/launchSettings.json` faylida portni o'zgartiring
-
-### "dotnet" buyrug'i topilmadi
-- .NET SDK o'rnatilganligini tekshiring: `dotnet --version`
+**5. Brauzer'da oching:**
+- Frontend: `https://localhost:5001`
+- API docs: `https://localhost:5001/scalar/v1`
 
 ---
 
-Muvaffaqiyat tilayman! Savollar bo'lsa, so'rang.
+## ⚙️ Konfiguratsiya
+
+`appsettings.json` faylini o'zgartiring:
+
+```json
+{
+  "ConnectionStrings": {
+    "DefaultConnection": "Server=(localdb)\\MSSQLLocalDB;Database=KutubxonaDB;Trusted_Connection=True"
+  },
+  "Jwt": {
+    "Key": "SIZNING_MAXFIY_KALITINGIZ_KAMIDA_32_BELGI",
+    "Issuer": "KutubxonaAPI",
+    "Audience": "KutubxonaUsers",
+    "ExpireDays": 7
+  },
+  "AllowedOrigins": [
+    "http://localhost:5000",
+    "https://localhost:5001"
+  ]
+}
+```
+
+---
+
+## 📡 API Endpointlar
+
+### 🔐 Auth
+| Method | Endpoint | Auth | Tavsif |
+|--------|----------|------|--------|
+| POST | `/api/auth/register` | ❌ | Ro'yxatdan o'tish |
+| POST | `/api/auth/login` | ❌ | Kirish |
+| GET | `/api/auth/me` | ✅ | Joriy foydalanuvchi |
+
+### 📚 Books
+| Method | Endpoint | Auth | Tavsif |
+|--------|----------|------|--------|
+| GET | `/api/books?page=1&pageSize=20` | ❌ | Pagination bilan ro'yxat |
+| GET | `/api/books/{id}` | ❌ | Bitta kitob |
+| GET | `/api/books/categories` | ❌ | Kategoriyalar |
+| POST | `/api/books` | 👮 Admin | Yaratish |
+| PUT | `/api/books/{id}` | 👮 Admin | Yangilash |
+| DELETE | `/api/books/{id}` | 👮 Admin | O'chirish |
+
+### 📄 Book Pages
+| Method | Endpoint | Auth | Tavsif |
+|--------|----------|------|--------|
+| GET | `/api/books/{id}/pages` | ❌ | Sahifalar ro'yxati |
+| GET | `/api/books/{id}/pages/{n}` | ❌ | Bitta sahifa |
+| POST | `/api/books/{id}/pages/bulk` | 👮 Admin | PDF matnni yuklash |
+| DELETE | `/api/books/{id}/pages` | 👮 Admin | Barcha sahifalarni o'chirish |
+
+### 💬 Comments
+| Method | Endpoint | Auth | Tavsif |
+|--------|----------|------|--------|
+| GET | `/api/books/{id}/comments` | ❌ | Izohlar + o'rtacha reyting |
+| POST | `/api/books/{id}/comments` | ❌ | Izoh qoldirish |
+| DELETE | `/api/books/{id}/comments/{cid}` | 👮 Admin | O'chirish |
+
+### 🛒 SaleBooks (Marketplace)
+| Method | Endpoint | Auth | Tavsif |
+|--------|----------|------|--------|
+| GET | `/api/salebooks` | ❌ | Sotuvdagi kitoblar |
+| POST | `/api/salebooks` | 👮 Admin | Yaratish |
+| PATCH | `/api/salebooks/{id}/toggle` | 👮 Admin | Faol/nofaol |
+
+### 📦 Orders
+| Method | Endpoint | Auth | Tavsif |
+|--------|----------|------|--------|
+| POST | `/api/orders` | ✅ | Buyurtma yaratish |
+| GET | `/api/orders/my` | ✅ | Mening buyurtmalarim |
+| GET | `/api/orders` | 👮 Admin | Barcha buyurtmalar |
+| PATCH | `/api/orders/{id}/status` | 👮 Admin | Statusni o'zgartirish |
+
+---
+
+## 📁 Loyiha strukturasi
+
+KutubxonaAPI/
+├── Controllers/ # API kontrollerlar
+│ ├── AuthController.cs
+│ ├── BooksController.cs
+│ ├── BookPagesController.cs
+│ ├── CommentsController.cs
+│ ├── SaleBooksController.cs
+│ └── OrdersController.cs
+├── Models/ # Entity klasslar
+│ ├── Book.cs
+│ ├── BookPage.cs
+│ ├── Comment.cs
+│ ├── User.cs
+│ ├── SaleBook.cs
+│ ├── Order.cs
+│ └── OrderItem.cs
+├── Data/
+│ └── AppDbContext.cs # EF Core DbContext
+├── DTOs/ # Data Transfer Objects
+│ └── PagedResult.cs
+├── Middleware/
+│ └── GlobalExceptionMiddleware.cs
+├── Migrations/ # EF migratsiyalar
+├── wwwroot/ # Frontend fayllar
+│ ├── index.html # Bosh sahifa (kutubxona)
+│ ├── market.html # Marketplace
+│ ├── admin.html # Admin panel
+│ ├── login.html # Kirish
+│ ├── register.html # Ro'yxatdan o'tish
+│ └── my-orders.html # Buyurtmalarim
+├── appsettings.json
+├── Program.cs
+└── KutubxonaAPI.csproj
+
+
+---
+
+## 📸 Ekran suratlar
+
+> Ekran suratlar tez orada qo'shiladi
+
+---
+
+## 🔮 Rejalar (Roadmap)
+
+### ✅ Bajarilgan
+- [x] CRUD amallar
+- [x] JWT autentifikatsiya
+- [x] Role-based avtorizatsiya
+- [x] 3D varaqlash effekti
+- [x] PDF matn ajratish
+- [x] Dark Premium dizayn
+- [x] Marketplace
+- [x] Pagination
+- [x] Rate Limiting
+- [x] Global Exception Handler
+
+### 🚧 Rejada
+- [ ] ❤️ Sevimli kitoblar
+- [ ] 👤 Foydalanuvchi profili sahifasi
+- [ ] 📧 Email tasdiqlash
+- [ ] 🔑 Parolni tiklash
+- [ ] 🔄 Refresh token
+- [ ] 💳 Click/Payme integratsiyasi
+- [ ] 📱 Telegram bot
+- [ ] 🎧 Audio kitoblar
+- [ ] 🔔 SignalR real-time bildirishnomalar
+- [ ] 🐳 Docker containerization
+- [ ] ☁️ Azure/Render deploy
+- [ ] 🧪 xUnit testlar
+
+---
+
+## 🤝 Ishtirok etish
+
+Loyihaga hissa qo'shishni istaysizmi? Ajoyib!
+
+1. **Fork** qiling
+2. Yangi branch yarating (`git checkout -b feature/AjoyibXususiyat`)
+3. O'zgarishlarni commit qiling (`git commit -m 'Ajoyib xususiyat qo'shildi'`)
+4. Branch'ga push qiling (`git push origin feature/AjoyibXususiyat`)
+5. **Pull Request** oching
+
+---
+
+## 📝 Litsenziya
+
+Bu loyiha **MIT** litsenziyasi ostida tarqatiladi. Batafsil ma'lumot uchun [LICENSE](LICENSE) fayliga qarang.
+
+---
+
+## 👨‍💻 Muallif
+
+**Abbos Haydarov**  
+📧 developerhaydarov@gmail.com  
+🐙 GitHub: [@AsrorCode](https://github.com/AsrorCode)
+
+---
+
+## 🙏 Minnatdorchilik
+
+- **Anthropic Claude** — Loyihani qurishda yordam bergani uchun
+- **Microsoft** — .NET va ASP.NET Core uchun
+- **Scalar** — Chiroyli API dokumentatsiya uchun
+- **O'zbek adabiyoti mualliflari** — Bizga ilhom bergani uchun
+
+---
+
+<div align="center">
+
+**⭐ Agar loyiha yoqqan bo'lsa, GitHub'da yulduzcha qo'ying!**
+
+Made with ❤️ in Uzbekistan 🇺🇿
+
+</div>
