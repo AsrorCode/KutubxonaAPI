@@ -290,8 +290,8 @@ Bu loyiha **MIT** litsenziyasi ostida tarqatiladi. Batafsil ma'lumot uchun [LICE
 
 ## 👨‍💻 Muallif
 
-**Abbos Haydarov**  
-📧 developerhaydarov@gmail.com  
+**Asror Haydarov**  
+📧 asroh131@gmail.com  
 🐙 GitHub: [@AsrorCode](https://github.com/AsrorCode)
 
 ---
