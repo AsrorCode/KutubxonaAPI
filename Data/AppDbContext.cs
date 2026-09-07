@@ -15,6 +15,7 @@ public class AppDbContext : DbContext
     public DbSet<SaleBook> SaleBooks { get; set; }       // ← QO'SHILDI
     public DbSet<Order> Orders { get; set; }              // ← QO'SHILDI
     public DbSet<OrderItem> OrderItems { get; set; }      // ← QO'SHILDI
+    public DbSet<RefreshToken> RefreshTokens { get; set; } // ← Refresh tokens
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -72,6 +73,20 @@ public class AppDbContext : DbContext
             .WithMany()
             .HasForeignKey(c => c.UserId)
             .OnDelete(DeleteBehavior.Restrict);
+
+        // ===== RefreshToken → User (cascade) =====
+        modelBuilder.Entity<RefreshToken>()
+            .HasOne(rt => rt.User)
+            .WithMany()
+            .HasForeignKey(rt => rt.UserId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<RefreshToken>()
+            .HasIndex(rt => rt.Token)
+            .IsUnique();
+
+        modelBuilder.Entity<RefreshToken>()
+            .HasIndex(rt => rt.UserId);
 
         // ===== Indexes (STEP 3 uchun ham foydali) =====
         modelBuilder.Entity<Book>().HasIndex(b => b.Category);

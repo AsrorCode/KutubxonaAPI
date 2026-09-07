@@ -462,6 +462,7 @@
         </div>
     </div>
 
+    <script src="/auth.js"></script>
     <script>
         const API_BASE = window.location.origin;
 
@@ -470,12 +471,12 @@
             return userStr ? JSON.parse(userStr) : null;
         }
         function getToken() { return localStorage.getItem('auth_token'); }
-        function logout() {
+        async function logout() {
             if (!confirm('Tizimdan chiqmoqchimisiz?')) return;
-            localStorage.removeItem('auth_token');
-            localStorage.removeItem('auth_user');
+            await serverLogout();
             window.location.href = '/';
         }
+        setInterval(() => { if (getRefreshToken()) refreshAccessToken(); }, 12 * 60 * 1000);
 
         function renderAuthBar() {
             const user = getCurrentUser();

@@ -269,7 +269,10 @@
                     throw new Error(errorMsg);
                 }
 
-                localStorage.setItem('auth_token', data.token);
+                localStorage.setItem('auth_token', data.accessToken || data.token);
+                if (data.refreshToken) {
+                    localStorage.setItem('auth_refresh_token', data.refreshToken);
+                }
                 localStorage.setItem('auth_user', JSON.stringify(data.user));
 
                 statusEl.textContent = `🎉 Tabriklaymiz, ${data.user.firstName}! Hisobingiz yaratildi.`;

@@ -198,7 +198,11 @@
                     throw new Error(data.message || 'Email yoki parol noto\'g\'ri');
                 }
 
-                localStorage.setItem('auth_token', data.token);
+                // Access + Refresh token saqlash
+                localStorage.setItem('auth_token', data.accessToken || data.token);
+                if (data.refreshToken) {
+                    localStorage.setItem('auth_refresh_token', data.refreshToken);
+                }
                 localStorage.setItem('auth_user', JSON.stringify(data.user));
 
                 statusEl.textContent = `👋 Xush kelibsiz, ${data.user.firstName}!`;
