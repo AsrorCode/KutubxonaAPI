@@ -66,6 +66,13 @@ public class AppDbContext : DbContext
             .HasForeignKey(c => c.BookId)
             .OnDelete(DeleteBehavior.Cascade);
 
+        // ===== User → Comments (restrict — user o'chirilsa comment qolsin) =====
+        modelBuilder.Entity<Comment>()
+            .HasOne(c => c.User)
+            .WithMany()
+            .HasForeignKey(c => c.UserId)
+            .OnDelete(DeleteBehavior.Restrict);
+
         // ===== Indexes (STEP 3 uchun ham foydali) =====
         modelBuilder.Entity<Book>().HasIndex(b => b.Category);
         modelBuilder.Entity<Book>().HasIndex(b => b.CreatedAt);

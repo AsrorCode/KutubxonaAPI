@@ -1,173 +1,146 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="uz">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ro'yxatdan o'tish — Kutubxona</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, sans-serif;
+        :root {
+            --bg-base: #0a0a0f;
+            --bg-elevated: #14141b;
+            --bg-glass: rgba(255, 255, 255, 0.03);
+            --border: rgba(255, 255, 255, 0.08);
+            --border-hover: rgba(139, 92, 246, 0.4);
+            --primary: #8b5cf6;
+            --primary-glow: rgba(139, 92, 246, 0.4);
+            --secondary: #06b6d4;
+            --accent: #ec4899;
+            --text: #fafafa;
+            --text-dim: #a1a1aa;
+            --text-faint: #71717a;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
         }
-
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             min-height: 100vh;
-            background: linear-gradient(135deg, #2c1810 0%, #5d3a1e 100%);
-            color: #f4ebd9;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            background: var(--bg-base);
+            background-image:
+                radial-gradient(at 20% 0%, rgba(139, 92, 246, 0.15) 0px, transparent 50%),
+                radial-gradient(at 80% 0%, rgba(6, 182, 212, 0.1) 0px, transparent 50%),
+                radial-gradient(at 50% 100%, rgba(236, 72, 153, 0.08) 0px, transparent 50%);
+            background-attachment: fixed;
+            color: var(--text);
+            font-family: 'Inter', -apple-system, sans-serif;
+            display: flex; align-items: center; justify-content: center;
             padding: 20px;
         }
-
         .auth-card {
-            background: rgba(0,0,0,0.4);
-            border: 2px solid #8b4513;
-            border-radius: 16px;
+            background: var(--bg-elevated);
+            border: 1px solid var(--border);
+            border-radius: 20px;
             padding: 40px;
             width: 100%;
             max-width: 480px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+            box-shadow: 0 24px 80px rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(20px);
         }
-
-        .auth-header {
-            text-align: center;
-            margin-bottom: 30px;
+        .back-link {
+            display: inline-flex; align-items: center; gap: 8px;
+            color: var(--text-dim); text-decoration: none;
+            font-size: 14px; margin-bottom: 24px;
+            transition: color 0.2s;
         }
+        .back-link:hover { color: var(--primary); }
 
-            .auth-header h1 {
-                font-size: 30px;
-                background: linear-gradient(45deg, #ffd700, #ff8c00);
-                -webkit-background-clip: text;
-                -webkit-text-fill-color: transparent;
-                margin-bottom: 8px;
-            }
-
-            .auth-header .icon {
-                font-size: 50px;
-                margin-bottom: 10px;
-            }
-
-            .auth-header .subtitle {
-                color: #c8b89c;
-                font-size: 14px;
-            }
-
-        .form-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
+        .auth-header { text-align: center; margin-bottom: 32px; }
+        .auth-header .icon {
+            display: inline-flex; align-items: center; justify-content: center;
+            width: 56px; height: 56px;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            border-radius: 14px; font-size: 28px; margin-bottom: 16px;
+            box-shadow: 0 8px 32px var(--primary-glow);
         }
-
-        .form-field {
-            margin-bottom: 18px;
+        .auth-header h1 {
+            font-size: 28px; font-weight: 800; letter-spacing: -0.02em;
+            background: linear-gradient(135deg, #fff, #c4b5fd 50%, #67e8f9);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            margin-bottom: 6px;
         }
+        .auth-header .subtitle { color: var(--text-dim); font-size: 14px; }
 
-            .form-field label {
-                display: block;
-                color: #ffd700;
-                font-weight: 600;
-                margin-bottom: 6px;
-                font-size: 14px;
-            }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .form-field { margin-bottom: 16px; }
+        .form-field label {
+            display: block; color: var(--text-dim); font-size: 13px;
+            margin-bottom: 6px; font-weight: 500;
+        }
+        .form-field input {
+            width: 100%; padding: 12px 14px;
+            background: var(--bg-glass); color: var(--text);
+            border: 1px solid var(--border); border-radius: 10px;
+            font-size: 14px; font-family: inherit; outline: none;
+            transition: all 0.2s;
+        }
+        .form-field input::placeholder { color: var(--text-faint); }
+        .form-field input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
+        }
+        .hint { color: var(--text-faint); font-size: 12px; margin-top: 6px; }
 
-            .form-field input {
-                width: 100%;
-                padding: 12px 16px;
-                background: #faf3e0;
-                color: #2c1810;
-                border: 2px solid #8b4513;
-                border-radius: 8px;
-                font-size: 15px;
-                outline: none;
-                transition: all 0.3s;
-            }
-
-                .form-field input:focus {
-                    border-color: #ffd700;
-                }
+        .password-strength { margin-top: 8px; }
+        .password-strength-bar {
+            height: 4px; background: rgba(255, 255, 255, 0.06);
+            border-radius: 999px; overflow: hidden;
+        }
+        .password-strength-fill {
+            height: 100%; transition: all 0.3s;
+            width: 0%; background: var(--danger);
+        }
+        .password-strength-text {
+            font-size: 11px; color: var(--text-faint); margin-top: 4px;
+        }
 
         .submit-btn {
-            background: linear-gradient(135deg, #059669, #10b981);
-            color: white;
-            border: none;
-            padding: 14px;
-            border-radius: 8px;
-            font-size: 16px;
-            font-weight: 700;
-            cursor: pointer;
-            width: 100%;
-            margin-top: 10px;
-            transition: all 0.3s;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            color: #fff; border: none; padding: 14px;
+            border-radius: 12px; font-size: 15px; font-weight: 600;
+            cursor: pointer; width: 100%; margin-top: 8px;
+            font-family: inherit;
+            box-shadow: 0 8px 24px var(--primary-glow);
+            transition: all 0.2s;
         }
-
-            .submit-btn:hover:not(:disabled) {
-                transform: translateY(-2px);
-            }
-
-            .submit-btn:disabled {
-                opacity: 0.5;
-                cursor: not-allowed;
-            }
+        .submit-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 32px var(--primary-glow);
+        }
+        .submit-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
 
         .auth-footer {
-            text-align: center;
-            margin-top: 20px;
-            color: #c8b89c;
-            font-size: 14px;
+            text-align: center; margin-top: 24px;
+            color: var(--text-dim); font-size: 14px;
         }
-
-            .auth-footer a {
-                color: #ffd700;
-                text-decoration: none;
-                font-weight: 600;
-            }
-
-                .auth-footer a:hover {
-                    text-decoration: underline;
-                }
+        .auth-footer a { color: var(--primary); text-decoration: none; font-weight: 600; }
+        .auth-footer a:hover { text-decoration: underline; }
 
         .status {
-            padding: 12px;
-            border-radius: 6px;
-            margin-top: 15px;
-            font-size: 13px;
-            display: none;
-            text-align: center;
+            padding: 12px 14px; border-radius: 10px;
+            margin-top: 14px; font-size: 13px; display: none;
         }
-
-            .status.success {
-                background: rgba(16,185,129,0.2);
-                border: 1px solid #10b981;
-                color: #6ee7b7;
-                display: block;
-            }
-
-            .status.error {
-                background: rgba(239,68,68,0.2);
-                border: 1px solid #ef4444;
-                color: #fca5a5;
-                display: block;
-            }
-
-        .back-link {
-            display: inline-block;
-            margin-bottom: 20px;
-            color: #ffd700;
-            text-decoration: none;
-            font-size: 14px;
+        .status.success {
+            background: rgba(16, 185, 129, 0.1); color: var(--success);
+            border: 1px solid rgba(16, 185, 129, 0.3); display: block;
         }
-
-            .back-link:hover {
-                text-decoration: underline;
-            }
-
-        .hint {
-            color: #8b7355;
-            font-size: 12px;
-            margin-top: 4px;
+        .status.error {
+            background: rgba(239, 68, 68, 0.1); color: var(--danger);
+            border: 1px solid rgba(239, 68, 68, 0.3); display: block;
+        }
+        .status.warning {
+            background: rgba(245, 158, 11, 0.1); color: var(--warning);
+            border: 1px solid rgba(245, 158, 11, 0.3); display: block;
         }
     </style>
 </head>
@@ -185,11 +158,11 @@
             <div class="form-row">
                 <div class="form-field">
                     <label for="firstName">Ism</label>
-                    <input type="text" id="firstName" required placeholder="Asror" autocomplete="given-name">
+                    <input type="text" id="firstName" required placeholder="Asror" autocomplete="given-name" maxlength="50">
                 </div>
                 <div class="form-field">
                     <label for="lastName">Familiya</label>
-                    <input type="text" id="lastName" required placeholder="Haydarov" autocomplete="family-name">
+                    <input type="text" id="lastName" required placeholder="Haydarov" autocomplete="family-name" maxlength="50">
                 </div>
             </div>
 
@@ -200,8 +173,13 @@
 
             <div class="form-field">
                 <label for="password">Parol</label>
-                <input type="password" id="password" required minlength="6" placeholder="Kamida 6 ta belgi" autocomplete="new-password">
-                <div class="hint">Parolni esda saqlang — keyinroq kirish uchun kerak</div>
+                <input type="password" id="password" required minlength="8" placeholder="Kamida 8 belgi" autocomplete="new-password" oninput="checkPasswordStrength()">
+                <div class="password-strength">
+                    <div class="password-strength-bar">
+                        <div id="strengthFill" class="password-strength-fill"></div>
+                    </div>
+                    <div id="strengthText" class="password-strength-text">Kamida 8 belgi, katta+kichik harf va raqam</div>
+                </div>
             </div>
 
             <button type="submit" class="submit-btn" id="submitBtn">Ro'yxatdan o'tish</button>
@@ -214,6 +192,36 @@
     </div>
 
     <script>
+        function checkPasswordStrength() {
+            const pwd = document.getElementById('password').value;
+            const fill = document.getElementById('strengthFill');
+            const text = document.getElementById('strengthText');
+
+            let score = 0;
+            if (pwd.length >= 8) score++;
+            if (/[A-Z]/.test(pwd)) score++;
+            if (/[a-z]/.test(pwd)) score++;
+            if (/\d/.test(pwd)) score++;
+            if (pwd.length >= 12) score++;
+
+            const percent = (score / 5) * 100;
+            fill.style.width = percent + '%';
+
+            if (score <= 2) {
+                fill.style.background = 'var(--danger)';
+                text.textContent = '⚠️ Zaif parol';
+            } else if (score <= 3) {
+                fill.style.background = 'var(--warning)';
+                text.textContent = '🟡 O\'rtacha';
+            } else if (score <= 4) {
+                fill.style.background = 'var(--secondary)';
+                text.textContent = '✅ Yaxshi';
+            } else {
+                fill.style.background = 'var(--success)';
+                text.textContent = '🎯 Juda kuchli';
+            }
+        }
+
         async function submitRegister(e) {
             e.preventDefault();
             const firstName = document.getElementById('firstName').value.trim();
@@ -225,18 +233,35 @@
 
             btn.disabled = true;
             btn.textContent = 'Yaratilmoqda...';
+            statusEl.className = 'status';
 
             try {
                 const response = await fetch('/api/auth/register', {
                     method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ firstName, lastName, email, password })
                 });
 
-                const data = await response.json();
+                // Rate limit yoki server xatosi (bo'sh javob)
+                if (response.status === 429) {
+                    throw new Error('⏱️ Juda ko\'p urinish. 1 daqiqa kutib qayta uring.');
+                }
+
+                if (response.status >= 500) {
+                    throw new Error('🔧 Server xatosi. Iltimos, keyinroq urinib ko\'ring.');
+                }
+
+                // Javobni xavfsiz o'qish
+                const text = await response.text();
+                let data;
+                try {
+                    data = text ? JSON.parse(text) : {};
+                } catch {
+                    throw new Error('Serverdan noto\'g\'ri javob keldi');
+                }
 
                 if (!response.ok) {
-                    let errorMsg = data.message || 'Ro\'yxatdan o\'tish xato';
+                    let errorMsg = data.message || 'Ro\'yxatdan o\'tishda xato';
                     if (data.errors) {
                         const allErrors = Object.values(data.errors).flat().join('; ');
                         if (allErrors) errorMsg = allErrors;
