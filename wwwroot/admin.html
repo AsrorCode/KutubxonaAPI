@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="uz">
 <head>
     <meta charset="UTF-8">
@@ -25,381 +25,231 @@
             --warning: #f59e0b;
             --danger: #ef4444;
         }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             min-height: 100vh;
             background: var(--bg-base);
-            background-image: radial-gradient(at 20% 0%, rgba(139, 92, 246, 0.15) 0px, transparent 50%), radial-gradient(at 80% 0%, rgba(6, 182, 212, 0.1) 0px, transparent 50%), radial-gradient(at 50% 100%, rgba(236, 72, 153, 0.08) 0px, transparent 50%);
+            background-image:
+                radial-gradient(at 20% 0%, rgba(139, 92, 246, 0.15) 0px, transparent 50%),
+                radial-gradient(at 80% 0%, rgba(6, 182, 212, 0.1) 0px, transparent 50%),
+                radial-gradient(at 50% 100%, rgba(236, 72, 153, 0.08) 0px, transparent 50%);
             background-attachment: fixed;
             color: var(--text);
             font-family: 'Inter', -apple-system, sans-serif;
             padding: 24px;
         }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
+        .container { max-width: 1280px; margin: 0 auto; }
         .back-btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            color: var(--text);
-            text-decoration: none;
+            display: inline-flex; align-items: center; gap: 8px;
+            color: var(--text); text-decoration: none;
             padding: 10px 18px;
-            background: var(--bg-glass);
-            border: 1px solid var(--border);
-            border-radius: 10px;
-            font-size: 14px;
-            font-weight: 500;
-            backdrop-filter: blur(10px);
-            transition: all 0.2s;
-            margin-bottom: 24px;
+            background: var(--bg-glass); border: 1px solid var(--border);
+            border-radius: 10px; font-size: 14px; font-weight: 500;
+            backdrop-filter: blur(10px); transition: all 0.2s; margin-bottom: 24px;
         }
+        .back-btn:hover { border-color: var(--border-hover); background: rgba(139, 92, 246, 0.1); }
 
-            .back-btn:hover {
-                border-color: var(--border-hover);
-                background: rgba(139, 92, 246, 0.1);
-            }
-
-        header {
-            text-align: center;
-            margin-bottom: 40px;
-        }
-
+        header { text-align: center; margin-bottom: 32px; }
         .header-icon {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            width: 64px;
-            height: 64px;
+            display: inline-flex; align-items: center; justify-content: center;
+            width: 64px; height: 64px;
             background: linear-gradient(135deg, var(--primary), var(--accent));
-            border-radius: 16px;
-            font-size: 32px;
-            margin-bottom: 16px;
+            border-radius: 16px; font-size: 32px; margin-bottom: 16px;
             box-shadow: 0 12px 40px var(--primary-glow);
         }
-
         h1 {
-            font-size: 40px;
-            font-weight: 800;
-            letter-spacing: -0.03em;
+            font-size: 40px; font-weight: 800; letter-spacing: -0.03em;
             background: linear-gradient(135deg, #fff, #c4b5fd 50%, #67e8f9);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
             margin-bottom: 8px;
         }
+        .subtitle { color: var(--text-dim); font-size: 15px; }
 
-        .subtitle {
-            color: var(--text-dim);
-            font-size: 15px;
+        /* Tabs */
+        .tabs {
+            display: flex; gap: 8px; justify-content: center;
+            margin-bottom: 32px; flex-wrap: wrap;
+            padding: 6px;
+            background: var(--bg-glass);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            width: fit-content;
+            margin-left: auto; margin-right: auto;
         }
+        .tab-btn {
+            padding: 10px 20px;
+            background: transparent; color: var(--text-dim);
+            border: none; border-radius: 10px;
+            cursor: pointer; font-size: 14px; font-weight: 600;
+            font-family: inherit; transition: all 0.2s;
+        }
+        .tab-btn.active {
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            color: #fff; box-shadow: 0 4px 20px var(--primary-glow);
+        }
+        .tab-panel { display: none; }
+        .tab-panel.active { display: block; }
 
         .card {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 16px;
-            padding: 28px;
-            margin-bottom: 24px;
+            background: var(--bg-card); border: 1px solid var(--border);
+            border-radius: 16px; padding: 24px; margin-bottom: 20px;
             backdrop-filter: blur(20px);
         }
-
         .card-title {
-            font-size: 20px;
-            font-weight: 700;
-            margin-bottom: 20px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
+            font-size: 18px; font-weight: 700; margin-bottom: 18px;
+            display: flex; align-items: center; gap: 10px;
             letter-spacing: -0.02em;
-            padding-bottom: 16px;
-            border-bottom: 1px solid var(--border);
+            padding-bottom: 14px; border-bottom: 1px solid var(--border);
         }
 
-        .form-row {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 16px;
-            margin-bottom: 16px;
-        }
-
-            .form-row.cols-3 {
-                grid-template-columns: 1fr 1fr auto;
-                align-items: end;
-            }
-
+        .form-row { display: grid; grid-template-columns: 1fr; gap: 14px; margin-bottom: 14px; }
+        .form-row.cols-2 { grid-template-columns: 1fr 1fr; }
+        .form-row.cols-3 { grid-template-columns: 1fr 1fr auto; align-items: end; }
         @media (max-width: 640px) {
-            .form-row.cols-3 {
-                grid-template-columns: 1fr;
-            }
+            .form-row.cols-2, .form-row.cols-3 { grid-template-columns: 1fr; }
         }
 
         .form-field label {
-            display: block;
-            color: var(--text-dim);
-            font-size: 13px;
-            margin-bottom: 6px;
-            font-weight: 500;
+            display: block; color: var(--text-dim); font-size: 13px;
+            margin-bottom: 6px; font-weight: 500;
         }
-
         .form-field input, .form-field textarea, .form-field select {
-            width: 100%;
-            padding: 12px 14px;
-            background: var(--bg-glass);
-            color: var(--text);
-            border: 1px solid var(--border);
-            border-radius: 10px;
-            font-size: 14px;
-            font-family: inherit;
-            outline: none;
-            transition: all 0.2s;
+            width: 100%; padding: 11px 13px;
+            background: var(--bg-glass); color: var(--text);
+            border: 1px solid var(--border); border-radius: 10px;
+            font-size: 14px; font-family: inherit; outline: none;
         }
-
-            .form-field input:focus, .form-field textarea:focus {
-                border-color: var(--primary);
-                box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
-            }
-
-        .form-field textarea {
-            resize: vertical;
-            min-height: 120px;
+        .form-field input:focus, .form-field textarea:focus, .form-field select:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
         }
+        .form-field textarea { resize: vertical; min-height: 80px; }
 
         .checkbox-wrap {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            padding: 12px 14px;
-            background: var(--bg-glass);
-            border: 1px solid var(--border);
+            display: flex; align-items: center; gap: 8px;
+            padding: 11px 13px;
+            background: var(--bg-glass); border: 1px solid var(--border);
             border-radius: 10px;
         }
-
-            .checkbox-wrap input {
-                width: 18px;
-                height: 18px;
-                accent-color: var(--primary);
-            }
+        .checkbox-wrap input { width: 18px; height: 18px; accent-color: var(--primary); }
 
         .btn {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            padding: 12px 20px;
-            border: none;
-            border-radius: 10px;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            font-family: inherit;
-            transition: all 0.2s;
+            display: inline-flex; align-items: center; justify-content: center;
+            gap: 6px; padding: 11px 18px; border: none; border-radius: 10px;
+            font-size: 13px; font-weight: 600; cursor: pointer;
+            font-family: inherit; transition: all 0.2s; text-decoration: none;
         }
-
         .btn-primary {
             background: linear-gradient(135deg, var(--primary), var(--accent));
             color: #fff;
-            width: 100%;
             box-shadow: 0 4px 20px var(--primary-glow);
         }
-
-            .btn-primary:hover {
-                transform: translateY(-1px);
-                box-shadow: 0 8px 30px var(--primary-glow);
-            }
-
-            .btn-primary:disabled {
-                opacity: 0.5;
-                cursor: not-allowed;
-                transform: none;
-            }
-
+        .btn-primary:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 8px 30px var(--primary-glow); }
         .btn-secondary {
-            background: var(--bg-glass);
-            color: var(--text);
+            background: var(--bg-glass); color: var(--text);
             border: 1px solid var(--border);
         }
+        .btn-secondary:hover { border-color: var(--border-hover); background: rgba(139, 92, 246, 0.08); }
+        .btn-danger { background: rgba(239, 68, 68, 0.15); color: var(--danger); border: 1px solid rgba(239, 68, 68, 0.3); }
+        .btn-danger:hover { background: rgba(239, 68, 68, 0.25); }
+        .btn-success { background: rgba(16, 185, 129, 0.15); color: var(--success); border: 1px solid rgba(16, 185, 129, 0.3); }
+        .btn-warning { background: rgba(245, 158, 11, 0.15); color: var(--warning); border: 1px solid rgba(245, 158, 11, 0.3); }
+        .btn-full { width: 100%; }
+        .btn-sm { padding: 6px 12px; font-size: 12px; }
 
-            .btn-secondary:hover {
-                border-color: var(--border-hover);
-                background: rgba(139, 92, 246, 0.08);
-            }
-
-        .btn-danger {
-            background: rgba(239, 68, 68, 0.15);
-            color: var(--danger);
-            border: 1px solid rgba(239, 68, 68, 0.3);
-        }
-
-            .btn-danger:hover {
-                background: rgba(239, 68, 68, 0.25);
-            }
-
-        .btn-success {
-            background: linear-gradient(135deg, var(--success), #34d399);
-            color: #fff;
-        }
-
-        .book-item {
-            display: grid;
-            grid-template-columns: 1fr auto;
-            gap: 16px;
+        .item-row {
+            display: grid; grid-template-columns: 1fr auto; gap: 14px;
             align-items: center;
-            padding: 16px;
-            margin-bottom: 10px;
-            background: var(--bg-glass);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            transition: all 0.2s;
+            padding: 14px; margin-bottom: 10px;
+            background: var(--bg-glass); border: 1px solid var(--border);
+            border-radius: 12px; transition: all 0.2s;
         }
-
-            .book-item:hover {
-                border-color: var(--border-hover);
-            }
-
-        .book-info h3 {
-            font-size: 16px;
-            margin-bottom: 4px;
-        }
-
-        .book-info .meta {
-            font-size: 12px;
-            color: var(--text-dim);
-        }
-
-        .book-actions {
-            display: flex;
-            gap: 8px;
-        }
+        .item-row:hover { border-color: var(--border-hover); }
+        .item-info h3 { font-size: 15px; margin-bottom: 4px; }
+        .item-info .meta { font-size: 12px; color: var(--text-dim); display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+        .item-actions { display: flex; gap: 6px; flex-wrap: wrap; }
 
         .badge {
-            display: inline-block;
-            padding: 3px 10px;
-            background: var(--bg-glass);
-            border: 1px solid var(--border);
-            border-radius: 999px;
-            font-size: 11px;
-            color: var(--text-dim);
+            display: inline-block; padding: 3px 10px;
+            background: var(--bg-glass); border: 1px solid var(--border);
+            border-radius: 999px; font-size: 11px; color: var(--text-dim);
         }
+        .badge-success { color: var(--success); border-color: rgba(16, 185, 129, 0.3); }
+        .badge-danger { color: var(--danger); border-color: rgba(239, 68, 68, 0.3); }
+        .badge-warning { color: var(--warning); border-color: rgba(245, 158, 11, 0.3); }
+        .badge-info { color: var(--secondary); border-color: rgba(6, 182, 212, 0.3); }
+        .badge-primary { color: var(--primary); border-color: rgba(139, 92, 246, 0.3); }
 
         .upload-area {
             border: 2px dashed rgba(139, 92, 246, 0.3);
-            border-radius: 12px;
-            padding: 40px;
-            text-align: center;
+            border-radius: 12px; padding: 32px; text-align: center;
+            cursor: pointer; background: rgba(139, 92, 246, 0.03);
             transition: all 0.2s;
-            cursor: pointer;
-            background: rgba(139, 92, 246, 0.03);
         }
-
-            .upload-area:hover {
-                border-color: var(--primary);
-                background: rgba(139, 92, 246, 0.08);
-            }
-
-        .upload-icon {
-            font-size: 48px;
-            margin-bottom: 12px;
-        }
+        .upload-area:hover { border-color: var(--primary); background: rgba(139, 92, 246, 0.08); }
+        .upload-icon { font-size: 40px; margin-bottom: 8px; }
 
         .progress-bar {
-            height: 6px;
-            background: rgba(255, 255, 255, 0.06);
-            border-radius: 999px;
-            overflow: hidden;
-            margin-top: 12px;
+            height: 6px; background: rgba(255, 255, 255, 0.06);
+            border-radius: 999px; overflow: hidden; margin-top: 12px;
         }
-
         .progress-fill {
             height: 100%;
             background: linear-gradient(90deg, var(--primary), var(--secondary));
-            border-radius: 999px;
-            transition: width 0.3s;
-            width: 0%;
+            border-radius: 999px; transition: width 0.3s; width: 0%;
         }
 
         .status-msg {
-            padding: 12px 16px;
-            border-radius: 10px;
-            margin-top: 12px;
-            font-size: 13px;
-            display: none;
+            padding: 11px 14px; border-radius: 10px;
+            margin-top: 10px; font-size: 13px; display: none;
         }
-
-            .status-msg.success {
-                background: rgba(16, 185, 129, 0.1);
-                color: var(--success);
-                border: 1px solid rgba(16, 185, 129, 0.3);
-                display: block;
-            }
-
-            .status-msg.error {
-                background: rgba(239, 68, 68, 0.1);
-                color: var(--danger);
-                border: 1px solid rgba(239, 68, 68, 0.3);
-                display: block;
-            }
-
-            .status-msg.info {
-                background: rgba(6, 182, 212, 0.1);
-                color: var(--secondary);
-                border: 1px solid rgba(6, 182, 212, 0.3);
-                display: block;
-            }
+        .status-msg.success { background: rgba(16, 185, 129, 0.1); color: var(--success); border: 1px solid rgba(16, 185, 129, 0.3); display: block; }
+        .status-msg.error { background: rgba(239, 68, 68, 0.1); color: var(--danger); border: 1px solid rgba(239, 68, 68, 0.3); display: block; }
+        .status-msg.info { background: rgba(6, 182, 212, 0.1); color: var(--secondary); border: 1px solid rgba(6, 182, 212, 0.3); display: block; }
 
         .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-            gap: 16px;
-            margin-bottom: 24px;
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 14px; margin-bottom: 24px;
         }
-
         .stat-card {
-            padding: 20px;
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 14px;
-            backdrop-filter: blur(20px);
+            padding: 18px;
+            background: var(--bg-card); border: 1px solid var(--border);
+            border-radius: 14px; backdrop-filter: blur(20px);
         }
-
         .stat-value {
-            font-size: 32px;
-            font-weight: 800;
-            letter-spacing: -0.02em;
+            font-size: 28px; font-weight: 800; letter-spacing: -0.02em;
             background: linear-gradient(135deg, var(--primary), var(--secondary));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
         }
-
-        .stat-label {
-            font-size: 12px;
-            color: var(--text-dim);
-            margin-top: 4px;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-        }
+        .stat-label { font-size: 11px; color: var(--text-dim); margin-top: 4px; text-transform: uppercase; letter-spacing: 0.05em; }
 
         .access-denied {
-            text-align: center;
-            padding: 60px;
-            background: var(--bg-card);
-            border: 1px solid rgba(239, 68, 68, 0.3);
-            border-radius: 16px;
-            backdrop-filter: blur(20px);
+            text-align: center; padding: 60px;
+            background: var(--bg-card); border: 1px solid rgba(239, 68, 68, 0.3);
+            border-radius: 16px; backdrop-filter: blur(20px);
         }
+        .access-denied h2 { color: var(--danger); font-size: 28px; margin-bottom: 12px; }
 
-            .access-denied h2 {
-                color: var(--danger);
-                font-size: 28px;
-                margin-bottom: 12px;
-            }
+        .empty { text-align: center; padding: 24px; color: var(--text-faint); }
+
+        .order-details {
+            margin-top: 10px;
+            padding: 10px 12px;
+            background: rgba(0,0,0,0.2);
+            border-radius: 8px;
+            font-size: 12px;
+        }
+        .order-details ul { list-style: none; padding: 0; }
+        .order-details li { padding: 3px 0; color: var(--text-dim); }
+        .order-details li strong { color: var(--text); }
+
+        select {
+            width: 100%; padding: 11px 13px;
+            background: var(--bg-glass); color: var(--text);
+            border: 1px solid var(--border); border-radius: 10px;
+            font-size: 14px; font-family: inherit; outline: none;
+        }
+        select option { background: var(--bg-elevated); }
     </style>
 </head>
 <body>
@@ -409,73 +259,163 @@
         <header>
             <div class="header-icon">⚙️</div>
             <h1>Admin Panel</h1>
-            <p class="subtitle">Kitoblarni boshqarish, sahifalar yuklash va o'chirish</p>
+            <p class="subtitle">Kitoblar, marketplace va buyurtmalarni boshqarish</p>
         </header>
 
         <div id="content" style="display:none;">
             <!-- STATISTIKA -->
             <div class="stats-grid" id="statsGrid"></div>
 
-            <!-- YANGI KITOB -->
-            <div class="card">
-                <div class="card-title">📕 Yangi kitob qo'shish</div>
-                <div class="form-row cols-3">
-                    <div class="form-field">
-                        <label>Kitob nomi *</label>
-                        <input type="text" id="newTitle" placeholder="Masalan: O'tkan kunlar">
-                    </div>
-                    <div class="form-field">
-                        <label>Muallif *</label>
-                        <input type="text" id="newAuthor" placeholder="Abdulla Qodiriy">
-                    </div>
-                    <div class="checkbox-wrap">
-                        <input type="checkbox" id="newAvailable" checked>
-                        <label for="newAvailable" style="margin:0;">Mavjud</label>
-                    </div>
-                </div>
-                <div class="form-row cols-3">
-                    <div class="form-field">
-                        <label>Nashr yili</label>
-                        <input type="number" id="newYear" placeholder="1925" min="1000" max="2100">
-                    </div>
-                    <div class="form-field">
-                        <label>Kategoriya</label>
-                        <input type="text" id="newCategory" placeholder="Klassika">
-                    </div>
-                    <button class="btn btn-primary" onclick="createBook()">+ Yaratish</button>
-                </div>
-                <div class="status-msg" id="createStatus"></div>
+            <!-- TABS -->
+            <div class="tabs">
+                <button class="tab-btn active" onclick="switchTab('reading')">📚 O'qish bo'limi</button>
+                <button class="tab-btn" onclick="switchTab('market')">🛒 Marketplace</button>
+                <button class="tab-btn" onclick="switchTab('orders')">📦 Buyurtmalar</button>
             </div>
 
-            <!-- PDF YUKLASH -->
-            <div class="card">
-                <div class="card-title">📄 PDF dan sahifalar yuklash</div>
-                <div class="form-field">
-                    <label>Kitobni tanlang</label>
-                    <select id="pdfBookSelect">
-                        <option value="">-- Kitob tanlang --</option>
-                    </select>
+            <!-- ============================================ -->
+            <!-- TAB 1: O'QISH BO'LIMI (Books + Pages) -->
+            <!-- ============================================ -->
+            <div class="tab-panel active" id="tab-reading">
+                <div class="card">
+                    <div class="card-title">📕 Yangi kitob qo'shish</div>
+                    <div class="form-row cols-3">
+                        <div class="form-field">
+                            <label>Kitob nomi *</label>
+                            <input type="text" id="newTitle" placeholder="Masalan: O'tkan kunlar">
+                        </div>
+                        <div class="form-field">
+                            <label>Muallif *</label>
+                            <input type="text" id="newAuthor" placeholder="Abdulla Qodiriy">
+                        </div>
+                        <div class="checkbox-wrap">
+                            <input type="checkbox" id="newAvailable" checked>
+                            <label for="newAvailable" style="margin:0;">Mavjud</label>
+                        </div>
+                    </div>
+                    <div class="form-row cols-3">
+                        <div class="form-field">
+                            <label>Nashr yili</label>
+                            <input type="number" id="newYear" placeholder="1925" min="1000" max="2100">
+                        </div>
+                        <div class="form-field">
+                            <label>Kategoriya</label>
+                            <input type="text" id="newCategory" placeholder="Klassika">
+                        </div>
+                        <button class="btn btn-primary" onclick="createBook()">+ Yaratish</button>
+                    </div>
+                    <div class="status-msg" id="createBookStatus"></div>
                 </div>
-                <label class="upload-area" for="pdfInput">
-                    <div class="upload-icon">📁</div>
-                    <div style="font-weight:600; margin-bottom:4px;">PDF faylni tanlang</div>
-                    <div style="color:var(--text-dim); font-size:13px;">Matn avtomatik ajratiladi va sahifalarga bo'linadi</div>
-                    <input type="file" id="pdfInput" accept=".pdf" style="display:none;" onchange="handlePdfSelected(event)">
-                </label>
-                <div class="progress-bar" id="pdfProgress" style="display:none;">
-                    <div class="progress-fill" id="pdfFill"></div>
+
+                <div class="card">
+                    <div class="card-title">📄 PDF dan sahifalar yuklash</div>
+                    <div class="form-field">
+                        <label>Kitobni tanlang</label>
+                        <select id="pdfBookSelect">
+                            <option value="">-- Kitob tanlang --</option>
+                        </select>
+                    </div>
+                    <label class="upload-area" for="pdfInput">
+                        <div class="upload-icon">📁</div>
+                        <div style="font-weight:600; margin-bottom:4px;">PDF faylni tanlang</div>
+                        <div style="color:var(--text-dim); font-size:13px;">Matn avtomatik ajratiladi va sahifalarga bo'linadi</div>
+                        <input type="file" id="pdfInput" accept=".pdf" style="display:none;" onchange="handlePdfSelected(event)">
+                    </label>
+                    <div class="progress-bar" id="pdfProgress" style="display:none;">
+                        <div class="progress-fill" id="pdfFill"></div>
+                    </div>
+                    <div class="status-msg" id="pdfStatus"></div>
                 </div>
-                <div class="status-msg" id="pdfStatus"></div>
+
+                <div class="card">
+                    <div class="card-title">📚 Barcha kitoblar</div>
+                    <div id="booksList"><div class="empty">Yuklanmoqda...</div></div>
+                </div>
             </div>
 
-            <!-- KITOBLAR RO'YXATI -->
-            <div class="card">
-                <div class="card-title">📚 Barcha kitoblar</div>
-                <div id="booksList"></div>
+            <!-- ============================================ -->
+            <!-- TAB 2: MARKETPLACE (SaleBooks) -->
+            <!-- ============================================ -->
+            <div class="tab-panel" id="tab-market">
+                <div class="card">
+                    <div class="card-title">🛒 Marketplace'ga kitob qo'shish</div>
+                    <div class="form-row cols-2">
+                        <div class="form-field">
+                            <label>Kitob nomi *</label>
+                            <input type="text" id="sTitle" placeholder="To Kill a Mockingbird">
+                        </div>
+                        <div class="form-field">
+                            <label>Muallif *</label>
+                            <input type="text" id="sAuthor" placeholder="Harper Lee">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-field">
+                            <label>Tavsif</label>
+                            <textarea id="sDescription" placeholder="Kitob haqida qisqacha..."></textarea>
+                        </div>
+                    </div>
+                    <div class="form-row cols-3">
+                        <div class="form-field">
+                            <label>Narx (so'm) *</label>
+                            <input type="number" id="sPrice" placeholder="78000" min="0" step="1000">
+                        </div>
+                        <div class="form-field">
+                            <label>Zaxira (dona)</label>
+                            <input type="number" id="sStock" placeholder="10" min="0" value="1">
+                        </div>
+                        <div class="checkbox-wrap">
+                            <input type="checkbox" id="sActive" checked>
+                            <label for="sActive" style="margin:0;">Faol</label>
+                        </div>
+                    </div>
+                    <div class="form-row cols-3">
+                        <div class="form-field">
+                            <label>Kategoriya</label>
+                            <input type="text" id="sCategory" placeholder="Klassik adabiyot">
+                        </div>
+                        <div class="form-field">
+                            <label>Yil</label>
+                            <input type="number" id="sYear" placeholder="1960" min="1000" max="2100">
+                        </div>
+                        <button class="btn btn-primary" onclick="createSaleBook()">+ Yaratish</button>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-field">
+                            <label>Rasm URL (ixtiyoriy)</label>
+                            <input type="url" id="sImageUrl" placeholder="https://...">
+                        </div>
+                    </div>
+                    <div class="status-msg" id="createSaleStatus"></div>
+                </div>
+
+                <div class="card">
+                    <div class="card-title">🛍️ Marketplace kitoblari</div>
+                    <div id="saleBooksList"><div class="empty">Yuklanmoqda...</div></div>
+                </div>
+            </div>
+
+            <!-- ============================================ -->
+            <!-- TAB 3: BUYURTMALAR -->
+            <!-- ============================================ -->
+            <div class="tab-panel" id="tab-orders">
+                <div class="card">
+                    <div class="card-title">
+                        📦 Barcha buyurtmalar
+                        <select id="orderStatusFilter" onchange="loadOrders()" style="margin-left:auto; width:auto; padding:8px 12px;">
+                            <option value="">Barcha statuslar</option>
+                            <option value="Pending">Kutilmoqda</option>
+                            <option value="Paid">To'langan</option>
+                            <option value="Shipped">Jo'natilgan</option>
+                            <option value="Delivered">Yetkazilgan</option>
+                            <option value="Cancelled">Bekor qilingan</option>
+                        </select>
+                    </div>
+                    <div id="ordersList"><div class="empty">Yuklanmoqda...</div></div>
+                </div>
             </div>
         </div>
 
-        <!-- ACCESS DENIED -->
         <div id="accessDenied" class="access-denied" style="display:none;">
             <h2>🚫 Ruxsat yo'q</h2>
             <p style="color:var(--text-dim); margin-bottom:20px;">Bu sahifa faqat administratorlar uchun</p>
@@ -497,6 +437,18 @@
             if (json) h['Content-Type'] = 'application/json';
             return h;
         }
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = String(text ?? '');
+            return div.innerHTML;
+        }
+        function fmtMoney(n) {
+            return Number(n).toLocaleString('uz-UZ') + " so'm";
+        }
+        function fmtDate(d) {
+            const dt = new Date(d);
+            return dt.toLocaleDateString('uz-UZ') + ' ' + dt.toLocaleTimeString('uz-UZ', {hour:'2-digit', minute:'2-digit'});
+        }
 
         function checkAdmin() {
             const user = getUser();
@@ -508,59 +460,90 @@
             return true;
         }
 
-        // ========== KITOBLAR ==========
+        function switchTab(name) {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+            event.target.classList.add('active');
+            document.getElementById('tab-' + name).classList.add('active');
+        }
+
+        // ==========================================
+        // STATISTICS
+        // ==========================================
+        async function loadStats() {
+            try {
+                const [booksRes, saleRes, ordersRes] = await Promise.all([
+                    fetch(`${API}/books?pageSize=1`),
+                    fetch(`${API}/salebooks`),
+                    fetch(`${API}/orders`, { headers: authHeaders(false) })
+                ]);
+
+                const books = await booksRes.json();
+                const saleBooks = saleRes.ok ? await saleRes.json() : [];
+                const orders = ordersRes.ok ? await ordersRes.json() : [];
+
+                const totalRevenue = orders
+                    .filter(o => o.status !== 'Cancelled')
+                    .reduce((s, o) => s + (o.totalAmount || 0), 0);
+
+                document.getElementById('statsGrid').innerHTML = `
+                    <div class="stat-card">
+                        <div class="stat-value">${books.totalCount || 0}</div>
+                        <div class="stat-label">📚 Kitoblar</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">${saleBooks.length || 0}</div>
+                        <div class="stat-label">🛒 Marketplace</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">${orders.length || 0}</div>
+                        <div class="stat-label">📦 Buyurtmalar</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" style="font-size:22px;">${fmtMoney(totalRevenue)}</div>
+                        <div class="stat-label">💰 Jami daromad</div>
+                    </div>
+                `;
+            } catch (err) { console.error(err); }
+        }
+
+        // ==========================================
+        // BOOKS (Reading)
+        // ==========================================
         async function loadBooks() {
             try {
                 const res = await fetch(`${API}/books?pageSize=100`);
                 const data = await res.json();
-                const books = data.items || data;
+                const books = data.items || [];
 
-                // Statistika
-                const stats = document.getElementById('statsGrid');
-                stats.innerHTML = `
-                        <div class="stat-card">
-                            <div class="stat-value">${books.length}</div>
-                            <div class="stat-label">📚 Jami kitoblar</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-value">${books.filter(b => b.isAvailable).length}</div>
-                            <div class="stat-label">✅ Mavjud</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-value">${new Set(books.map(b => b.category)).size}</div>
-                            <div class="stat-label">🏷️ Kategoriyalar</div>
-                        </div>
-                    `;
-
-                // PDF select
                 const select = document.getElementById('pdfBookSelect');
                 select.innerHTML = '<option value="">-- Kitob tanlang --</option>' +
-                    books.map(b => `<option value="${b.id}">${b.title} — ${b.author}</option>`).join('');
+                    books.map(b => `<option value="${b.id}">${escapeHtml(b.title)} — ${escapeHtml(b.author)}</option>`).join('');
 
-                // Kitoblar ro'yxati
                 const list = document.getElementById('booksList');
                 if (books.length === 0) {
-                    list.innerHTML = '<p style="color:var(--text-dim); text-align:center; padding:20px;">Hali kitoblar yo\'q</p>';
+                    list.innerHTML = '<div class="empty">Hali kitoblar yo\'q</div>';
                     return;
                 }
                 list.innerHTML = books.map(b => `
-                        <div class="book-item">
-                            <div class="book-info">
-                                <h3>${b.title}</h3>
-                                <div class="meta">
-                                    ✍️ ${b.author} • 📅 ${b.year} •
-                                    <span class="badge">${b.category}</span>
-                                    ${b.isAvailable ? '<span class="badge" style="color:var(--success);">Mavjud</span>' : '<span class="badge" style="color:var(--danger);">Yo\'q</span>'}
-                                </div>
-                            </div>
-                            <div class="book-actions">
-                                <button class="btn btn-danger" onclick="deleteBook(${b.id}, '${b.title.replace(/'/g, "\\'")}')">🗑️ O'chirish</button>
+                    <div class="item-row">
+                        <div class="item-info">
+                            <h3>${escapeHtml(b.title)}</h3>
+                            <div class="meta">
+                                ✍️ ${escapeHtml(b.author)}
+                                <span class="badge">${escapeHtml(b.category)}</span>
+                                <span class="badge">${b.year}</span>
+                                ${b.isAvailable
+                                    ? '<span class="badge badge-success">Mavjud</span>'
+                                    : '<span class="badge badge-danger">Yo\'q</span>'}
                             </div>
                         </div>
-                    `).join('');
-            } catch (err) {
-                console.error('Xato:', err);
-            }
+                        <div class="item-actions">
+                            <button class="btn btn-danger btn-sm" onclick="deleteBook(${b.id}, '${escapeHtml(b.title).replace(/'/g, "\\'")}')">🗑️ O'chirish</button>
+                        </div>
+                    </div>
+                `).join('');
+            } catch (err) { console.error('Xato:', err); }
         }
 
         async function createBook() {
@@ -569,7 +552,7 @@
             const year = parseInt(document.getElementById('newYear').value) || new Date().getFullYear();
             const category = document.getElementById('newCategory').value.trim() || 'Boshqa';
             const isAvailable = document.getElementById('newAvailable').checked;
-            const status = document.getElementById('createStatus');
+            const status = document.getElementById('createBookStatus');
 
             if (!title || !author) {
                 status.className = 'status-msg error';
@@ -589,7 +572,9 @@
                 document.getElementById('newTitle').value = '';
                 document.getElementById('newAuthor').value = '';
                 document.getElementById('newCategory').value = '';
+                document.getElementById('newYear').value = '';
                 await loadBooks();
+                await loadStats();
                 setTimeout(() => status.className = 'status-msg', 3000);
             } catch (err) {
                 status.className = 'status-msg error';
@@ -606,10 +591,10 @@
                 });
                 if (!res.ok) throw new Error(`Xato: ${res.status}`);
                 await loadBooks();
+                await loadStats();
             } catch (err) { alert('Xato: ' + err.message); }
         }
 
-        // ========== PDF UPLOAD ==========
         async function handlePdfSelected(event) {
             const file = event.target.files[0];
             const bookId = document.getElementById('pdfBookSelect').value;
@@ -651,7 +636,7 @@
                     const data = await res.json();
                     fill.style.width = '100%';
                     status.className = 'status-msg success';
-                    status.textContent = `✅ ${data.count || 'Sahifalar'} muvaffaqiyatli yuklandi!`;
+                    status.textContent = `✅ ${data.count || ''} ta sahifa yuklandi!`;
                     document.getElementById('pdfInput').value = '';
                     setTimeout(() => {
                         progress.style.display = 'none';
@@ -666,9 +651,192 @@
             }
         }
 
-        // ========== INIT ==========
+        // ==========================================
+        // SALE BOOKS (Marketplace)
+        // ==========================================
+        async function loadSaleBooks() {
+            try {
+                const res = await fetch(`${API}/salebooks`);
+                const books = res.ok ? await res.json() : [];
+
+                const list = document.getElementById('saleBooksList');
+                if (books.length === 0) {
+                    list.innerHTML = '<div class="empty">Marketplace\'da hali kitoblar yo\'q</div>';
+                    return;
+                }
+                list.innerHTML = books.map(b => `
+                    <div class="item-row">
+                        <div class="item-info">
+                            <h3>${escapeHtml(b.title)}</h3>
+                            <div class="meta">
+                                ✍️ ${escapeHtml(b.author)}
+                                <span class="badge badge-primary">${fmtMoney(b.price)}</span>
+                                <span class="badge">${escapeHtml(b.category || 'Boshqa')}</span>
+                                <span class="badge ${b.stock > 0 ? 'badge-success' : 'badge-danger'}">Zaxira: ${b.stock}</span>
+                                ${b.isActive
+                                    ? '<span class="badge badge-success">Faol</span>'
+                                    : '<span class="badge badge-danger">Nofaol</span>'}
+                            </div>
+                        </div>
+                        <div class="item-actions">
+                            <button class="btn btn-warning btn-sm" onclick="toggleSaleActive(${b.id})">🔄 Toggle</button>
+                            <button class="btn btn-danger btn-sm" onclick="deleteSaleBook(${b.id}, '${escapeHtml(b.title).replace(/'/g, "\\'")}')">🗑️</button>
+                        </div>
+                    </div>
+                `).join('');
+            } catch (err) { console.error(err); }
+        }
+
+        async function createSaleBook() {
+            const title = document.getElementById('sTitle').value.trim();
+            const author = document.getElementById('sAuthor').value.trim();
+            const description = document.getElementById('sDescription').value.trim();
+            const price = parseFloat(document.getElementById('sPrice').value) || 0;
+            const stock = parseInt(document.getElementById('sStock').value) || 0;
+            const category = document.getElementById('sCategory').value.trim() || 'Boshqa';
+            const year = parseInt(document.getElementById('sYear').value) || null;
+            const imageUrl = document.getElementById('sImageUrl').value.trim();
+            const isActive = document.getElementById('sActive').checked;
+            const status = document.getElementById('createSaleStatus');
+
+            if (!title || !author || price <= 0) {
+                status.className = 'status-msg error';
+                status.textContent = '❌ Kitob nomi, muallif va narx majburiy';
+                return;
+            }
+
+            try {
+                const res = await fetch(`${API}/salebooks`, {
+                    method: 'POST',
+                    headers: authHeaders(),
+                    body: JSON.stringify({ title, author, description, price, stock, category, year, imageUrl, isActive })
+                });
+                if (!res.ok) throw new Error(`Xato: ${res.status}`);
+                status.className = 'status-msg success';
+                status.textContent = '✅ Marketplace\'ga qo\'shildi!';
+                ['sTitle', 'sAuthor', 'sDescription', 'sPrice', 'sCategory', 'sYear', 'sImageUrl'].forEach(id =>
+                    document.getElementById(id).value = ''
+                );
+                document.getElementById('sStock').value = '1';
+                await loadSaleBooks();
+                await loadStats();
+                setTimeout(() => status.className = 'status-msg', 3000);
+            } catch (err) {
+                status.className = 'status-msg error';
+                status.textContent = '❌ ' + err.message;
+            }
+        }
+
+        async function deleteSaleBook(id, title) {
+            if (!confirm(`"${title}" ni marketplace'dan o'chirmoqchimisiz?`)) return;
+            try {
+                const res = await fetch(`${API}/salebooks/${id}`, {
+                    method: 'DELETE',
+                    headers: authHeaders(false)
+                });
+                if (!res.ok) throw new Error(`Xato: ${res.status}`);
+                await loadSaleBooks();
+                await loadStats();
+            } catch (err) { alert('Xato: ' + err.message); }
+        }
+
+        async function toggleSaleActive(id) {
+            try {
+                const res = await fetch(`${API}/salebooks/${id}/toggle`, {
+                    method: 'PATCH',
+                    headers: authHeaders(false)
+                });
+                if (!res.ok) throw new Error(`Xato: ${res.status}`);
+                await loadSaleBooks();
+            } catch (err) { alert('Xato: ' + err.message); }
+        }
+
+        // ==========================================
+        // ORDERS
+        // ==========================================
+        async function loadOrders() {
+            try {
+                const filter = document.getElementById('orderStatusFilter').value;
+                const url = filter ? `${API}/orders?status=${filter}` : `${API}/orders`;
+                const res = await fetch(url, { headers: authHeaders(false) });
+
+                if (!res.ok) throw new Error('Buyurtmalar yuklanmadi');
+                const orders = await res.json();
+
+                const list = document.getElementById('ordersList');
+                if (orders.length === 0) {
+                    list.innerHTML = '<div class="empty">Buyurtmalar yo\'q</div>';
+                    return;
+                }
+
+                const statusClass = {
+                    Pending: 'badge-warning',
+                    Paid: 'badge-info',
+                    Shipped: 'badge-primary',
+                    Delivered: 'badge-success',
+                    Cancelled: 'badge-danger'
+                };
+
+                list.innerHTML = orders.map(o => `
+                    <div class="item-row" style="grid-template-columns: 1fr; gap: 8px;">
+                        <div style="display: grid; grid-template-columns: 1fr auto; gap: 14px; align-items: center;">
+                            <div class="item-info">
+                                <h3>#${o.id} — ${fmtMoney(o.totalAmount)}
+                                    <span class="badge ${statusClass[o.status] || 'badge'}">${o.status}</span>
+                                </h3>
+                                <div class="meta">
+                                    👤 ${escapeHtml(o.customer?.firstName || '')} ${escapeHtml(o.customer?.lastName || '')}
+                                    (${escapeHtml(o.customer?.email || '')})
+                                    <span>📞 ${escapeHtml(o.customerPhone || '—')}</span>
+                                    <span>📅 ${fmtDate(o.createdAt)}</span>
+                                    <span class="badge">${o.itemsCount} ta kitob</span>
+                                </div>
+                            </div>
+                            <div class="item-actions">
+                                <select onchange="updateOrderStatus(${o.id}, this.value)" style="width: auto; padding: 6px 10px; font-size: 12px;">
+                                    <option value="">Status o'zgartirish</option>
+                                    <option value="Pending" ${o.status === 'Pending' ? 'disabled' : ''}>Kutilmoqda</option>
+                                    <option value="Paid" ${o.status === 'Paid' ? 'disabled' : ''}>To'langan</option>
+                                    <option value="Shipped" ${o.status === 'Shipped' ? 'disabled' : ''}>Jo'natilgan</option>
+                                    <option value="Delivered" ${o.status === 'Delivered' ? 'disabled' : ''}>Yetkazilgan</option>
+                                    <option value="Cancelled" ${o.status === 'Cancelled' ? 'disabled' : ''}>Bekor qilish</option>
+                                </select>
+                            </div>
+                        </div>
+                        ${o.deliveryAddress ? `<div class="order-details">📍 <strong>Manzil:</strong> ${escapeHtml(o.deliveryAddress)}</div>` : ''}
+                    </div>
+                `).join('');
+            } catch (err) {
+                document.getElementById('ordersList').innerHTML =
+                    `<div class="empty">Xato: ${err.message}</div>`;
+            }
+        }
+
+        async function updateOrderStatus(orderId, newStatus) {
+            if (!newStatus) return;
+            if (!confirm(`Buyurtma #${orderId} statusini "${newStatus}" ga o'zgartirmoqchimisiz?`)) {
+                loadOrders();
+                return;
+            }
+            try {
+                const res = await fetch(`${API}/orders/${orderId}/status?status=${newStatus}`, {
+                    method: 'PATCH',
+                    headers: authHeaders(false)
+                });
+                if (!res.ok) throw new Error(`Xato: ${res.status}`);
+                await loadOrders();
+                await loadStats();
+            } catch (err) { alert('Xato: ' + err.message); }
+        }
+
+        // ==========================================
+        // INIT
+        // ==========================================
         if (checkAdmin()) {
+            loadStats();
             loadBooks();
+            loadSaleBooks();
+            loadOrders();
         }
     </script>
 </body>
