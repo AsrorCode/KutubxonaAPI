@@ -51,4 +51,14 @@ public class Comment
     /// Navigation Property - bu izoh tegishli bo'lgan Book.
     /// </summary>
     public Book? Book { get; set; }
+
+    /// <summary>
+    /// Foreign Key - izohni yozgan foydalanuvchi ID si.
+    /// </summary>
+    public int UserId { get; set; }
+
+    /// <summary>
+    /// Navigation Property - izoh muallifi.
+    /// </summary>
+    public User? User { get; set; }
 }

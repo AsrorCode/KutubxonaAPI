@@ -1368,9 +1368,8 @@
             </div>
             <div class="comment-form">
                 <h3>✍️ Izoh qoldiring</h3>
-                <div class="form-field">
-                    <label>Ismingiz</label>
-                    <input type="text" id="commentName" placeholder="Asror" maxlength="100">
+                <div id="commentAuthNotice" class="form-status error" style="display:none;">
+                    🔐 Izoh qoldirish uchun <a href="/login.html" style="color:var(--primary); text-decoration:underline;">tizimga kiring</a>
                 </div>
                 <div class="form-field">
                     <label>Bahoyingiz</label>
@@ -1791,27 +1790,48 @@
         }
 
         function resetCommentForm() {
-            document.getElementById('commentName').value = '';
             document.getElementById('commentText').value = '';
             selectedRating = 0;
             updateStarDisplay();
             document.getElementById('formStatus').className = 'form-status';
+
+            // Auth notice
+            const user = getCurrentUser();
+            const notice = document.getElementById('commentAuthNotice');
+            const submitBtn = document.getElementById('submitCommentBtn');
+            if (user) {
+                notice.style.display = 'none';
+                submitBtn.disabled = false;
+            } else {
+                notice.style.display = 'block';
+                submitBtn.disabled = true;
+            }
         }
 
         async function submitComment() {
-            const name = document.getElementById('commentName').value.trim();
             const text = document.getElementById('commentText').value.trim();
             const statusEl = document.getElementById('formStatus');
-            if (!name) { statusEl.textContent = 'Ismingizni kiriting!'; statusEl.className = 'form-status error'; return; }
+
+            const user = getCurrentUser();
+            if (!user) {
+                statusEl.textContent = 'Izoh qoldirish uchun tizimga kiring!';
+                statusEl.className = 'form-status error';
+                return;
+            }
+
             if (selectedRating < 1) { statusEl.textContent = 'Yulduz bahosini tanlang!'; statusEl.className = 'form-status error'; return; }
             if (!text) { statusEl.textContent = 'Izoh matnini yozing!'; statusEl.className = 'form-status error'; return; }
             const btn = document.getElementById('submitCommentBtn');
             btn.disabled = true; btn.textContent = 'Yuborilmoqda...';
             try {
+                const token = localStorage.getItem('auth_token');
                 const response = await fetch(`${API_BASE}/api/books/${modalBookId}/comments`, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ authorName: name, content: text, rating: selectedRating })
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ content: text, rating: selectedRating })
                 });
                 if (!response.ok) { const err = await response.text(); throw new Error(err || `Status ${response.status}`); }
                 resetCommentForm();
