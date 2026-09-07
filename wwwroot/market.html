@@ -749,6 +749,7 @@
 </head>
 <body>
     <div class="auth-bar" id="authBar"></div>
+    <script src="/auth.js"></script>
 
     <div class="container">
         <header>
@@ -821,12 +822,13 @@
             return userStr ? JSON.parse(userStr) : null;
         }
         function getToken() { return localStorage.getItem('auth_token'); }
-        function logout() {
+        async function logout() {
             if (!confirm('Tizimdan chiqmoqchimisiz?')) return;
-            localStorage.removeItem('auth_token');
-            localStorage.removeItem('auth_user');
+            await serverLogout();
             window.location.reload();
         }
+        // Access tokenni har 12 daqiqada avtomatik yangilash
+        setInterval(() => { if (getRefreshToken()) refreshAccessToken(); }, 12 * 60 * 1000);
         function renderAuthBar() {
             const user = getCurrentUser();
             const bar = document.getElementById('authBar');

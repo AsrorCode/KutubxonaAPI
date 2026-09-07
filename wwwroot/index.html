@@ -1408,8 +1408,14 @@
         </div>
     </div>
     <div class="toast" id="toast"></div>
+    <script src="/auth.js"></script>
     <script>
         const API_BASE = window.location.origin;
+
+        // Access token'ni har 12 daqiqada avtomatik yangilash (u 15 daqiqada tugaydi)
+        setInterval(() => {
+            if (getRefreshToken()) refreshAccessToken();
+        }, 12 * 60 * 1000);
         const PAGE_SIZE = 20;
         let currentBookPage = 1;
         let hasMorePages = true;
@@ -1435,10 +1441,9 @@
             const userStr = localStorage.getItem('auth_user');
             return userStr ? JSON.parse(userStr) : null;
         }
-        function logout() {
+        async function logout() {
             if (!confirm('Tizimdan chiqmoqchimisiz?')) return;
-            localStorage.removeItem('auth_token');
-            localStorage.removeItem('auth_user');
+            await serverLogout();
             window.location.reload();
         }
         function renderAuthBar() {

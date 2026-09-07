@@ -423,9 +423,13 @@
         </div>
     </div>
 
+    <script src="/auth.js"></script>
     <script>
         const API = window.location.origin + '/api';
         pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+        // Access tokenni har 12 daqiqada yangilash
+        setInterval(() => { if (getRefreshToken()) refreshAccessToken(); }, 12 * 60 * 1000);
 
         function getToken() { return localStorage.getItem('auth_token'); }
         function getUser() {
