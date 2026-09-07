@@ -61,7 +61,7 @@ public class AppDbContext : DbContext
 
         // ===== Book → Comments (cascade) =====
         modelBuilder.Entity<Comment>()
-            .HasOne<Book>()
+            .HasOne(c => c.Book)
             .WithMany(b => b.Comments)
             .HasForeignKey(c => c.BookId)
             .OnDelete(DeleteBehavior.Cascade);
