@@ -178,9 +178,7 @@
             }
 
         .cart-icon {
-            position: fixed;
-            top: 20px;
-            right: 200px;
+            position: relative;
             z-index: 9999;
             background: linear-gradient(135deg, var(--accent), var(--warning));
             color: #fff;
@@ -751,9 +749,6 @@
 </head>
 <body>
     <div class="auth-bar" id="authBar"></div>
-    <button class="cart-icon" id="cartIcon" onclick="openCart()">
-        🛒 Savatcha <span class="cart-badge" id="cartBadge">0</span>
-    </button>
 
     <div class="container">
         <header>
@@ -763,6 +758,7 @@
             <div class="top-nav">
                 <a href="/" class="nav-pill">📚 O'qish bo'limi</a>
                 <a href="/my-orders.html" class="nav-pill">📦 Mening buyurtmalarim</a>
+                <a href="/admin.html" class="nav-pill" id="adminLink" style="display:none;">⚙️ Admin panel</a>
             </div>
         </header>
 
@@ -834,19 +830,29 @@
         function renderAuthBar() {
             const user = getCurrentUser();
             const bar = document.getElementById('authBar');
+            const adminLink = document.getElementById('adminLink');
             if (user) {
                 const isAdmin = user.role === 'Admin';
                 const badge = isAdmin ? '<span class="admin-tag">ADMIN</span>' : '';
                 bar.innerHTML = `
+                        <button class="cart-icon" id="cartIcon" onclick="openCart()">
+                            🛒 <span class="cart-badge" id="cartBadge">0</span>
+                        </button>
                         <span class="user-pill">👤 ${escapeHtml(user.firstName)} ${badge}</span>
                         <button class="auth-btn" onclick="logout()">Chiqish</button>
                     `;
+                if (adminLink) adminLink.style.display = isAdmin ? 'inline-flex' : 'none';
             } else {
                 bar.innerHTML = `
+                        <button class="cart-icon" id="cartIcon" onclick="openCart()">
+                            🛒 <span class="cart-badge" id="cartBadge">0</span>
+                        </button>
                         <a href="/login.html" class="auth-btn">Kirish</a>
                         <a href="/register.html" class="auth-btn">Ro'yxatdan o'tish</a>
                     `;
+                if (adminLink) adminLink.style.display = 'none';
             }
+            updateCartBadge();
         }
 
         function getCart() { return JSON.parse(localStorage.getItem('cart') || '[]'); }

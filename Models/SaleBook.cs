@@ -37,5 +37,12 @@ public class SaleBook
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public DateTime? UpdatedAt { get; set; }
 
+    /// <summary>
+    /// Concurrency token — bir vaqtda 2 kishi Stock ni o'zgartira olmaydi.
+    /// EF Core avtomatik boshqaradi.
+    /// </summary>
+    [Timestamp]
+    public byte[]? RowVersion { get; set; }
+
     public List<OrderItem> OrderItems { get; set; } = new();
 }
