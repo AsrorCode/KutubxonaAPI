@@ -1,10 +1,15 @@
+using System.IO.Compression;
+using System.Reflection;
 using System.Text;
 using System.Threading.RateLimiting;
+using FluentValidation;
+using FluentValidation.AspNetCore;
 using KutubxonaAPI.Data;
 using KutubxonaAPI.Middleware;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.RateLimiting;
+using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.IdentityModel.Tokens;
@@ -44,6 +49,51 @@ try
                 new System.Text.Json.Serialization.JsonStringEnumConverter());
         });
     builder.Services.AddOpenApi();
+
+    // ============================================
+    // FLUENTVALIDATION
+    // ============================================
+    builder.Services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
+    builder.Services.AddFluentValidationAutoValidation();
+    builder.Services.AddFluentValidationClientsideAdapters();
+
+    // ============================================
+    // RESPONSE COMPRESSION (Gzip + Brotli)
+    // ============================================
+    builder.Services.AddResponseCompression(options =>
+    {
+        options.EnableForHttps = true;
+        options.Providers.Add<BrotliCompressionProvider>();
+        options.Providers.Add<GzipCompressionProvider>();
+        options.MimeTypes = ResponseCompressionDefaults.MimeTypes.Concat(new[]
+        {
+            "application/json",
+            "text/plain",
+            "image/svg+xml"
+        });
+    });
+
+    builder.Services.Configure<BrotliCompressionProviderOptions>(o => o.Level = CompressionLevel.Fastest);
+    builder.Services.Configure<GzipCompressionProviderOptions>(o => o.Level = CompressionLevel.Fastest);
+
+    // ============================================
+    // IN-MEMORY CACHE + OUTPUT CACHE
+    // ============================================
+    builder.Services.AddMemoryCache();
+    builder.Services.AddOutputCache(options =>
+    {
+        // Default: 60 sekund cache
+        options.AddBasePolicy(builder => builder.Expire(TimeSpan.FromSeconds(60)));
+
+        // Kategoriya kabi static data uchun — 5 daqiqa
+        options.AddPolicy("static-5min", builder =>
+            builder.Expire(TimeSpan.FromMinutes(5)));
+
+        // Kitob ro'yxati — 30 sekund
+        options.AddPolicy("books-30sec", builder =>
+            builder.Expire(TimeSpan.FromSeconds(30))
+                   .SetVaryByQuery("page", "pageSize", "category", "search"));
+    });
 
     // Database
     var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
@@ -155,6 +205,9 @@ try
     // 1. Global Exception Handler
     app.UseMiddleware<GlobalExceptionMiddleware>();
 
+    // Response compression — birinchi bo'lib pipeline'da
+    app.UseResponseCompression();
+
     // 2. Serilog request logging — har HTTP so'rov loglanadi
     app.UseSerilogRequestLogging(options =>
     {
@@ -204,6 +257,9 @@ try
     // 8. Authentication + Authorization
     app.UseAuthentication();
     app.UseAuthorization();
+
+    // Output cache
+    app.UseOutputCache();
 
     // ============================================
     // HEALTH CHECK ENDPOINTS
