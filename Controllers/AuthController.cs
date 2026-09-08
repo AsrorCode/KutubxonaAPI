@@ -4,6 +4,9 @@ using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 using KutubxonaAPI.Data;
+using KutubxonaAPI.DTOs.Auth;
+using KutubxonaAPI.DTOs.Mapping;
+using KutubxonaAPI.DTOs.Users;
 using KutubxonaAPI.Models;
 using KutubxonaAPI.Models.Enums;
 using Microsoft.AspNetCore.Authorization;
@@ -68,21 +71,14 @@ public class AuthController : ControllerBase
         var accessToken = GenerateAccessToken(user);
         var refreshToken = await CreateRefreshToken(user.Id);
 
-        return Ok(new
+        return Ok(new AuthResponseDto
         {
-            message = "Ro'yxatdan muvaffaqiyatli o'tildi!",
-            token = accessToken,           // Backward compat
-            accessToken,
-            refreshToken = refreshToken.Token,
-            expiresIn = GetAccessTokenMinutes() * 60, // sekundlarda
-            user = new
-            {
-                user.Id,
-                user.Email,
-                user.FirstName,
-                user.LastName,
-                user.Role
-            }
+            Message = "Ro'yxatdan muvaffaqiyatli o'tildi!",
+            Token = accessToken,           // Backward compat
+            AccessToken = accessToken,
+            RefreshToken = refreshToken.Token,
+            ExpiresIn = GetAccessTokenMinutes() * 60,
+            User = user.ToDto()
         });
     }
 
@@ -113,21 +109,14 @@ public class AuthController : ControllerBase
         var accessToken = GenerateAccessToken(user);
         var refreshToken = await CreateRefreshToken(user.Id);
 
-        return Ok(new
+        return Ok(new AuthResponseDto
         {
-            message = "Muvaffaqiyatli kirdingiz!",
-            token = accessToken,           // Backward compat
-            accessToken,
-            refreshToken = refreshToken.Token,
-            expiresIn = GetAccessTokenMinutes() * 60,
-            user = new
-            {
-                user.Id,
-                user.Email,
-                user.FirstName,
-                user.LastName,
-                user.Role
-            }
+            Message = "Muvaffaqiyatli kirdingiz!",
+            Token = accessToken,           // Backward compat
+            AccessToken = accessToken,
+            RefreshToken = refreshToken.Token,
+            ExpiresIn = GetAccessTokenMinutes() * 60,
+            User = user.ToDto()
         });
     }
 
@@ -171,11 +160,11 @@ public class AuthController : ControllerBase
 
         await _context.SaveChangesAsync();
 
-        return Ok(new
+        return Ok(new RefreshResponseDto
         {
-            accessToken = newAccessToken,
-            refreshToken = newRefreshToken.Token,
-            expiresIn = GetAccessTokenMinutes() * 60
+            AccessToken = newAccessToken,
+            RefreshToken = newRefreshToken.Token,
+            ExpiresIn = GetAccessTokenMinutes() * 60
         });
     }
 
@@ -243,24 +232,11 @@ public class AuthController : ControllerBase
         if (!int.TryParse(userIdClaim, out var userId))
             return Unauthorized();
 
-        var user = await _context.Users
-            .Where(u => u.Id == userId)
-            .Select(u => new
-            {
-                u.Id,
-                u.Email,
-                u.FirstName,
-                u.LastName,
-                u.Role,
-                u.CreatedAt,
-                u.LastLoginAt
-            })
-            .FirstOrDefaultAsync();
-
+        var user = await _context.Users.FindAsync(userId);
         if (user == null)
             return NotFound(new { message = "Foydalanuvchi topilmadi" });
 
-        return Ok(user);
+        return Ok(user.ToDto());
     }
 
     // ============================================

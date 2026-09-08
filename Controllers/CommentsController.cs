@@ -1,6 +1,8 @@
 using System.ComponentModel.DataAnnotations;
 using System.Security.Claims;
 using KutubxonaAPI.Data;
+using KutubxonaAPI.DTOs.Comments;
+using KutubxonaAPI.DTOs.Mapping;
 using KutubxonaAPI.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -45,27 +47,27 @@ public class CommentsController : ControllerBase
         var comments = await _context.Comments
             .Where(c => c.BookId == bookId)
             .OrderByDescending(c => c.CreatedAt)
-            .Select(c => new
+            .Select(c => new CommentResponseDto
             {
-                c.Id,
-                c.AuthorName,
-                c.Content,
-                c.Rating,
-                c.CreatedAt,
-                c.UserId
+                Id = c.Id,
+                AuthorName = c.AuthorName,
+                Content = c.Content,
+                Rating = c.Rating,
+                CreatedAt = c.CreatedAt,
+                UserId = c.UserId
             })
             .ToListAsync();
 
         double averageRating = comments.Count > 0
-            ? comments.Average(c => c.Rating)
+            ? Math.Round(comments.Average(c => c.Rating), 1)
             : 0;
 
-        return Ok(new
+        return Ok(new CommentsListDto
         {
-            bookId,
-            totalComments = comments.Count,
-            averageRating = Math.Round(averageRating, 1),
-            comments
+            BookId = bookId,
+            TotalComments = comments.Count,
+            AverageRating = averageRating,
+            Comments = comments
         });
     }
 
@@ -139,15 +141,7 @@ public class CommentsController : ControllerBase
             "Yangi izoh qo'shildi. Kitob: {BookId}, User: {UserId} ({Name})",
             bookId, userId, user.FullName);
 
-        return Created($"/api/books/{bookId}/comments/{newComment.Id}", new
-        {
-            newComment.Id,
-            newComment.AuthorName,
-            newComment.Content,
-            newComment.Rating,
-            newComment.CreatedAt,
-            newComment.UserId
-        });
+        return Created($"/api/books/{bookId}/comments/{newComment.Id}", newComment.ToDto());
     }
 
     // ==========================================

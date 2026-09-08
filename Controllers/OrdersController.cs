@@ -1,5 +1,7 @@
 using System.Security.Claims;
 using KutubxonaAPI.Data;
+using KutubxonaAPI.DTOs.Mapping;
+using KutubxonaAPI.DTOs.Orders;
 using KutubxonaAPI.Models;
 using KutubxonaAPI.Models.Enums;
 using Microsoft.AspNetCore.Authorization;
@@ -170,14 +172,7 @@ public class OrdersController : ControllerBase
                 "Buyurtma yaratildi: OrderId={OrderId}, UserId={UserId}, Total={Total}, Items={Count}",
                 order.Id, userId, total, order.Items.Count);
 
-            return Created($"/api/orders/{order.Id}", new
-            {
-                order.Id,
-                order.TotalAmount,
-                order.Status,
-                order.CreatedAt,
-                ItemsCount = order.Items.Count
-            });
+            return Created($"/api/orders/{order.Id}", order.ToCreatedDto());
         }
         catch (DbUpdateConcurrencyException)
         {
@@ -206,26 +201,9 @@ public class OrdersController : ControllerBase
             .Include(o => o.Items)
                 .ThenInclude(i => i.SaleBook)
             .OrderByDescending(o => o.CreatedAt)
-            .Select(o => new
-            {
-                o.Id,
-                o.TotalAmount,
-                o.Status,
-                o.CreatedAt,
-                ItemsCount = o.Items.Count,
-                Items = o.Items.Select(i => new
-                {
-                    i.SaleBookId,
-                    BookTitle = i.SaleBook!.Title,
-                    BookAuthor = i.SaleBook.Author,
-                    i.Quantity,
-                    i.PriceAtOrder,
-                    Subtotal = i.Quantity * i.PriceAtOrder
-                })
-            })
             .ToListAsync();
 
-        return Ok(orders);
+        return Ok(orders.Select(o => o.ToSummaryDto()));
     }
 
     // ============================================
@@ -248,22 +226,12 @@ public class OrdersController : ControllerBase
         }
 
         var orders = await query
+            .Include(o => o.Items)
+                .ThenInclude(i => i.SaleBook)
             .OrderByDescending(o => o.CreatedAt)
-            .Select(o => new
-            {
-                o.Id,
-                o.TotalAmount,
-                o.Status,
-                o.CustomerName,
-                o.CustomerPhone,
-                o.DeliveryAddress,
-                o.CreatedAt,
-                Customer = new { o.User!.Email, o.User.FirstName, o.User.LastName },
-                ItemsCount = o.Items.Count
-            })
             .ToListAsync();
 
-        return Ok(orders);
+        return Ok(orders.Select(o => o.ToDetailDto()));
     }
 
     // ============================================
@@ -285,26 +253,7 @@ public class OrdersController : ControllerBase
         if (!isAdmin && order.UserId != userId)
             return Forbid();
 
-        return Ok(new
-        {
-            order.Id,
-            order.TotalAmount,
-            order.Status,
-            order.CustomerName,
-            order.CustomerPhone,
-            order.DeliveryAddress,
-            order.Notes,
-            order.CreatedAt,
-            Items = order.Items.Select(i => new
-            {
-                i.SaleBookId,
-                BookTitle = i.SaleBook!.Title,
-                BookAuthor = i.SaleBook.Author,
-                i.Quantity,
-                i.PriceAtOrder,
-                Subtotal = i.Quantity * i.PriceAtOrder
-            })
-        });
+        return Ok(order.ToDetailDto());
     }
 
     // ============================================
