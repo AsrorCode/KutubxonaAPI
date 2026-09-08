@@ -140,7 +140,7 @@ public class BookPagesController : ControllerBase
             return BadRequest(new { message = "Matn bo'sh" });
 
         // Matnni chunk'larga bo'lish
-        var chunks = SplitIntoChunks(dto.FullText, dto.ChunkSize ?? 2500);
+        var chunks = SplitIntoChunks(dto.FullText, dto.ChunkSize ?? 3500);
 
         if (chunks.Count == 0)
             return BadRequest(new { message = "Matndan sahifalar ajratib bo'lmadi" });
@@ -256,7 +256,7 @@ public class BookPagesController : ControllerBase
     // ============================================
     // HELPER: Matnni chunk'larga bo'lish (yaxshilangan)
     // ============================================
-    private static List<string> SplitIntoChunks(string text, int chunkSize = 2500)
+    private static List<string> SplitIntoChunks(string text, int chunkSize = 3500)
     {
         var chunks = new List<string>();
         if (string.IsNullOrWhiteSpace(text)) return chunks;
