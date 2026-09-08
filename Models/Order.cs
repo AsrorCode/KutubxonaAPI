@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using KutubxonaAPI.Models.Enums;
 
 namespace KutubxonaAPI.Models;
 
@@ -14,8 +15,8 @@ public class Order
 
     public decimal TotalAmount { get; set; }
 
-    [StringLength(30)]
-    public string Status { get; set; } = "Pending";
+    /// <summary>Buyurtma holati (Pending, Paid, Shipped, Delivered, Cancelled).</summary>
+    public OrderStatus Status { get; set; } = OrderStatus.Pending;
 
     [Required]
     [StringLength(150)]

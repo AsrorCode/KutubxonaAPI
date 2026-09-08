@@ -1,6 +1,7 @@
 using System.Security.Claims;
 using KutubxonaAPI.Data;
 using KutubxonaAPI.Models;
+using KutubxonaAPI.Models.Enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -130,7 +131,7 @@ public class OrdersController : ControllerBase
             var order = new Order
             {
                 UserId = userId,
-                Status = "Pending",
+                Status = OrderStatus.Pending,
                 CustomerName = dto.CustomerName.Trim(),
                 CustomerPhone = dto.CustomerPhone.Trim(),
                 DeliveryAddress = dto.DeliveryAddress.Trim(),
@@ -240,8 +241,11 @@ public class OrdersController : ControllerBase
                 .ThenInclude(i => i.SaleBook)
             .AsQueryable();
 
-        if (!string.IsNullOrWhiteSpace(status))
-            query = query.Where(o => o.Status == status);
+        if (!string.IsNullOrWhiteSpace(status)
+            && Enum.TryParse<OrderStatus>(status, ignoreCase: true, out var statusFilter))
+        {
+            query = query.Where(o => o.Status == statusFilter);
+        }
 
         var orders = await query
             .OrderByDescending(o => o.CreatedAt)
@@ -311,9 +315,15 @@ public class OrdersController : ControllerBase
     [HttpPatch("{id:int}/status")]
     public async Task<IActionResult> UpdateStatus(int id, [FromQuery] string status)
     {
-        var validStatuses = new[] { "Pending", "Paid", "Shipped", "Delivered", "Cancelled" };
-        if (!validStatuses.Contains(status))
-            return BadRequest(new { message = "Status noto'g'ri", valid = validStatuses });
+        // Enum'ga parse qilish — kompilyatsiya emas, runtime tekshirish
+        if (!Enum.TryParse<OrderStatus>(status, ignoreCase: true, out var newStatus))
+        {
+            return BadRequest(new
+            {
+                message = "Status noto'g'ri",
+                valid = Enum.GetNames<OrderStatus>()
+            });
+        }
 
         using var transaction = await _context.Database.BeginTransactionAsync();
 
@@ -328,7 +338,7 @@ public class OrdersController : ControllerBase
             var oldStatus = order.Status;
 
             // Bekor qilinsa — stock qaytariladi
-            if (status == "Cancelled" && oldStatus != "Cancelled")
+            if (newStatus == OrderStatus.Cancelled && oldStatus != OrderStatus.Cancelled)
             {
                 foreach (var item in order.Items)
                 {
@@ -343,7 +353,7 @@ public class OrdersController : ControllerBase
                 _logger.LogInformation("Buyurtma bekor qilindi, stock qaytarildi: OrderId={OrderId}", id);
             }
 
-            order.Status = status;
+            order.Status = newStatus;
             order.UpdatedAt = DateTime.UtcNow;
 
             await _context.SaveChangesAsync();
