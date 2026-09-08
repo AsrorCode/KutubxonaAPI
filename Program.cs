@@ -15,7 +15,13 @@ var builder = WebApplication.CreateBuilder(args);
 // ============================================
 
 // Controllers + OpenAPI (Scalar)
-builder.Services.AddControllers();
+// Enum'lar API'da string sifatida yuboriladi (masalan "Pending" — 0 emas)
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.Converters.Add(
+            new System.Text.Json.Serialization.JsonStringEnumConverter());
+    });
 builder.Services.AddOpenApi();
 
 // Database — EF Core + SQL Server

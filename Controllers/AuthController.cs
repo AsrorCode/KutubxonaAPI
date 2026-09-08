@@ -5,6 +5,7 @@ using System.Security.Cryptography;
 using System.Text;
 using KutubxonaAPI.Data;
 using KutubxonaAPI.Models;
+using KutubxonaAPI.Models.Enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
@@ -54,7 +55,7 @@ public class AuthController : ControllerBase
             PasswordHash = passwordHash,
             FirstName = dto.FirstName.Trim(),
             LastName = dto.LastName.Trim(),
-            Role = "User",
+            Role = UserRole.User,
             CreatedAt = DateTime.UtcNow
         };
 
@@ -288,7 +289,7 @@ public class AuthController : ControllerBase
             new(ClaimTypes.NameIdentifier, user.Id.ToString()),
             new(ClaimTypes.Email, user.Email),
             new(ClaimTypes.Name, $"{user.FirstName} {user.LastName}"),
-            new(ClaimTypes.Role, user.Role),
+            new(ClaimTypes.Role, user.Role.ToString()),
             new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
         };
 

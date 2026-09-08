@@ -1,4 +1,5 @@
 using KutubxonaAPI.Models;
+using KutubxonaAPI.Models.Enums;
 using Microsoft.EntityFrameworkCore;
 
 namespace KutubxonaAPI.Data;
@@ -25,6 +26,17 @@ public class AppDbContext : DbContext
         modelBuilder.Entity<User>()
             .HasIndex(u => u.Email)
             .IsUnique();
+
+        // Enum'lar STRING sifatida saqlanadi (o'qishga oson, migration'ga qulay)
+        modelBuilder.Entity<User>()
+            .Property(u => u.Role)
+            .HasConversion<string>()
+            .HasMaxLength(30);
+
+        modelBuilder.Entity<Order>()
+            .Property(o => o.Status)
+            .HasConversion<string>()
+            .HasMaxLength(30);
 
         // ===== Decimal precision (pul) =====
         modelBuilder.Entity<SaleBook>()

@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using KutubxonaAPI.Models.Enums;
 
 namespace KutubxonaAPI.Models;
 
@@ -30,11 +31,10 @@ public class User
     public string LastName { get; set; } = string.Empty;
 
     /// <summary>
-    /// Foydalanuvchi roli: "User", "Admin", "Seller".
-    /// Default - "User".
+    /// Foydalanuvchi roli: User, Admin, Seller.
+    /// Default — User.
     /// </summary>
-    [StringLength(50)]
-    public string Role { get; set; } = "User";
+    public UserRole Role { get; set; } = UserRole.User;
 
     /// <summary>Ro'yxatdan o'tgan vaqti.</summary>
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
