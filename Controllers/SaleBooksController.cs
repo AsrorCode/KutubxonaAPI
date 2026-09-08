@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using KutubxonaAPI.Data;
 using KutubxonaAPI.DTOs.Mapping;
 using KutubxonaAPI.DTOs.SaleBooks;
@@ -126,7 +127,7 @@ public class SaleBooksController : ControllerBase
         return Ok(book.ToDto());
     }
 
-    // ======== DELETE /api/salebooks/{id} (Admin) ========
+    // ======== DELETE /api/salebooks/{id} — Soft Delete (Admin) ========
     [Authorize(Roles = "Admin")]
     [HttpDelete("{id:int}")]
     public async Task<IActionResult> Delete(int id)
@@ -134,9 +135,54 @@ public class SaleBooksController : ControllerBase
         var book = await _context.SaleBooks.FindAsync(id);
         if (book == null) return NotFound();
 
-        _context.SaleBooks.Remove(book);
+        book.DeletedByUserId = GetCurrentUserId();
+        _context.SaleBooks.Remove(book); // Auto soft delete
         await _context.SaveChangesAsync();
+
+        _logger.LogInformation("Marketplace kitob o'chirildi (soft): Id={Id}", id);
         return NoContent();
+    }
+
+    // ======== GET /api/salebooks/trash (Admin) ========
+    [Authorize(Roles = "Admin")]
+    [HttpGet("trash")]
+    public async Task<ActionResult<IEnumerable<SaleBookResponseDto>>> GetDeleted()
+    {
+        var books = await _context.SaleBooks
+            .IgnoreQueryFilters()
+            .Where(b => b.IsDeleted)
+            .OrderByDescending(b => b.DeletedAt)
+            .ToListAsync();
+
+        return Ok(books.Select(b => b.ToDto()));
+    }
+
+    // ======== POST /api/salebooks/{id}/restore (Admin) ========
+    [Authorize(Roles = "Admin")]
+    [HttpPost("{id:int}/restore")]
+    public async Task<ActionResult<SaleBookResponseDto>> Restore(int id)
+    {
+        var book = await _context.SaleBooks
+            .IgnoreQueryFilters()
+            .FirstOrDefaultAsync(b => b.Id == id);
+
+        if (book == null) return NotFound();
+        if (!book.IsDeleted) return BadRequest(new { message = "Kitob o'chirilmagan" });
+
+        book.IsDeleted = false;
+        book.DeletedAt = null;
+        book.DeletedByUserId = null;
+        book.UpdatedAt = DateTime.UtcNow;
+
+        await _context.SaveChangesAsync();
+        _logger.LogInformation("Marketplace kitob tiklandi: Id={Id}", id);
+        return Ok(book.ToDto());
+    }
+
+    private int? GetCurrentUserId()
+    {
+        var idStr = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        return int.TryParse(idStr, out var id) ? id : null;
     }
 
     // ======== PATCH /api/salebooks/{id}/toggle (Admin) ========

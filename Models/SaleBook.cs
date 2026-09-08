@@ -2,8 +2,14 @@
 
 namespace KutubxonaAPI.Models;
 
-public class SaleBook
+public class SaleBook : ISoftDelete
 {
+    // ===== Soft Delete =====
+    public bool IsDeleted { get; set; }
+    public DateTime? DeletedAt { get; set; }
+    public int? DeletedByUserId { get; set; }
+
+
     public int Id { get; set; }
 
     [Required(ErrorMessage = "Kitob nomi shart")]
