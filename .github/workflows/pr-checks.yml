@@ -1,0 +1,44 @@
+name: ✅ PR Checks
+
+on:
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  validate:
+    name: PR Validation
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: ⚙️ Setup .NET 10
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+          dotnet-quality: 'preview'
+
+      - name: 📦 Restore & Build
+        run: |
+          dotnet restore
+          dotnet build --no-restore --configuration Release
+
+      - name: 📊 PR size check
+        run: |
+          FILES_CHANGED=$(git diff --name-only origin/main...HEAD | wc -l)
+          echo "Files changed: $FILES_CHANGED"
+          if [ $FILES_CHANGED -gt 50 ]; then
+            echo "⚠️ Warning: PR has more than 50 files changed"
+          fi
+
+      - name: 💬 Check commit message
+        run: |
+          COMMIT_MSG=$(git log -1 --pretty=%B)
+          echo "Commit: $COMMIT_MSG"
+          if [ ${#COMMIT_MSG} -lt 10 ]; then
+            echo "❌ Commit message too short"
+            exit 1
+          fi

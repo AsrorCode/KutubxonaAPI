@@ -1,4 +1,6 @@
-﻿using KutubxonaAPI.Data;
+using KutubxonaAPI.Data;
+using KutubxonaAPI.DTOs.Mapping;
+using KutubxonaAPI.DTOs.SaleBooks;
 using KutubxonaAPI.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -22,7 +24,8 @@ public class SaleBooksController : ControllerBase
 
     // ======== GET /api/salebooks ========
     [HttpGet]
-    public async Task<IActionResult> GetAll([FromQuery] bool includeInactive = false)
+    public async Task<ActionResult<IEnumerable<SaleBookResponseDto>>> GetAll(
+        [FromQuery] bool includeInactive = false)
     {
         var query = _context.SaleBooks.AsQueryable();
         if (!includeInactive) query = query.Where(b => b.IsActive);
@@ -31,21 +34,23 @@ public class SaleBooksController : ControllerBase
             .OrderByDescending(b => b.CreatedAt)
             .ToListAsync();
 
-        return Ok(books);
+        return Ok(books.Select(b => b.ToDto()));
     }
 
     // ======== GET /api/salebooks/{id} ========
     [HttpGet("{id:int}")]
-    public async Task<IActionResult> GetOne(int id)
+    public async Task<ActionResult<SaleBookResponseDto>> GetOne(int id)
     {
         var book = await _context.SaleBooks.FindAsync(id);
         if (book == null) return NotFound(new { message = "Kitob topilmadi" });
-        return Ok(book);
+        return Ok(book.ToDto());
     }
 
     // ======== GET /api/salebooks/search ========
     [HttpGet("search")]
-    public async Task<IActionResult> Search([FromQuery] string q = "", [FromQuery] string? category = null)
+    public async Task<ActionResult<IEnumerable<SaleBookResponseDto>>> Search(
+        [FromQuery] string q = "",
+        [FromQuery] string? category = null)
     {
         var query = _context.SaleBooks.Where(b => b.IsActive);
 
@@ -64,13 +69,13 @@ public class SaleBooksController : ControllerBase
         }
 
         var books = await query.ToListAsync();
-        return Ok(books);
+        return Ok(books.Select(b => b.ToDto()));
     }
 
     // ======== POST /api/salebooks (Admin) ========
     [Authorize(Roles = "Admin")]
     [HttpPost]
-    public async Task<IActionResult> Create([FromBody] SaleBookDto dto)
+    public async Task<ActionResult<SaleBookResponseDto>> Create([FromBody] SaleBookCreateDto dto)
     {
         if (!ModelState.IsValid) return BadRequest(ModelState);
 
@@ -84,7 +89,7 @@ public class SaleBooksController : ControllerBase
             ImageUrl = dto.ImageUrl ?? "",
             Category = dto.Category ?? "Boshqa",
             Year = dto.Year,
-            IsActive = true,
+            IsActive = dto.IsActive,
             CreatedAt = DateTime.UtcNow
         };
 
@@ -92,14 +97,16 @@ public class SaleBooksController : ControllerBase
         await _context.SaveChangesAsync();
 
         _logger.LogInformation("Yangi sotuv kitobi qo'shildi: {Title}", book.Title);
-        return CreatedAtAction(nameof(GetOne), new { id = book.Id }, book);
+        return CreatedAtAction(nameof(GetOne), new { id = book.Id }, book.ToDto());
     }
 
     // ======== PUT /api/salebooks/{id} (Admin) ========
     [Authorize(Roles = "Admin")]
     [HttpPut("{id:int}")]
-    public async Task<IActionResult> Update(int id, [FromBody] SaleBookDto dto)
+    public async Task<ActionResult<SaleBookResponseDto>> Update(int id, [FromBody] SaleBookCreateDto dto)
     {
+        if (!ModelState.IsValid) return BadRequest(ModelState);
+
         var book = await _context.SaleBooks.FindAsync(id);
         if (book == null) return NotFound(new { message = "Kitob topilmadi" });
 
@@ -111,11 +118,12 @@ public class SaleBooksController : ControllerBase
         book.ImageUrl = dto.ImageUrl ?? "";
         book.Category = dto.Category ?? book.Category;
         book.Year = dto.Year;
+        book.IsActive = dto.IsActive;
         book.UpdatedAt = DateTime.UtcNow;
 
         await _context.SaveChangesAsync();
 
-        return Ok(book);
+        return Ok(book.ToDto());
     }
 
     // ======== DELETE /api/salebooks/{id} (Admin) ========
@@ -131,30 +139,17 @@ public class SaleBooksController : ControllerBase
         return NoContent();
     }
 
-    // ======== PATCH /api/salebooks/{id}/status (Admin) ========
+    // ======== PATCH /api/salebooks/{id}/toggle (Admin) ========
     [Authorize(Roles = "Admin")]
-    [HttpPatch("{id:int}/status")]
-    public async Task<IActionResult> ToggleActive(int id, [FromQuery] bool isActive)
+    [HttpPatch("{id:int}/toggle")]
+    public async Task<ActionResult<SaleBookResponseDto>> ToggleActive(int id)
     {
         var book = await _context.SaleBooks.FindAsync(id);
         if (book == null) return NotFound();
 
-        book.IsActive = isActive;
+        book.IsActive = !book.IsActive;
         book.UpdatedAt = DateTime.UtcNow;
         await _context.SaveChangesAsync();
-        return Ok(book);
+        return Ok(book.ToDto());
     }
-}
-
-// DTO
-public class SaleBookDto
-{
-    public string Title { get; set; } = string.Empty;
-    public string Author { get; set; } = string.Empty;
-    public string? Description { get; set; }
-    public decimal Price { get; set; }
-    public int Stock { get; set; }
-    public string? ImageUrl { get; set; }
-    public string? Category { get; set; }
-    public int? Year { get; set; }
 }
