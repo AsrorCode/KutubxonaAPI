@@ -6,8 +6,14 @@ namespace KutubxonaAPI.Models;
 /// Kitob modeli - ma'lumotlar bazasidagi "Books" jadvalini ifodalaydi.
 /// Har bir property jadval ustuniga aylanadi.
 /// </summary>
-public class Book
+public class Book : ISoftDelete
 {
+    // ===== Soft Delete =====
+    public bool IsDeleted { get; set; }
+    public DateTime? DeletedAt { get; set; }
+    public int? DeletedByUserId { get; set; }
+
+
     /// <summary>
     /// Kitobning unique ID raqami (Primary Key).
     /// EF Core avtomatik ravishda auto-increment qiladi.

@@ -6,8 +6,14 @@ namespace KutubxonaAPI.Models;
 /// Kitobga qoldirilgan izoh (sharh).
 /// Bir nechta Comment bitta Book ga tegishli (One-to-Many).
 /// </summary>
-public class Comment
+public class Comment : ISoftDelete
 {
+    // ===== Soft Delete =====
+    public bool IsDeleted { get; set; }
+    public DateTime? DeletedAt { get; set; }
+    public int? DeletedByUserId { get; set; }
+
+
     /// <summary>
     /// Izohning unique ID si.
     /// </summary>

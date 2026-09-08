@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using KutubxonaAPI.Data;
 using KutubxonaAPI.DTOs;
 using KutubxonaAPI.DTOs.Books;
@@ -185,7 +186,8 @@ public class BooksController : ControllerBase
     }
 
     // ============================================
-    // DELETE: /api/books/{id} — O'chirish (ADMIN)
+    // DELETE: /api/books/{id} — Soft delete (ADMIN)
+    // Ma'lumot yo'q qilinmaydi, faqat "o'chirilgan" belgilanadi.
     // ============================================
     [HttpDelete("{id}")]
     [Authorize(Roles = "Admin")]
@@ -195,11 +197,91 @@ public class BooksController : ControllerBase
         if (book == null)
             return NotFound(new { message = "Kitob topilmadi" });
 
-        _context.Books.Remove(book);
+        book.DeletedByUserId = GetCurrentUserId();
+
+        _context.Books.Remove(book); // AppDbContext.ApplySoftDelete avtomatik marklaydi
         await _context.SaveChangesAsync();
 
-        _logger.LogInformation("Kitob o'chirildi: {Id}", id);
+        _logger.LogInformation("Kitob o'chirildi (soft): Id={Id}, By={UserId}", id, book.DeletedByUserId);
 
         return NoContent();
+    }
+
+    // ============================================
+    // GET: /api/books/trash — O'chirilgan kitoblar (ADMIN)
+    // ============================================
+    [HttpGet("trash")]
+    [Authorize(Roles = "Admin")]
+    public async Task<ActionResult<IEnumerable<BookResponseDto>>> GetDeletedBooks()
+    {
+        var books = await _context.Books
+            .IgnoreQueryFilters()
+            .Where(b => b.IsDeleted)
+            .OrderByDescending(b => b.DeletedAt)
+            .ToListAsync();
+
+        return Ok(books.Select(b => b.ToDto()));
+    }
+
+    // ============================================
+    // POST: /api/books/{id}/restore — Tiklash (ADMIN)
+    // ============================================
+    [HttpPost("{id}/restore")]
+    [Authorize(Roles = "Admin")]
+    public async Task<IActionResult> RestoreBook(int id)
+    {
+        var book = await _context.Books
+            .IgnoreQueryFilters()
+            .FirstOrDefaultAsync(b => b.Id == id);
+
+        if (book == null)
+            return NotFound(new { message = "Kitob topilmadi" });
+
+        if (!book.IsDeleted)
+            return BadRequest(new { message = "Kitob o'chirilmagan" });
+
+        book.IsDeleted = false;
+        book.DeletedAt = null;
+        book.DeletedByUserId = null;
+        book.UpdatedAt = DateTime.UtcNow;
+
+        await _context.SaveChangesAsync();
+
+        _logger.LogInformation("Kitob tiklandi: Id={Id}", id);
+
+        return Ok(book.ToDto());
+    }
+
+    // ============================================
+    // DELETE: /api/books/{id}/permanent — Butunlay o'chirish (ADMIN)
+    // ⚠️ Ma'lumot yo'qoladi va tiklab bo'lmaydi.
+    // ============================================
+    [HttpDelete("{id}/permanent")]
+    [Authorize(Roles = "Admin")]
+    public async Task<IActionResult> PermanentlyDelete(int id)
+    {
+        var book = await _context.Books
+            .IgnoreQueryFilters()
+            .FirstOrDefaultAsync(b => b.Id == id);
+
+        if (book == null)
+            return NotFound(new { message = "Kitob topilmadi" });
+
+        if (!book.IsDeleted)
+            return BadRequest(new { message = "Avval chiqindiga tashlang, keyin butunlay o'chiring" });
+
+        // Force delete — soft delete filterni chetlab o'tish
+        _context.ChangeTracker.Entries<Book>().First(e => e.Entity.Id == id).State = EntityState.Detached;
+        _context.Database.ExecuteSqlRaw("DELETE FROM Books WHERE Id = {0}", id);
+
+        _logger.LogWarning("⚠️ Kitob BUTUNLAY o'chirildi: Id={Id}", id);
+
+        return NoContent();
+    }
+
+    private int? GetCurrentUserId()
+    {
+        var idStr = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        return int.TryParse(idStr, out var id) ? id : null;
     }
 }

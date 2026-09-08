@@ -6,8 +6,14 @@ namespace KutubxonaAPI.Models;
 /// <summary>
 /// Foydalanuvchining buyurtmasi.
 /// </summary>
-public class Order
+public class Order : ISoftDelete
 {
+    // ===== Soft Delete =====
+    public bool IsDeleted { get; set; }
+    public DateTime? DeletedAt { get; set; }
+    public int? DeletedByUserId { get; set; }
+
+
     public int Id { get; set; }
 
     public int UserId { get; set; }

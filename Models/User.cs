@@ -6,8 +6,14 @@ namespace KutubxonaAPI.Models;
 /// <summary>
 /// Foydalanuvchi modeli - ro'yxatdan o'tgan har bir kishi.
 /// </summary>
-public class User
+public class User : ISoftDelete
 {
+    // ===== Soft Delete =====
+    public bool IsDeleted { get; set; }
+    public DateTime? DeletedAt { get; set; }
+    public int? DeletedByUserId { get; set; }
+
+
     public int Id { get; set; }
 
     /// <summary>Foydalanuvchining email manzili (unique).</summary>
