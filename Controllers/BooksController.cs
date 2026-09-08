@@ -27,11 +27,13 @@ public class BooksController : ControllerBase
     // GET: /api/books?page=1&pageSize=20&category=Klassika&search=Qodiriy
     // ============================================
     [HttpGet]
+    [Microsoft.AspNetCore.OutputCaching.OutputCache(PolicyName = "books-30sec")]
     public async Task<ActionResult<PagedResult<BookWithStatsDto>>> GetBooks(
         [FromQuery] int page = 1,
         [FromQuery] int pageSize = 20,
         [FromQuery] string? category = null,
-        [FromQuery] string? search = null)
+        [FromQuery] string? search = null,
+        CancellationToken ct = default)
     {
         if (page < 1) page = 1;
         if (pageSize < 1) pageSize = 20;
@@ -50,9 +52,8 @@ public class BooksController : ControllerBase
                 b.Author.ToLower().Contains(searchLower));
         }
 
-        var totalCount = await query.CountAsync();
+        var totalCount = await query.CountAsync(ct);
 
-        // Bir so'rovda: kitob + statistika (N+1 muammosini yechadi)
         var items = await query
             .OrderByDescending(b => b.CreatedAt)
             .Skip((page - 1) * pageSize)
@@ -70,7 +71,7 @@ public class BooksController : ControllerBase
                 CommentsCount = b.Comments.Count(),
                 AverageRating = b.Comments.Any() ? b.Comments.Average(c => c.Rating) : 0
             })
-            .ToListAsync();
+            .ToListAsync(ct);
 
         return Ok(new PagedResult<BookWithStatsDto>
         {
@@ -85,12 +86,12 @@ public class BooksController : ControllerBase
     // GET: /api/books/{id}
     // ============================================
     [HttpGet("{id}")]
-    public async Task<ActionResult<BookResponseDto>> GetBook(int id)
+    public async Task<ActionResult<BookResponseDto>> GetBook(int id, CancellationToken ct)
     {
-        var book = await _context.Books.FindAsync(id);
+        var book = await _context.Books.FindAsync(new object[] { id }, ct);
 
         if (book == null)
-            return NotFound(new { message = "Kitob topilmadi" });
+            throw new KutubxonaAPI.Exceptions.NotFoundException("Kitob", id);
 
         return Ok(book.ToDto());
     }
@@ -99,13 +100,14 @@ public class BooksController : ControllerBase
     // GET: /api/books/categories — barcha kategoriyalar
     // ============================================
     [HttpGet("categories")]
-    public async Task<ActionResult<IEnumerable<string>>> GetCategories()
+    [Microsoft.AspNetCore.OutputCaching.OutputCache(PolicyName = "static-5min")]
+    public async Task<ActionResult<IEnumerable<string>>> GetCategories(CancellationToken ct)
     {
         var categories = await _context.Books
             .Select(b => b.Category)
             .Distinct()
             .OrderBy(c => c)
-            .ToListAsync();
+            .ToListAsync(ct);
 
         return Ok(categories);
     }
