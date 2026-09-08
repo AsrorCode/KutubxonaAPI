@@ -13,6 +13,15 @@ obj/
 *.mdf
 *.ldf
 
-# Logs
+# Logs (Serilog)
+Logs/
 logs/
 *.log
+*.txt.log
+
+# User secrets
+secrets.json
+
+# OS
+.DS_Store
+Thumbs.db
