@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace KutubxonaAPI.Models;
 
@@ -29,7 +30,8 @@ public class SaleBook : ISoftDelete
     [Range(0, int.MaxValue)]
     public int Stock { get; set; }
 
-    [StringLength(500)]
+    // Base64 rasmlarga joy kerak — nvarchar(max)
+    [Column(TypeName = "nvarchar(max)")]
     public string ImageUrl { get; set; } = string.Empty;
 
     [StringLength(50)]
@@ -39,6 +41,13 @@ public class SaleBook : ISoftDelete
     public int? Year { get; set; }
 
     public bool IsActive { get; set; } = true;
+
+    /// <summary>Chegirma foizi (0-100). Ixtiyoriy — 0 bo'lsa yo'q.</summary>
+    [Range(0, 100)]
+    public int Discount { get; set; } = 0;
+
+    /// <summary>Chegirma tugash sanasi. NULL bo'lsa cheklovsiz.</summary>
+    public DateTime? DiscountEndsAt { get; set; }
 
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public DateTime? UpdatedAt { get; set; }

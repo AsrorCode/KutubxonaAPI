@@ -51,21 +51,33 @@ public static class MappingExtensions
     };
 
     // ===== SALEBOOK =====
-    public static SaleBookResponseDto ToDto(this SaleBook s) => new()
+    public static SaleBookResponseDto ToDto(this SaleBook s)
     {
-        Id = s.Id,
-        Title = s.Title,
-        Author = s.Author,
-        Description = s.Description,
-        Price = s.Price,
-        Stock = s.Stock,
-        ImageUrl = s.ImageUrl,
-        Category = s.Category,
-        Year = s.Year,
-        IsActive = s.IsActive,
-        CreatedAt = s.CreatedAt,
-        UpdatedAt = s.UpdatedAt
-    };
+        var isDiscountActive = s.Discount > 0
+            && (s.DiscountEndsAt == null || s.DiscountEndsAt > DateTime.UtcNow);
+        var finalPrice = isDiscountActive
+            ? s.Price - (s.Price * s.Discount / 100m)
+            : s.Price;
+
+        return new()
+        {
+            Id = s.Id,
+            Title = s.Title,
+            Author = s.Author,
+            Description = s.Description,
+            Price = s.Price,
+            Stock = s.Stock,
+            ImageUrl = s.ImageUrl,
+            Category = s.Category,
+            Year = s.Year,
+            IsActive = s.IsActive,
+            Discount = isDiscountActive ? s.Discount : 0,
+            DiscountEndsAt = s.DiscountEndsAt,
+            FinalPrice = Math.Round(finalPrice, 0),
+            CreatedAt = s.CreatedAt,
+            UpdatedAt = s.UpdatedAt
+        };
+    }
 
     // ===== ORDER ITEM =====
     public static OrderItemDto ToDto(this OrderItem i) => new()

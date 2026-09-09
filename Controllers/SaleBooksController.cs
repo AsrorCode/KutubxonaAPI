@@ -91,6 +91,8 @@ public class SaleBooksController : ControllerBase
             Category = dto.Category ?? "Boshqa",
             Year = dto.Year,
             IsActive = dto.IsActive,
+            Discount = dto.Discount,
+            DiscountEndsAt = dto.DiscountEndsAt,
             CreatedAt = DateTime.UtcNow
         };
 
@@ -120,6 +122,8 @@ public class SaleBooksController : ControllerBase
         book.Category = dto.Category ?? book.Category;
         book.Year = dto.Year;
         book.IsActive = dto.IsActive;
+        book.Discount = dto.Discount;
+        book.DiscountEndsAt = dto.DiscountEndsAt;
         book.UpdatedAt = DateTime.UtcNow;
 
         await _context.SaveChangesAsync();

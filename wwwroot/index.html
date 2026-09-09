@@ -379,6 +379,369 @@
             margin-top: 4px;
         }
 
+        /* ============================================
+           HOME PAGE MEGA UPGRADE
+           Hero + Stats + Quote + Netflix rows + Challenges
+           ============================================ */
+
+        /* ===== HERO: HAFTANING KITOBI ===== */
+        .hero-featured {
+            display: grid;
+            grid-template-columns: 220px 1fr;
+            gap: 32px;
+            padding: 32px;
+            margin-bottom: 32px;
+            background:
+                radial-gradient(at 100% 0%, rgba(139, 92, 246, 0.25), transparent 50%),
+                radial-gradient(at 0% 100%, rgba(6, 182, 212, 0.15), transparent 50%),
+                linear-gradient(135deg, rgba(139, 92, 246, 0.12), rgba(20, 20, 27, 0.9));
+            border: 1px solid rgba(139, 92, 246, 0.3);
+            border-radius: 20px;
+            backdrop-filter: blur(20px);
+            position: relative;
+            overflow: hidden;
+        }
+        .hero-featured::before {
+            content: '';
+            position: absolute;
+            top: -50%; right: -20%;
+            width: 500px; height: 500px;
+            background: radial-gradient(circle, rgba(236, 72, 153, 0.15), transparent 70%);
+            pointer-events: none;
+        }
+        .hero-cover-wrap {
+            display: flex; align-items: center; justify-content: center;
+        }
+        .hero-cover {
+            width: 200px; height: 280px;
+            border-radius: 8px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+            transform: rotateY(-8deg) rotateX(4deg);
+            transition: transform 0.3s;
+        }
+        .hero-cover:hover { transform: rotateY(0) rotateX(0) scale(1.05); }
+
+        .hero-info {
+            display: flex; flex-direction: column; justify-content: center;
+            position: relative; z-index: 2;
+        }
+        .hero-tag {
+            display: inline-block;
+            font-size: 11px; font-weight: 700;
+            letter-spacing: 0.2em;
+            color: var(--warning);
+            background: rgba(245, 158, 11, 0.15);
+            border: 1px solid rgba(245, 158, 11, 0.3);
+            padding: 4px 12px; border-radius: 999px;
+            width: fit-content;
+            margin-bottom: 12px;
+        }
+        .hero-title {
+            font-size: 32px; font-weight: 800; letter-spacing: -0.02em;
+            background: linear-gradient(135deg, #fff, #c4b5fd);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            margin-bottom: 6px;
+        }
+        .hero-author {
+            color: var(--text-dim); font-size: 14px; margin-bottom: 14px;
+        }
+        .hero-desc {
+            color: var(--text); opacity: 0.85; font-size: 14px;
+            line-height: 1.6; margin-bottom: 16px;
+        }
+        .hero-stats {
+            display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px;
+        }
+        .hero-stats .badge {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            padding: 6px 14px; border-radius: 999px;
+            font-size: 12px; color: var(--text);
+        }
+        .hero-actions {
+            display: flex; gap: 10px; flex-wrap: wrap;
+        }
+        .hero-btn {
+            padding: 12px 24px; border-radius: 12px;
+            font-size: 14px; font-weight: 600;
+            cursor: pointer; text-decoration: none;
+            font-family: inherit;
+            transition: all 0.2s;
+            display: inline-flex; align-items: center; gap: 8px;
+            border: none;
+        }
+        .hero-btn.primary {
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            color: #fff;
+            box-shadow: 0 8px 24px var(--primary-glow);
+        }
+        .hero-btn.primary:hover { transform: translateY(-2px); box-shadow: 0 12px 32px var(--primary-glow); }
+        .hero-btn.secondary {
+            background: rgba(255, 255, 255, 0.08);
+            color: var(--text);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+        }
+        .hero-btn.secondary:hover { background: rgba(255, 255, 255, 0.14); }
+
+        @media (max-width: 768px) {
+            .hero-featured { grid-template-columns: 1fr; padding: 20px; }
+            .hero-cover { width: 140px; height: 200px; }
+            .hero-title { font-size: 24px; }
+        }
+
+        /* ===== STATS + STREAK ===== */
+        .stats-panel {
+            background: rgba(20, 20, 27, 0.6);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 24px;
+            backdrop-filter: blur(20px);
+        }
+        .stats-panel-header {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 18px;
+        }
+        .stats-panel-header h3 { font-size: 16px; font-weight: 700; }
+        .stats-panel-sub { color: var(--text-dim); font-size: 12px; }
+        .stats-panel-grid {
+            display: grid;
+            grid-template-columns: auto 1fr 1fr 1fr;
+            gap: 14px;
+            margin-bottom: 18px;
+        }
+        .stat-streak {
+            padding: 20px;
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.15), rgba(236, 72, 153, 0.1));
+            border: 1px solid rgba(245, 158, 11, 0.3);
+            border-radius: 14px;
+            text-align: center;
+            min-width: 130px;
+        }
+        .stat-streak-emoji { font-size: 36px; line-height: 1; }
+        .stat-streak-num {
+            font-size: 32px; font-weight: 800; color: var(--warning);
+            margin: 4px 0;
+        }
+        .stat-streak-lbl { font-size: 10px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.1em; }
+
+        .stat-item {
+            padding: 16px;
+            border-radius: 12px;
+            display: flex; flex-direction: column; justify-content: center;
+        }
+        .stat-purple {
+            background: rgba(139, 92, 246, 0.15);
+            border: 1px solid rgba(139, 92, 246, 0.3);
+        }
+        .stat-cyan {
+            background: rgba(6, 182, 212, 0.15);
+            border: 1px solid rgba(6, 182, 212, 0.3);
+        }
+        .stat-pink {
+            background: rgba(236, 72, 153, 0.15);
+            border: 1px solid rgba(236, 72, 153, 0.3);
+        }
+        .stat-item-lbl { font-size: 11px; color: var(--text-dim); margin-bottom: 6px; }
+        .stat-item-val { font-size: 26px; font-weight: 800; }
+        .stat-purple .stat-item-val { color: #c4b5fd; }
+        .stat-cyan .stat-item-val { color: #67e8f9; }
+        .stat-pink .stat-item-val { color: #f9a8d4; }
+        .stat-item-unit { font-size: 10px; color: var(--text-dim); }
+
+        .daily-goal {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 10px;
+            padding: 14px 18px;
+        }
+        .daily-goal-header {
+            display: flex; justify-content: space-between;
+            font-size: 12px; color: var(--text-dim);
+            margin-bottom: 8px;
+        }
+        .daily-goal-bar {
+            height: 6px;
+            background: rgba(255, 255, 255, 0.06);
+            border-radius: 999px; overflow: hidden;
+        }
+        .daily-goal-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--secondary), var(--primary));
+            border-radius: 999px;
+            transition: width 0.5s;
+            width: 0%;
+        }
+
+        @media (max-width: 768px) {
+            .stats-panel-grid { grid-template-columns: 1fr 1fr; }
+            .stat-streak { grid-column: span 2; }
+        }
+
+        /* ===== QUOTE OF THE DAY ===== */
+        .quote-card {
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.1), rgba(20, 20, 27, 0.4));
+            border: 1px solid rgba(139, 92, 246, 0.2);
+            border-radius: 16px;
+            padding: 24px 32px;
+            margin-bottom: 24px;
+            position: relative;
+            backdrop-filter: blur(20px);
+            overflow: hidden;
+        }
+        .quote-mark {
+            position: absolute;
+            top: -10px; left: 20px;
+            font-size: 60px;
+            color: var(--primary);
+            opacity: 0.4;
+            font-family: Georgia, serif;
+            line-height: 1;
+            z-index: 1;
+        }
+        .quote-body {
+            position: relative;
+            min-height: 90px;
+            transition: opacity 0.6s ease, transform 0.6s ease;
+        }
+        .quote-body.fading {
+            opacity: 0;
+            transform: translateY(-8px);
+        }
+        .quote-text {
+            font-family: 'Crimson Pro', Georgia, serif;
+            font-size: 20px;
+            font-style: italic;
+            line-height: 1.5;
+            color: #e5e5e5;
+            padding-left: 40px;
+            margin-bottom: 8px;
+        }
+        .quote-author {
+            padding-left: 40px;
+            color: var(--text-dim);
+            font-size: 12px;
+            text-align: right;
+        }
+        .quote-dots {
+            display: flex; justify-content: center; gap: 6px;
+            margin-top: 14px;
+        }
+        .quote-dot {
+            width: 6px; height: 6px; border-radius: 50%;
+            background: rgba(255, 255, 255, 0.15);
+            cursor: pointer; transition: all 0.3s;
+        }
+        .quote-dot.active {
+            background: var(--primary);
+            width: 20px; border-radius: 3px;
+        }
+        .quote-controls {
+            position: absolute;
+            top: 50%; transform: translateY(-50%);
+            display: flex; gap: 4px;
+            opacity: 0; transition: opacity 0.3s;
+        }
+        .quote-card:hover .quote-controls { opacity: 1; }
+        .quote-controls.left  { left: 8px; }
+        .quote-controls.right { right: 8px; }
+        .quote-nav-btn {
+            width: 28px; height: 28px;
+            border-radius: 50%;
+            background: rgba(20, 20, 27, 0.7);
+            border: 1px solid rgba(139, 92, 246, 0.3);
+            color: #fff;
+            cursor: pointer;
+            font-size: 12px;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .quote-nav-btn:hover { background: rgba(139, 92, 246, 0.3); }
+
+        /* ===== NETFLIX ROWS ===== */
+        .row-header {
+            display: flex; justify-content: space-between; align-items: center;
+            margin: 24px 0 14px;
+        }
+        .row-header h3 { font-size: 18px; font-weight: 700; letter-spacing: -0.02em; }
+        .netflix-row {
+            display: flex;
+            gap: 14px;
+            overflow-x: auto;
+            padding: 4px 0 14px;
+            scroll-snap-type: x mandatory;
+            -webkit-overflow-scrolling: touch;
+        }
+        .netflix-row::-webkit-scrollbar { height: 6px; }
+        .netflix-row::-webkit-scrollbar-thumb {
+            background: rgba(139, 92, 246, 0.3);
+            border-radius: 3px;
+        }
+        .netflix-card {
+            flex: 0 0 auto;
+            width: 140px;
+            scroll-snap-align: start;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+        .netflix-card:hover { transform: translateY(-4px); }
+        .netflix-card .cover {
+            width: 140px; height: 200px;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+        }
+        .netflix-card .title {
+            font-size: 12px; font-weight: 600;
+            color: var(--text);
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        .netflix-card .author {
+            font-size: 10px; color: var(--text-dim);
+            margin-top: 2px;
+        }
+
+        /* ===== CHALLENGES ===== */
+        .challenges-section { margin-bottom: 24px; }
+        .challenges-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 14px;
+        }
+        .challenge-card {
+            padding: 16px;
+            border-radius: 12px;
+            backdrop-filter: blur(20px);
+        }
+        .challenge-emoji { font-size: 24px; margin-bottom: 6px; }
+        .challenge-title { font-size: 13px; font-weight: 700; margin-bottom: 2px; }
+        .challenge-desc { font-size: 11px; color: var(--text-dim); margin-bottom: 10px; }
+        .challenge-progress {
+            height: 4px;
+            background: rgba(255, 255, 255, 0.06);
+            border-radius: 999px;
+            overflow: hidden;
+            margin-bottom: 6px;
+        }
+        .challenge-progress-fill { height: 100%; border-radius: 999px; }
+        .challenge-status { font-size: 10px; }
+
+        /* ===== BOOK CARD COVER ===== */
+        .book-card-cover {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 14px;
+            transition: transform 0.3s;
+        }
+        .book-card-cover svg {
+            border-radius: 6px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+        }
+        .book-card:hover .book-card-cover {
+            transform: translateY(-4px);
+        }
+
         .book-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -1401,10 +1764,85 @@
                 <a href="/admin.html" class="nav-pill" id="adminLink" style="display:none;">⚙️ Admin panel</a>
             </div>
         </header>
+
+        <!-- ===== HERO: HAFTANING KITOBI ===== -->
+        <div class="hero-featured" id="heroFeatured" style="display:none;">
+            <div class="hero-cover-wrap">
+                <div id="heroCover" class="hero-cover"></div>
+            </div>
+            <div class="hero-info">
+                <div class="hero-tag">✨ HAFTANING KITOBI</div>
+                <h2 class="hero-title" id="heroTitle"></h2>
+                <p class="hero-author" id="heroAuthor"></p>
+                <p class="hero-desc" id="heroDesc"></p>
+                <div class="hero-stats" id="heroStats"></div>
+                <div class="hero-actions">
+                    <button class="hero-btn primary" id="heroReadBtn">📖 Hozir o'qish</button>
+                    <a href="/market.html" class="hero-btn secondary">💰 Sotib olish</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== STATS + STREAK ===== -->
+        <div class="stats-panel" id="statsPanel" style="display:none;">
+            <div class="stats-panel-header">
+                <h3>🔥 Sizning natijalaringiz</h3>
+                <span class="stats-panel-sub" id="statsSub">Bu oy</span>
+            </div>
+            <div class="stats-panel-grid">
+                <div class="stat-streak">
+                    <div class="stat-streak-emoji">🔥</div>
+                    <div class="stat-streak-num" id="streakNum">0</div>
+                    <div class="stat-streak-lbl">kunlik streak</div>
+                </div>
+                <div class="stat-item stat-purple">
+                    <div class="stat-item-lbl">📖 Bu oy</div>
+                    <div class="stat-item-val" id="pagesMonth">0</div>
+                    <div class="stat-item-unit">sahifa</div>
+                </div>
+                <div class="stat-item stat-cyan">
+                    <div class="stat-item-lbl">📚 O'qilgan</div>
+                    <div class="stat-item-val" id="booksRead">0</div>
+                    <div class="stat-item-unit">kitob</div>
+                </div>
+                <div class="stat-item stat-pink">
+                    <div class="stat-item-lbl">🏆 Nishonlar</div>
+                    <div class="stat-item-val" id="badgesCount">0</div>
+                    <div class="stat-item-unit">olindi</div>
+                </div>
+            </div>
+            <div class="daily-goal">
+                <div class="daily-goal-header">
+                    <span>Kunlik maqsad: 20 sahifa</span>
+                    <span id="goalPercent">0%</span>
+                </div>
+                <div class="daily-goal-bar">
+                    <div class="daily-goal-fill" id="goalFill"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== KUN IQTIBOSI (avto-aylanuvchi) ===== -->
+        <div class="quote-card" id="quoteCard">
+            <div class="quote-mark">"</div>
+            <div class="quote-controls left">
+                <button class="quote-nav-btn" onclick="prevQuote()" aria-label="Oldingi">‹</button>
+            </div>
+            <div class="quote-controls right">
+                <button class="quote-nav-btn" onclick="nextQuote()" aria-label="Keyingi">›</button>
+            </div>
+            <div class="quote-body" id="quoteBody">
+                <div class="quote-text" id="quoteText"></div>
+                <div class="quote-author" id="quoteAuthor"></div>
+            </div>
+            <div class="quote-dots" id="quoteDots"></div>
+        </div>
+
         <div class="search-wrap">
             <span class="search-icon-left">🔍</span>
             <input type="text" id="searchInput" class="search-input" placeholder="Kitob nomi yoki muallifni qidiring..." oninput="onSearchInput()">
         </div>
+
         <div class="continue-card" id="continueSection">
             <div class="continue-info">
                 <div class="continue-label">📖 Davom eting</div>
@@ -1413,6 +1851,23 @@
             </div>
             <button class="continue-btn" id="continueBtn">Davom etish →</button>
         </div>
+
+        <!-- ===== YAQINDA QO'SHILDI (Netflix uslubi) ===== -->
+        <div id="newBooksSection" style="display:none;">
+            <div class="row-header">
+                <h3>🆕 Yaqinda qo'shildi</h3>
+            </div>
+            <div class="netflix-row" id="newBooksRow"></div>
+        </div>
+
+        <!-- ===== CHALLENGES ===== -->
+        <div class="challenges-section">
+            <div class="row-header">
+                <h3>🎯 Faol challenges</h3>
+            </div>
+            <div class="challenges-grid" id="challengesGrid"></div>
+        </div>
+
         <div id="categoriesWrap">
             <div class="section-title">🗂️ Kategoriyalar</div>
             <div class="category-grid" id="categoryGrid"></div>
@@ -1723,6 +2178,9 @@
                 }
                 return `
                         <div class="book-card">
+                            <div class="book-card-cover" onclick="openBook(${book.id})" style="cursor:pointer;">
+                                ${generateBookCover(book.title, book.author, 100, 140)}
+                            </div>
                             <h2>${escapeHtml(book.title)}</h2>
                             <p class="author">✍️ ${escapeHtml(book.author)}</p>
                             <div class="meta">
@@ -2207,9 +2665,326 @@
         function hideWelcome() { document.getElementById('welcomeOverlay').classList.remove('active'); }
         function closeWelcome(event) { if (event.target.id === 'welcomeOverlay') hideWelcome(); }
 
+        // ============================================
+        // HOME PAGE MEGA UPGRADE — Funksiyalar
+        // ============================================
+
+        // Muallif nomiga ko'ra rang palitrasi tanlash
+        function pickPalette(seedText) {
+            const palettes = [
+                ['#7c3aed', '#ec4899'], // purple-pink
+                ['#0891b2', '#7c3aed'], // cyan-purple
+                ['#f59e0b', '#ec4899'], // gold-pink
+                ['#10b981', '#0891b2'], // green-cyan
+                ['#ef4444', '#f59e0b'], // red-gold
+                ['#8b5cf6', '#06b6d4'], // violet-teal
+                ['#ec4899', '#f59e0b'], // pink-amber
+                ['#0369a1', '#1e40af'], // blue tones
+                ['#166534', '#15803d'], // green tones
+            ];
+            let hash = 0;
+            for (let i = 0; i < seedText.length; i++)
+                hash = ((hash << 5) - hash) + seedText.charCodeAt(i);
+            return palettes[Math.abs(hash) % palettes.length];
+        }
+
+        // Chiroyli SVG kitob muqovasi generatsiya qilish
+        function generateBookCover(title, author, width = 200, height = 280) {
+            const [c1, c2] = pickPalette(author + title);
+            const emoji = getCategoryIcon(title) || '📖';
+            const shortTitle = (title || '').substring(0, 40);
+            const titleLines = wrapText(shortTitle, 12);
+            const authorShort = (author || '').substring(0, 20);
+            return `
+                <svg width="${width}" height="${height}" viewBox="0 0 200 280" xmlns="http://www.w3.org/2000/svg" style="display:block; width:${width}px; height:${height}px;">
+                    <defs>
+                        <linearGradient id="cvg-${Math.random().toString(36).slice(2,7)}" x1="0" y1="0" x2="1" y2="1">
+                            <stop offset="0" stop-color="${c1}"/>
+                            <stop offset="1" stop-color="${c2}"/>
+                        </linearGradient>
+                    </defs>
+                    <rect width="200" height="280" fill="url(#cvg-${Math.random().toString(36).slice(2,7)})" rx="8"/>
+                    <rect x="0" y="0" width="200" height="280" fill="rgba(0,0,0,.3)" rx="8"/>
+                    <line x1="15" y1="0" x2="15" y2="280" stroke="rgba(0,0,0,.25)" stroke-width="2"/>
+                    <text x="50%" y="60" text-anchor="middle" fill="#fff" font-size="14" font-weight="700" letter-spacing="2" opacity="0.7">KUTUBXONA</text>
+                    ${titleLines.map((line, i) => `<text x="50%" y="${140 + i * 24}" text-anchor="middle" fill="#fff" font-size="19" font-weight="800" font-family="Georgia, serif">${escapeHtml(line)}</text>`).join('')}
+                    <text x="50%" y="240" text-anchor="middle" fill="rgba(255,255,255,.85)" font-size="11" font-family="Georgia, serif" font-style="italic">${escapeHtml(authorShort)}</text>
+                </svg>
+            `;
+        }
+
+        function wrapText(text, maxLen) {
+            const words = text.split(' ');
+            const lines = [];
+            let current = '';
+            for (const w of words) {
+                if ((current + ' ' + w).length > maxLen) {
+                    if (current) lines.push(current);
+                    current = w;
+                } else {
+                    current = current ? current + ' ' + w : w;
+                }
+            }
+            if (current) lines.push(current);
+            return lines.slice(0, 3);
+        }
+
+        // ===== READING ACTIVITY (localStorage) =====
+        function todayKey() {
+            const d = new Date();
+            return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+        }
+        function getActivity() {
+            return JSON.parse(localStorage.getItem('reading_activity') || '{}');
+        }
+        function saveActivityPage() {
+            const act = getActivity();
+            const key = todayKey();
+            act[key] = (act[key] || 0) + 1;
+            localStorage.setItem('reading_activity', JSON.stringify(act));
+        }
+        function computeStreak() {
+            const act = getActivity();
+            let streak = 0;
+            const today = new Date();
+            for (let i = 0; i < 365; i++) {
+                const d = new Date(today);
+                d.setDate(d.getDate() - i);
+                const key = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+                if (act[key]) streak++;
+                else if (i > 0) break;
+            }
+            return streak;
+        }
+        function pagesThisMonth() {
+            const act = getActivity();
+            const now = new Date();
+            const prefix = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
+            return Object.entries(act)
+                .filter(([k]) => k.startsWith(prefix))
+                .reduce((s, [_, v]) => s + v, 0);
+        }
+        function pagesToday() {
+            return getActivity()[todayKey()] || 0;
+        }
+        function booksFinished() {
+            const prog = getAllProgress();
+            return Object.values(prog).filter(p => p.page >= p.totalPages && p.totalPages > 0).length;
+        }
+        function computeBadges() {
+            let count = 0;
+            if (computeStreak() >= 3) count++;      // 3-day streak
+            if (computeStreak() >= 7) count++;      // 7-day streak
+            if (pagesThisMonth() >= 100) count++;   // 100 pages
+            if (booksFinished() >= 1) count++;      // First book
+            if (booksFinished() >= 5) count++;      // 5 books
+            return count;
+        }
+
+        // Har varaq ochilganda activity++
+        (function hookProgressTracking() {
+            const originalSave = window.saveProgress;
+            window.saveProgress = function(bookId, page, totalPages) {
+                originalSave(bookId, page, totalPages);
+                saveActivityPage();
+            };
+        })();
+
+        function renderStatsPanel() {
+            const streak = computeStreak();
+            const pagesM = pagesThisMonth();
+            const books = booksFinished();
+            const badges = computeBadges();
+            const today = pagesToday();
+            const goal = 20;
+            const percent = Math.min(100, Math.round((today / goal) * 100));
+
+            // Faqat activity bo'lsa ko'rsatish
+            if (streak === 0 && pagesM === 0 && books === 0) {
+                document.getElementById('statsPanel').style.display = 'none';
+                return;
+            }
+            document.getElementById('statsPanel').style.display = 'block';
+            document.getElementById('streakNum').textContent = streak;
+            document.getElementById('pagesMonth').textContent = pagesM;
+            document.getElementById('booksRead').textContent = books;
+            document.getElementById('badgesCount').textContent = badges;
+            document.getElementById('goalPercent').textContent = percent + '%';
+            document.getElementById('goalFill').style.width = percent + '%';
+        }
+
+        // ===== QUOTE OF THE DAY =====
+        const QUOTES = [
+            { text: "O'qish — bu o'z hayotingizga hech kimning bermagan boyliklarini qo'shish demakdir.", author: "Vissarion Belinskiy" },
+            { text: "Kitob — barcha mo''jizalarning eng buyugi.", author: "Maksim Gorkiy" },
+            { text: "Aql-idrok kitob orqali toblanadi.", author: "Alisher Navoiy" },
+            { text: "Sen kim ekanligingni, o'qigan kitobing aytadi.", author: "Prancesko Petrarka" },
+            { text: "Kitobsiz uy — o'zi jismi bor, ammo jonsiz badan.", author: "Sitseron" },
+            { text: "Bir kitob — bu ming yashash imkoniyati.", author: "Jorj R.R. Martin" },
+            { text: "Hayotdagi eng katta boylik — bilim, uni faqat kitobdan olamiz.", author: "Cho'lpon" },
+            { text: "Kitob o'qigan odam — hech qachon yolg'iz emas.", author: "Ernest Xemingway" },
+            { text: "Har bir sahifa — yangi bir dunyo.", author: "Umberto Eko" },
+            { text: "Kitob — inson qalbining oynasidir.", author: "Abdulla Qodiriy" },
+        ];
+        // Iqtiboslar avto-aylanish
+        let quoteIndex = 0;
+        let quoteTimer = null;
+        const QUOTE_INTERVAL = 15000; // 15 sekund
+
+        function showQuote(idx) {
+            quoteIndex = ((idx % QUOTES.length) + QUOTES.length) % QUOTES.length;
+            const body = document.getElementById('quoteBody');
+            body.classList.add('fading');
+            setTimeout(() => {
+                const q = QUOTES[quoteIndex];
+                document.getElementById('quoteText').textContent = q.text;
+                document.getElementById('quoteAuthor').textContent = `— ${q.author}`;
+                body.classList.remove('fading');
+                renderQuoteDots();
+            }, 350);
+        }
+
+        function renderQuoteDots() {
+            const dots = document.getElementById('quoteDots');
+            dots.innerHTML = QUOTES.map((_, i) =>
+                `<div class="quote-dot ${i === quoteIndex ? 'active' : ''}" onclick="goToQuote(${i})"></div>`
+            ).join('');
+        }
+
+        function nextQuote() { showQuote(quoteIndex + 1); restartQuoteTimer(); }
+        function prevQuote() { showQuote(quoteIndex - 1); restartQuoteTimer(); }
+        function goToQuote(i) { showQuote(i); restartQuoteTimer(); }
+
+        function restartQuoteTimer() {
+            if (quoteTimer) clearInterval(quoteTimer);
+            quoteTimer = setInterval(() => showQuote(quoteIndex + 1), QUOTE_INTERVAL);
+        }
+
+        function renderQuoteOfDay() {
+            // Boshlanish nuqtasi — bugungi kunga bog'liq
+            const dayIndex = Math.floor(new Date().getTime() / 86400000) % QUOTES.length;
+            quoteIndex = dayIndex;
+            const q = QUOTES[quoteIndex];
+            document.getElementById('quoteText').textContent = q.text;
+            document.getElementById('quoteAuthor').textContent = `— ${q.author}`;
+            renderQuoteDots();
+            restartQuoteTimer();
+        }
+
+        // ===== HERO FEATURED BOOK =====
+        async function renderHeroFeatured() {
+            try {
+                const res = await fetch(`${API_BASE}/api/Books?pageSize=100`);
+                if (!res.ok) return;
+                const data = await res.json();
+                const books = data.items || [];
+                if (books.length === 0) return;
+
+                // Eng ko'p sahifali kitobni tanlash (yoki reyting bo'yicha)
+                const sorted = [...books].sort((a, b) => (b.totalPages || 0) - (a.totalPages || 0));
+                const featured = sorted[0];
+
+                document.getElementById('heroTitle').textContent = featured.title;
+                document.getElementById('heroAuthor').textContent = `${featured.author} • ${featured.category} • ${featured.year || ''}`;
+                document.getElementById('heroDesc').textContent =
+                    `${featured.category} janridagi ajoyib asar. Bugun o'qishni boshlang va yangi olamga sho'ng'ing.`;
+                document.getElementById('heroCover').innerHTML = generateBookCover(featured.title, featured.author);
+
+                const stats = [];
+                if (featured.averageRating > 0)
+                    stats.push(`⭐ ${featured.averageRating.toFixed(1)}`);
+                stats.push(`📄 ${featured.totalPages || 0} sahifa`);
+                if (featured.commentsCount > 0)
+                    stats.push(`💬 ${featured.commentsCount} izoh`);
+                document.getElementById('heroStats').innerHTML =
+                    stats.map(s => `<span class="badge">${s}</span>`).join('');
+
+                document.getElementById('heroReadBtn').onclick = () => openBook(featured.id);
+                document.getElementById('heroFeatured').style.display = 'grid';
+            } catch (err) { console.error('Hero xato:', err); }
+        }
+
+        // ===== NEW BOOKS ROW (Netflix uslubi) =====
+        async function renderNewBooksRow() {
+            try {
+                const res = await fetch(`${API_BASE}/api/Books?pageSize=15`);
+                if (!res.ok) return;
+                const data = await res.json();
+                const books = data.items || [];
+                if (books.length === 0) return;
+
+                const row = document.getElementById('newBooksRow');
+                row.innerHTML = books.map(book => `
+                    <div class="netflix-card" onclick="openBook(${book.id})">
+                        <div class="cover">${generateBookCover(book.title, book.author, 140, 200)}</div>
+                        <div class="title">${escapeHtml(book.title)}</div>
+                        <div class="author">${escapeHtml(book.author)}</div>
+                    </div>
+                `).join('');
+                document.getElementById('newBooksSection').style.display = 'block';
+            } catch (err) { console.error(err); }
+        }
+
+        // ===== CHALLENGES =====
+        function renderChallenges() {
+            const streak = computeStreak();
+            const pagesM = pagesThisMonth();
+            const books = booksFinished();
+
+            const CHALLENGES = [
+                {
+                    emoji: '🔥', title: '7 kunlik streak',
+                    desc: 'Har kun kitob o\'qing',
+                    current: streak, target: 7,
+                    color: 'rgba(245, 158, 11, 0.15)',
+                    border: 'rgba(245, 158, 11, 0.3)',
+                    fill: 'linear-gradient(90deg, #f59e0b, #ec4899)'
+                },
+                {
+                    emoji: '📚', title: 'Bu oy 200 sahifa',
+                    desc: 'Doimiy o\'qishning ko\'rinishi',
+                    current: pagesM, target: 200,
+                    color: 'rgba(139, 92, 246, 0.15)',
+                    border: 'rgba(139, 92, 246, 0.3)',
+                    fill: 'linear-gradient(90deg, #8b5cf6, #ec4899)'
+                },
+                {
+                    emoji: '🏆', title: 'Kitobxon',
+                    desc: '5 ta kitobni oxirigacha o\'qing',
+                    current: books, target: 5,
+                    color: 'rgba(16, 185, 129, 0.15)',
+                    border: 'rgba(16, 185, 129, 0.3)',
+                    fill: 'linear-gradient(90deg, #10b981, #06b6d4)'
+                },
+            ];
+
+            document.getElementById('challengesGrid').innerHTML = CHALLENGES.map(c => {
+                const percent = Math.min(100, Math.round((c.current / c.target) * 100));
+                const done = c.current >= c.target;
+                return `
+                    <div class="challenge-card" style="background:${c.color}; border:1px solid ${c.border};">
+                        <div class="challenge-emoji">${c.emoji}</div>
+                        <div class="challenge-title">${c.title}</div>
+                        <div class="challenge-desc">${c.desc}</div>
+                        <div class="challenge-progress">
+                            <div class="challenge-progress-fill" style="width:${percent}%; background:${c.fill};"></div>
+                        </div>
+                        <div class="challenge-status" style="color:${done ? '#10b981' : 'var(--text-dim)'};">
+                            ${c.current} / ${c.target} ${done ? '✓ Tugallandi!' : ''}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
         renderAuthBar();
         loadCategories();
         loadBooks(true);
+        renderHeroFeatured();
+        renderNewBooksRow();
+        renderQuoteOfDay();
+        renderStatsPanel();
+        renderChallenges();
         setTimeout(showWelcome, 800);
     </script>
 </body>
