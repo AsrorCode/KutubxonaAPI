@@ -1,4 +1,4 @@
-using System.Security.Claims;
+using KutubxonaAPI.Common.Extensions;
 using KutubxonaAPI.Data;
 using KutubxonaAPI.DTOs.Mapping;
 using KutubxonaAPI.DTOs.SaleBooks;
@@ -139,7 +139,7 @@ public class SaleBooksController : ControllerBase
         var book = await _context.SaleBooks.FindAsync(id);
         if (book == null) return NotFound();
 
-        book.DeletedByUserId = GetCurrentUserId();
+        book.DeletedByUserId = User.GetUserId();
         _context.SaleBooks.Remove(book); // Auto soft delete
         await _context.SaveChangesAsync();
 
@@ -181,12 +181,6 @@ public class SaleBooksController : ControllerBase
         await _context.SaveChangesAsync();
         _logger.LogInformation("Marketplace kitob tiklandi: Id={Id}", id);
         return Ok(book.ToDto());
-    }
-
-    private int? GetCurrentUserId()
-    {
-        var idStr = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-        return int.TryParse(idStr, out var id) ? id : null;
     }
 
     // ======== PATCH /api/salebooks/{id}/toggle (Admin) ========

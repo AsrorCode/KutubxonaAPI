@@ -4,6 +4,7 @@ using System.Text;
 using System.Threading.RateLimiting;
 using FluentValidation;
 using FluentValidation.AspNetCore;
+using KutubxonaAPI.Common.Constants;
 using KutubxonaAPI.Data;
 using KutubxonaAPI.Middleware;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -147,16 +148,16 @@ try
     {
         options.RejectionStatusCode = 429;
 
-        options.AddFixedWindowLimiter("auth", opt =>
+        options.AddFixedWindowLimiter(AuthConstants.AuthRateLimitPolicy, opt =>
         {
-            opt.PermitLimit = 5;
+            opt.PermitLimit = AuthConstants.AuthRateLimitPerMinute;
             opt.Window = TimeSpan.FromMinutes(1);
             opt.QueueLimit = 0;
         });
 
-        options.AddFixedWindowLimiter("general", opt =>
+        options.AddFixedWindowLimiter(AuthConstants.GeneralRateLimitPolicy, opt =>
         {
-            opt.PermitLimit = 100;
+            opt.PermitLimit = AuthConstants.GeneralRateLimitPerMinute;
             opt.Window = TimeSpan.FromMinutes(1);
             opt.QueueLimit = 10;
         });
@@ -171,12 +172,12 @@ try
 
     builder.Services.AddCors(options =>
     {
-        options.AddPolicy("Development", policy =>
+        options.AddPolicy(AuthConstants.DevelopmentCorsPolicy, policy =>
         {
             policy.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader();
         });
 
-        options.AddPolicy("Production", policy =>
+        options.AddPolicy(AuthConstants.ProductionCorsPolicy, policy =>
         {
             policy.WithOrigins(allowedOrigins)
                   .AllowAnyMethod()
@@ -221,7 +222,7 @@ try
             if (httpContext.User.Identity?.IsAuthenticated == true)
             {
                 diagnosticContext.Set("UserId",
-                    httpContext.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value);
+                    httpContext.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value ?? "anonymous");
             }
         };
     });
@@ -247,9 +248,9 @@ try
 
     // 6. CORS
     if (app.Environment.IsDevelopment())
-        app.UseCors("Development");
+        app.UseCors(AuthConstants.DevelopmentCorsPolicy);
     else
-        app.UseCors("Production");
+        app.UseCors(AuthConstants.ProductionCorsPolicy);
 
     // 7. Rate Limiter
     app.UseRateLimiter();
