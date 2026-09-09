@@ -250,6 +250,42 @@
             font-size: 14px; font-family: inherit; outline: none;
         }
         select option { background: var(--bg-elevated); }
+
+        /* IMAGE PICKER */
+        .image-picker {
+            border: 2px dashed rgba(139, 92, 246, 0.3);
+            border-radius: 12px;
+            padding: 14px;
+            background: rgba(139, 92, 246, 0.03);
+            transition: all 0.2s;
+            outline: none;
+        }
+        .image-picker:focus,
+        .image-picker.dragover {
+            border-color: var(--primary);
+            background: rgba(139, 92, 246, 0.08);
+        }
+        .image-picker-preview {
+            min-height: 140px;
+            display: flex; align-items: center; justify-content: center;
+            border-radius: 8px;
+            background: rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+        .image-picker-preview img {
+            max-width: 100%; max-height: 200px;
+            border-radius: 6px;
+            object-fit: contain;
+        }
+        .image-picker-empty {
+            text-align: center;
+            padding: 20px;
+        }
+        .image-picker-actions {
+            display: flex; gap: 8px; justify-content: center;
+            flex-wrap: wrap;
+        }
     </style>
 </head>
 <body>
@@ -380,10 +416,41 @@
                         </div>
                         <button class="btn btn-primary" onclick="createSaleBook()">+ Yaratish</button>
                     </div>
+                    <!-- Chegirma bo'limi (ixtiyoriy) -->
+                    <details class="discount-toggle" style="margin-bottom: 14px;">
+                        <summary style="cursor:pointer; color:var(--warning); font-weight:600; padding: 8px 0;">
+                            🔥 Chegirma qo'shish (ixtiyoriy)
+                        </summary>
+                        <div class="form-row cols-2" style="margin-top: 10px;">
+                            <div class="form-field">
+                                <label>Chegirma foizi (%)</label>
+                                <input type="number" id="sDiscount" placeholder="Masalan: 25" min="0" max="90" value="0">
+                            </div>
+                            <div class="form-field">
+                                <label>Chegirma tugash (ixtiyoriy)</label>
+                                <input type="datetime-local" id="sDiscountEnds">
+                            </div>
+                        </div>
+                    </details>
                     <div class="form-row">
                         <div class="form-field">
-                            <label>Rasm URL (ixtiyoriy)</label>
-                            <input type="url" id="sImageUrl" placeholder="https://...">
+                            <label>Kitob rasmi (ixtiyoriy)</label>
+                            <div class="image-picker" id="sImagePicker" onpaste="handleImagePaste(event)" tabindex="0">
+                                <div class="image-picker-preview" id="sImagePreview">
+                                    <div class="image-picker-empty">
+                                        <div style="font-size:36px;">🖼️</div>
+                                        <div style="font-size:13px; color:var(--text-dim); margin-top:8px;">Rasmni bu yerga tashlang, yopishtiring yoki tanlang</div>
+                                        <div style="font-size:11px; color:var(--text-faint); margin-top:4px;">JPG, PNG • Max 2 MB</div>
+                                    </div>
+                                </div>
+                                <input type="file" id="sImageFile" accept="image/*" style="display:none;" onchange="handleImageFile(event)">
+                                <div class="image-picker-actions">
+                                    <button type="button" class="btn btn-secondary btn-sm" onclick="document.getElementById('sImageFile').click()">📁 Fayl tanlash</button>
+                                    <button type="button" class="btn btn-secondary btn-sm" onclick="handleImageUrl()">🔗 URL yopishtirish</button>
+                                    <button type="button" class="btn btn-danger btn-sm" onclick="clearImage()" id="sImageClearBtn" style="display:none;">✕ O'chirish</button>
+                                </div>
+                            </div>
+                            <input type="hidden" id="sImageUrl">
                         </div>
                     </div>
                     <div class="status-msg" id="createSaleStatus"></div>
@@ -691,6 +758,107 @@
             } catch (err) { console.error(err); }
         }
 
+        // ============================================
+        // IMAGE PICKER — file/paste/URL, base64 encoding
+        // ============================================
+        const MAX_IMAGE_SIZE = 2 * 1024 * 1024; // 2 MB
+
+        function setImagePreview(dataUrl) {
+            const preview = document.getElementById('sImagePreview');
+            const clearBtn = document.getElementById('sImageClearBtn');
+            const hiddenInput = document.getElementById('sImageUrl');
+            if (dataUrl) {
+                preview.innerHTML = `<img src="${dataUrl}" alt="Preview">`;
+                hiddenInput.value = dataUrl;
+                clearBtn.style.display = 'inline-flex';
+            } else {
+                preview.innerHTML = `
+                    <div class="image-picker-empty">
+                        <div style="font-size:36px;">🖼️</div>
+                        <div style="font-size:13px; color:var(--text-dim); margin-top:8px;">Rasmni bu yerga tashlang, yopishtiring yoki tanlang</div>
+                        <div style="font-size:11px; color:var(--text-faint); margin-top:4px;">JPG, PNG • Max 2 MB</div>
+                    </div>`;
+                hiddenInput.value = '';
+                clearBtn.style.display = 'none';
+            }
+        }
+
+        function fileToDataUrl(file) {
+            return new Promise((resolve, reject) => {
+                if (!file || !file.type.startsWith('image/')) {
+                    reject(new Error('Bu rasm fayli emas'));
+                    return;
+                }
+                if (file.size > MAX_IMAGE_SIZE) {
+                    reject(new Error(`Fayl juda katta (${(file.size / 1024 / 1024).toFixed(1)} MB). Maksimum 2 MB.`));
+                    return;
+                }
+                const reader = new FileReader();
+                reader.onload = (e) => resolve(e.target.result);
+                reader.onerror = () => reject(new Error('Fayl o\'qib bo\'lmadi'));
+                reader.readAsDataURL(file);
+            });
+        }
+
+        async function handleImageFile(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            try {
+                const dataUrl = await fileToDataUrl(file);
+                setImagePreview(dataUrl);
+            } catch (err) { alert(err.message); }
+        }
+
+        async function handleImagePaste(event) {
+            const items = (event.clipboardData || event.originalEvent?.clipboardData)?.items;
+            if (!items) return;
+            for (const item of items) {
+                if (item.type.startsWith('image/')) {
+                    event.preventDefault();
+                    const file = item.getAsFile();
+                    try {
+                        const dataUrl = await fileToDataUrl(file);
+                        setImagePreview(dataUrl);
+                    } catch (err) { alert(err.message); }
+                    return;
+                }
+            }
+        }
+
+        function handleImageUrl() {
+            const url = prompt('Rasm URL:');
+            if (url && url.trim()) {
+                setImagePreview(url.trim());
+            }
+        }
+
+        function clearImage() {
+            document.getElementById('sImageFile').value = '';
+            setImagePreview(null);
+        }
+
+        // Drag & drop
+        document.addEventListener('DOMContentLoaded', () => {
+            const picker = document.getElementById('sImagePicker');
+            if (!picker) return;
+            picker.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                picker.classList.add('dragover');
+            });
+            picker.addEventListener('dragleave', () => picker.classList.remove('dragover'));
+            picker.addEventListener('drop', async (e) => {
+                e.preventDefault();
+                picker.classList.remove('dragover');
+                const file = e.dataTransfer.files[0];
+                if (file) {
+                    try {
+                        const dataUrl = await fileToDataUrl(file);
+                        setImagePreview(dataUrl);
+                    } catch (err) { alert(err.message); }
+                }
+            });
+        });
+
         async function createSaleBook() {
             const title = document.getElementById('sTitle').value.trim();
             const author = document.getElementById('sAuthor').value.trim();
@@ -701,6 +869,9 @@
             const year = parseInt(document.getElementById('sYear').value) || null;
             const imageUrl = document.getElementById('sImageUrl').value.trim();
             const isActive = document.getElementById('sActive').checked;
+            const discount = parseInt(document.getElementById('sDiscount').value) || 0;
+            const discountEndsRaw = document.getElementById('sDiscountEnds').value;
+            const discountEndsAt = discountEndsRaw ? new Date(discountEndsRaw).toISOString() : null;
             const status = document.getElementById('createSaleStatus');
 
             if (!title || !author || price <= 0) {
@@ -713,15 +884,17 @@
                 const res = await fetch(`${API}/salebooks`, {
                     method: 'POST',
                     headers: authHeaders(),
-                    body: JSON.stringify({ title, author, description, price, stock, category, year, imageUrl, isActive })
+                    body: JSON.stringify({ title, author, description, price, stock, category, year, imageUrl, isActive, discount, discountEndsAt })
                 });
                 if (!res.ok) throw new Error(`Xato: ${res.status}`);
                 status.className = 'status-msg success';
                 status.textContent = '✅ Marketplace\'ga qo\'shildi!';
-                ['sTitle', 'sAuthor', 'sDescription', 'sPrice', 'sCategory', 'sYear', 'sImageUrl'].forEach(id =>
+                ['sTitle', 'sAuthor', 'sDescription', 'sPrice', 'sCategory', 'sYear', 'sImageUrl', 'sDiscountEnds'].forEach(id =>
                     document.getElementById(id).value = ''
                 );
                 document.getElementById('sStock').value = '1';
+                document.getElementById('sDiscount').value = '0';
+                clearImage();
                 await loadSaleBooks();
                 await loadStats();
                 setTimeout(() => status.className = 'status-msg', 3000);

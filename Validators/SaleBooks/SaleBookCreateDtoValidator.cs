@@ -14,7 +14,7 @@ public class SaleBookCreateDtoValidator : AbstractValidator<SaleBookCreateDto>
             .GreaterThan(0).WithMessage("Narx 0 dan katta bo'lishi kerak")
             .LessThan(100_000_000).WithMessage("Narx juda katta");
         RuleFor(x => x.Stock).GreaterThanOrEqualTo(0);
-        RuleFor(x => x.ImageUrl).MaximumLength(500);
+        // ImageUrl cheklovsiz — base64 rasmlar uchun
         RuleFor(x => x.Category).MaximumLength(50);
         RuleFor(x => x.Year).InclusiveBetween(1000, 2100).When(x => x.Year.HasValue);
     }

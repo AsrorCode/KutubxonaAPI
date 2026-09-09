@@ -14,6 +14,9 @@ public class SaleBookResponseDto
     public string Category { get; set; } = string.Empty;
     public int? Year { get; set; }
     public bool IsActive { get; set; }
+    public int Discount { get; set; }
+    public DateTime? DiscountEndsAt { get; set; }
+    public decimal FinalPrice { get; set; }  // Chegirma bilan hisoblangan
     public DateTime CreatedAt { get; set; }
     public DateTime? UpdatedAt { get; set; }
 }
@@ -37,7 +40,7 @@ public class SaleBookCreateDto
     [Range(0, int.MaxValue)]
     public int Stock { get; set; }
 
-    [StringLength(500)]
+    // Base64 rasmlar uchun cheklov yo'q (frontend'da 2MB tekshiriladi)
     public string ImageUrl { get; set; } = string.Empty;
 
     [StringLength(50)]
@@ -47,4 +50,9 @@ public class SaleBookCreateDto
     public int? Year { get; set; }
 
     public bool IsActive { get; set; } = true;
+
+    [Range(0, 100)]
+    public int Discount { get; set; } = 0;
+
+    public DateTime? DiscountEndsAt { get; set; }
 }
