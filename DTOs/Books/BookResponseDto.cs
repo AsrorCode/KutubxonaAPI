@@ -11,6 +11,7 @@ public class BookResponseDto
     public int? Year { get; set; }
     public string Category { get; set; } = string.Empty;
     public bool IsAvailable { get; set; }
+    public string ImageUrl { get; set; } = string.Empty;
     public DateTime CreatedAt { get; set; }
     public DateTime? UpdatedAt { get; set; }
 }
@@ -27,6 +28,7 @@ public class BookWithStatsDto
     public int? Year { get; set; }
     public string Category { get; set; } = string.Empty;
     public bool IsAvailable { get; set; }
+    public string ImageUrl { get; set; } = string.Empty;
     public DateTime CreatedAt { get; set; }
 
     public int TotalPages { get; set; }

@@ -35,6 +35,7 @@ public static class MappingExtensions
         Year = b.Year,
         Category = b.Category,
         IsAvailable = b.IsAvailable,
+        ImageUrl = b.ImageUrl,
         CreatedAt = b.CreatedAt,
         UpdatedAt = b.UpdatedAt
     };
