@@ -73,6 +73,7 @@ public class BooksController : ControllerBase
                 Year = b.Year,
                 Category = b.Category,
                 IsAvailable = b.IsAvailable,
+                ImageUrl = b.ImageUrl,
                 CreatedAt = b.CreatedAt,
                 TotalPages = b.Pages.Count(),
                 CommentsCount = b.Comments.Count(),
@@ -136,6 +137,7 @@ public class BooksController : ControllerBase
             Year = dto.Year,
             Category = dto.Category,
             IsAvailable = dto.IsAvailable,
+            ImageUrl = dto.ImageUrl,
             CreatedAt = DateTime.UtcNow,
             UpdatedAt = DateTime.UtcNow
         };
@@ -166,6 +168,7 @@ public class BooksController : ControllerBase
         book.Year = dto.Year;
         book.Category = dto.Category;
         book.IsAvailable = dto.IsAvailable;
+        book.ImageUrl = dto.ImageUrl;
         book.UpdatedAt = DateTime.UtcNow;
 
         await _context.SaveChangesAsync();

@@ -22,6 +22,9 @@ public class BookCreateDto
     public string Category { get; set; } = "Boshqa";
 
     public bool IsAvailable { get; set; } = true;
+
+    /// <summary>Kitob muqovasi (URL yoki base64). Ixtiyoriy.</summary>
+    public string ImageUrl { get; set; } = string.Empty;
 }
 
 /// <summary>
@@ -44,4 +47,7 @@ public class BookUpdateDto
     public string Category { get; set; } = string.Empty;
 
     public bool IsAvailable { get; set; }
+
+    /// <summary>Kitob muqovasi (URL yoki base64). Ixtiyoriy.</summary>
+    public string ImageUrl { get; set; } = string.Empty;
 }

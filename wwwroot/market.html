@@ -211,14 +211,18 @@
         }
 
         .search-wrap {
-            max-width: 640px;
-            margin: 0 auto 32px;
+            max-width: 720px;
+            margin: 0 auto 8px;
             position: relative;
+            display: flex;
+            gap: 10px;
+            align-items: stretch;
         }
+        .search-box { flex: 1; position: relative; }
 
         .search-input {
             width: 100%;
-            padding: 14px 48px 14px 48px;
+            padding: 14px 16px 14px 46px;
             background: var(--bg-glass);
             border: 1px solid var(--border);
             border-radius: 12px;
@@ -229,11 +233,7 @@
             backdrop-filter: blur(20px);
             transition: all 0.2s;
         }
-
-            .search-input::placeholder {
-                color: var(--text-faint);
-            }
-
+            .search-input::placeholder { color: var(--text-faint); }
             .search-input:focus {
                 border-color: var(--primary);
                 box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.1);
@@ -245,9 +245,25 @@
             top: 50%;
             transform: translateY(-50%);
             color: var(--text-dim);
-            font-size: 18px;
+            font-size: 17px;
             pointer-events: none;
         }
+
+        .search-btn {
+            padding: 0 28px;
+            background: var(--text);
+            color: var(--bg-base);
+            border: none;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 600;
+            font-family: inherit;
+            cursor: pointer;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+        .search-btn:hover { background: var(--primary); color: #fff; }
+        @media (max-width: 640px) { .search-btn { padding: 0 18px; font-size: 14px; } }
 
         .categories {
             display: flex;
@@ -1030,8 +1046,11 @@
         </div>
 
         <div class="search-wrap">
-            <span class="search-icon-left">🔍</span>
-            <input type="text" id="searchInput" class="search-input" placeholder="Kitob nomi yoki muallifni qidiring..." oninput="onSearchInput()">
+            <div class="search-box">
+                <span class="search-icon-left">🔍</span>
+                <input type="text" id="searchInput" class="search-input" placeholder="Kitob yoki muallif qidirish..." oninput="onSearchInput()">
+            </div>
+            <button class="search-btn" onclick="doSearch()">Qidirish</button>
         </div>
 
         <!-- Sort bar -->
@@ -1424,6 +1443,11 @@
                 searchQuery = document.getElementById('searchInput').value.trim().toLowerCase();
                 renderBooks();
             }, 300);
+        }
+        function doSearch() {
+            clearTimeout(searchTimeout);
+            searchQuery = document.getElementById('searchInput').value.trim().toLowerCase();
+            renderBooks();
         }
 
         // ===== WISHLIST (localStorage) =====

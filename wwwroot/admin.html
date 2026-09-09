@@ -87,8 +87,8 @@
             background: linear-gradient(135deg, var(--primary), var(--accent));
             color: #fff; box-shadow: 0 4px 20px var(--primary-glow);
         }
-        .tab-panel { display: none; }
-        .tab-panel.active { display: block; }
+        .tab-panel { display: none !important; }
+        .tab-panel.active { display: block !important; }
 
         .card {
             background: var(--bg-card); border: 1px solid var(--border);
@@ -304,9 +304,9 @@
 
             <!-- TABS -->
             <div class="tabs">
-                <button class="tab-btn active" onclick="switchTab('reading')">📚 O'qish bo'limi</button>
-                <button class="tab-btn" onclick="switchTab('market')">🛒 Marketplace</button>
-                <button class="tab-btn" onclick="switchTab('orders')">📦 Buyurtmalar</button>
+                <button class="tab-btn active" onclick="switchTab('reading', this)">📕 Yangi kitob qo'shish</button>
+                <button class="tab-btn" onclick="switchTab('market', this)">🛒 Marketplace</button>
+                <button class="tab-btn" onclick="switchTab('orders', this)">📦 Buyurtmalar</button>
             </div>
 
             <!-- ============================================ -->
@@ -339,6 +339,28 @@
                             <input type="text" id="newCategory" placeholder="Klassika">
                         </div>
                         <button class="btn btn-primary" onclick="createBook()">+ Yaratish</button>
+                    </div>
+                    <!-- Rasm picker -->
+                    <div class="form-row">
+                        <div class="form-field">
+                            <label>Kitob muqovasi (ixtiyoriy)</label>
+                            <div class="image-picker" id="bImagePicker" onpaste="handleBookImagePaste(event)" tabindex="0">
+                                <div class="image-picker-preview" id="bImagePreview">
+                                    <div class="image-picker-empty">
+                                        <div style="font-size:36px;">📖</div>
+                                        <div style="font-size:13px; color:var(--text-dim); margin-top:8px;">Muqova rasmini tashlang, yopishtiring yoki tanlang</div>
+                                        <div style="font-size:11px; color:var(--text-faint); margin-top:4px;">JPG, PNG • Max 2 MB • Bo'lmasa avto-generatsiya</div>
+                                    </div>
+                                </div>
+                                <input type="file" id="bImageFile" accept="image/*" style="display:none;" onchange="handleBookImageFile(event)">
+                                <div class="image-picker-actions">
+                                    <button type="button" class="btn btn-secondary btn-sm" onclick="document.getElementById('bImageFile').click()">📁 Fayl</button>
+                                    <button type="button" class="btn btn-secondary btn-sm" onclick="handleBookImageUrl()">🔗 URL</button>
+                                    <button type="button" class="btn btn-danger btn-sm" onclick="clearBookImage()" id="bImageClearBtn" style="display:none;">✕ O'chirish</button>
+                                </div>
+                            </div>
+                            <input type="hidden" id="newImageUrl">
+                        </div>
                     </div>
                     <div class="status-msg" id="createBookStatus"></div>
                 </div>
@@ -490,9 +512,64 @@
         </div>
     </div>
 
+    <!-- ============================================
+         READING BOOK EDIT MODAL
+         ============================================ -->
+    <div id="readEditOverlay" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,.75); backdrop-filter:blur(10px); z-index:1000; align-items:flex-start; justify-content:center; padding:40px 20px; overflow-y:auto;">
+        <div style="background:var(--bg-elevated); border:1px solid var(--border); border-radius:16px; max-width:600px; width:100%; padding:28px; box-shadow:0 24px 60px rgba(0,0,0,.6);">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; padding-bottom:14px; border-bottom:1px solid var(--border);">
+                <h2 style="font-size:20px;">✏️ Kitobni tahrirlash</h2>
+                <button onclick="closeReadBookEdit()" style="background:var(--bg-glass); border:1px solid var(--border); color:var(--text); width:32px; height:32px; border-radius:8px; font-size:18px; cursor:pointer;">×</button>
+            </div>
+            <div class="form-field">
+                <label>Kitob nomi *</label>
+                <input type="text" id="rTitle">
+            </div>
+            <div class="form-field">
+                <label>Muallif *</label>
+                <input type="text" id="rAuthor">
+            </div>
+            <div class="form-row cols-2">
+                <div class="form-field">
+                    <label>Nashr yili</label>
+                    <input type="number" id="rYear" min="1000" max="2100">
+                </div>
+                <div class="form-field">
+                    <label>Kategoriya</label>
+                    <input type="text" id="rCategory">
+                </div>
+            </div>
+            <div class="checkbox-wrap">
+                <input type="checkbox" id="rAvailable">
+                <label for="rAvailable" style="margin:0;">Mavjud (o'quvchilar ko'radi)</label>
+            </div>
+            <div class="form-field" style="margin-top:12px;">
+                <label>Kitob muqovasi</label>
+                <div class="image-picker" id="rImagePicker" onpaste="handleReadEditPaste(event)" tabindex="0">
+                    <div class="image-picker-preview" id="rImagePreview">
+                        <div class="image-picker-empty">
+                            <div style="font-size:36px;">📖</div>
+                            <div style="font-size:13px; color:var(--text-dim); margin-top:8px;">Rasmni tashlang, yopishtiring yoki tanlang</div>
+                        </div>
+                    </div>
+                    <input type="file" id="rImageFile" accept="image/*" style="display:none;" onchange="handleReadEditFile(event)">
+                    <div class="image-picker-actions">
+                        <button type="button" class="btn btn-secondary btn-sm" onclick="document.getElementById('rImageFile').click()">📁 Fayl</button>
+                        <button type="button" class="btn btn-secondary btn-sm" onclick="handleReadEditUrl()">🔗 URL</button>
+                        <button type="button" class="btn btn-danger btn-sm" onclick="clearReadEditImage()" id="rImageClearBtn" style="display:none;">✕</button>
+                    </div>
+                </div>
+                <input type="hidden" id="rImageUrl">
+            </div>
+            <button class="btn btn-primary btn-full" onclick="saveReadBookEdit()" style="margin-top:16px;">💾 Saqlash</button>
+            <div class="status-msg" id="rStatus" style="margin-top:10px;"></div>
+        </div>
+    </div>
+
     <script src="/auth.js"></script>
     <script>
         const API = window.location.origin + '/api';
+        let readBooksCache = [];
         pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 
         // Access tokenni har 12 daqiqada yangilash
@@ -531,11 +608,12 @@
             return true;
         }
 
-        function switchTab(name) {
+        function switchTab(name, btn) {
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
             document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
-            event.target.classList.add('active');
-            document.getElementById('tab-' + name).classList.add('active');
+            if (btn) btn.classList.add('active');
+            const panel = document.getElementById('tab-' + name);
+            if (panel) panel.classList.add('active');
         }
 
         // ==========================================
@@ -596,24 +674,34 @@
                     list.innerHTML = '<div class="empty">Hali kitoblar yo\'q</div>';
                     return;
                 }
-                list.innerHTML = books.map(b => `
-                    <div class="item-row">
-                        <div class="item-info">
-                            <h3>${escapeHtml(b.title)}</h3>
-                            <div class="meta">
-                                ✍️ ${escapeHtml(b.author)}
-                                <span class="badge">${escapeHtml(b.category)}</span>
-                                <span class="badge">${b.year}</span>
-                                ${b.isAvailable
-                                    ? '<span class="badge badge-success">Mavjud</span>'
-                                    : '<span class="badge badge-danger">Yo\'q</span>'}
+                list.innerHTML = books.map(b => {
+                    const thumb = b.imageUrl
+                        ? `<img src="${escapeHtml(b.imageUrl)}" alt="" style="width:44px; height:60px; object-fit:cover; border-radius:6px; margin-right:12px;">`
+                        : `<div style="width:44px; height:60px; background:linear-gradient(135deg, var(--primary), var(--accent)); border-radius:6px; display:flex; align-items:center; justify-content:center; font-size:20px; margin-right:12px;">📖</div>`;
+                    return `
+                    <div class="item-row" style="align-items:center;">
+                        <div class="item-info" style="display:flex; align-items:center;">
+                            ${thumb}
+                            <div>
+                                <h3>${escapeHtml(b.title)}</h3>
+                                <div class="meta">
+                                    ✍️ ${escapeHtml(b.author)}
+                                    <span class="badge">${escapeHtml(b.category)}</span>
+                                    <span class="badge">${b.year}</span>
+                                    ${b.isAvailable
+                                        ? '<span class="badge badge-success">Mavjud</span>'
+                                        : '<span class="badge badge-danger">Yo\'q</span>'}
+                                </div>
                             </div>
                         </div>
                         <div class="item-actions">
-                            <button class="btn btn-danger btn-sm" onclick="deleteBook(${b.id}, '${escapeHtml(b.title).replace(/'/g, "\\'")}')">🗑️ O'chirish</button>
+                            <button class="btn btn-secondary btn-sm" onclick="openReadBookEdit(${b.id})">✏️ Tahrir</button>
+                            <button class="btn btn-danger btn-sm" onclick="deleteBook(${b.id}, '${escapeHtml(b.title).replace(/'/g, "\\'")}')">🗑️</button>
                         </div>
                     </div>
-                `).join('');
+                `;
+                }).join('');
+                readBooksCache = books;
             } catch (err) { console.error('Xato:', err); }
         }
 
@@ -623,6 +711,7 @@
             const year = parseInt(document.getElementById('newYear').value) || new Date().getFullYear();
             const category = document.getElementById('newCategory').value.trim() || 'Boshqa';
             const isAvailable = document.getElementById('newAvailable').checked;
+            const imageUrl = document.getElementById('newImageUrl').value;
             const status = document.getElementById('createBookStatus');
 
             if (!title || !author) {
@@ -635,7 +724,7 @@
                 const res = await fetch(`${API}/books`, {
                     method: 'POST',
                     headers: authHeaders(),
-                    body: JSON.stringify({ title, author, year, category, isAvailable })
+                    body: JSON.stringify({ title, author, year, category, isAvailable, imageUrl })
                 });
                 if (!res.ok) throw new Error(`Xato: ${res.status}`);
                 status.className = 'status-msg success';
@@ -644,6 +733,7 @@
                 document.getElementById('newAuthor').value = '';
                 document.getElementById('newCategory').value = '';
                 document.getElementById('newYear').value = '';
+                clearBookImage();
                 await loadBooks();
                 await loadStats();
                 setTimeout(() => status.className = 'status-msg', 3000);
@@ -652,6 +742,81 @@
                 status.textContent = '❌ ' + err.message;
             }
         }
+
+        // ============================================
+        // BOOK IMAGE PICKER (Reading library)
+        // ============================================
+        function setBookImagePreview(dataUrl) {
+            const preview = document.getElementById('bImagePreview');
+            const clearBtn = document.getElementById('bImageClearBtn');
+            const hidden = document.getElementById('newImageUrl');
+            if (dataUrl) {
+                preview.innerHTML = `<img src="${dataUrl}" alt="Preview">`;
+                hidden.value = dataUrl;
+                clearBtn.style.display = 'inline-flex';
+            } else {
+                preview.innerHTML = `
+                    <div class="image-picker-empty">
+                        <div style="font-size:36px;">📖</div>
+                        <div style="font-size:13px; color:var(--text-dim); margin-top:8px;">Muqova rasmini tashlang, yopishtiring yoki tanlang</div>
+                        <div style="font-size:11px; color:var(--text-faint); margin-top:4px;">JPG, PNG • Max 2 MB • Bo'lmasa avto-generatsiya</div>
+                    </div>`;
+                hidden.value = '';
+                clearBtn.style.display = 'none';
+            }
+        }
+        async function handleBookImageFile(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            try {
+                const dataUrl = await fileToDataUrl(file);
+                setBookImagePreview(dataUrl);
+            } catch (err) { alert(err.message); }
+        }
+        async function handleBookImagePaste(event) {
+            const items = (event.clipboardData || event.originalEvent?.clipboardData)?.items;
+            if (!items) return;
+            for (const item of items) {
+                if (item.type.startsWith('image/')) {
+                    event.preventDefault();
+                    const file = item.getAsFile();
+                    try {
+                        const dataUrl = await fileToDataUrl(file);
+                        setBookImagePreview(dataUrl);
+                    } catch (err) { alert(err.message); }
+                    return;
+                }
+            }
+        }
+        function handleBookImageUrl() {
+            const url = prompt('Rasm URL:');
+            if (url && url.trim()) setBookImagePreview(url.trim());
+        }
+        function clearBookImage() {
+            document.getElementById('bImageFile').value = '';
+            setBookImagePreview(null);
+        }
+        // Drag & drop
+        document.addEventListener('DOMContentLoaded', () => {
+            const picker = document.getElementById('bImagePicker');
+            if (!picker) return;
+            picker.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                picker.classList.add('dragover');
+            });
+            picker.addEventListener('dragleave', () => picker.classList.remove('dragover'));
+            picker.addEventListener('drop', async (e) => {
+                e.preventDefault();
+                picker.classList.remove('dragover');
+                const file = e.dataTransfer.files[0];
+                if (file) {
+                    try {
+                        const dataUrl = await fileToDataUrl(file);
+                        setBookImagePreview(dataUrl);
+                    } catch (err) { alert(err.message); }
+                }
+            });
+        });
 
         async function deleteBook(id, title) {
             if (!confirm(`"${title}" kitobini o'chirmoqchimisiz?`)) return;
@@ -665,6 +830,118 @@
                 await loadStats();
             } catch (err) { alert('Xato: ' + err.message); }
         }
+
+        // ============================================
+        // READING BOOK EDIT MODAL — funksiyalar
+        // ============================================
+        function setReadEditPreview(dataUrl) {
+            const preview = document.getElementById('rImagePreview');
+            const clearBtn = document.getElementById('rImageClearBtn');
+            const hidden = document.getElementById('rImageUrl');
+            if (dataUrl) {
+                preview.innerHTML = `<img src="${dataUrl}" alt="Preview">`;
+                hidden.value = dataUrl;
+                clearBtn.style.display = 'inline-flex';
+            } else {
+                preview.innerHTML = `
+                    <div class="image-picker-empty">
+                        <div style="font-size:36px;">📖</div>
+                        <div style="font-size:13px; color:var(--text-dim); margin-top:8px;">Rasmni tashlang, yopishtiring yoki tanlang</div>
+                    </div>`;
+                hidden.value = '';
+                clearBtn.style.display = 'none';
+            }
+        }
+        async function handleReadEditFile(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            try { setReadEditPreview(await fileToDataUrl(file)); }
+            catch (err) { alert(err.message); }
+        }
+        async function handleReadEditPaste(event) {
+            const items = (event.clipboardData || event.originalEvent?.clipboardData)?.items;
+            if (!items) return;
+            for (const item of items) {
+                if (item.type.startsWith('image/')) {
+                    event.preventDefault();
+                    try { setReadEditPreview(await fileToDataUrl(item.getAsFile())); }
+                    catch (err) { alert(err.message); }
+                    return;
+                }
+            }
+        }
+        function handleReadEditUrl() {
+            const url = prompt('Rasm URL:');
+            if (url && url.trim()) setReadEditPreview(url.trim());
+        }
+        function clearReadEditImage() {
+            document.getElementById('rImageFile').value = '';
+            setReadEditPreview(null);
+        }
+
+        let currentReadEditId = null;
+        function openReadBookEdit(id) {
+            const book = readBooksCache.find(b => b.id === id);
+            if (!book) return;
+            currentReadEditId = id;
+            document.getElementById('rTitle').value = book.title;
+            document.getElementById('rAuthor').value = book.author;
+            document.getElementById('rYear').value = book.year || '';
+            document.getElementById('rCategory').value = book.category || '';
+            document.getElementById('rAvailable').checked = book.isAvailable;
+            setReadEditPreview(book.imageUrl || null);
+            document.getElementById('readEditOverlay').style.display = 'flex';
+        }
+        function closeReadBookEdit() {
+            document.getElementById('readEditOverlay').style.display = 'none';
+            currentReadEditId = null;
+        }
+        async function saveReadBookEdit() {
+            if (!currentReadEditId) return;
+            const status = document.getElementById('rStatus');
+            const dto = {
+                title: document.getElementById('rTitle').value.trim(),
+                author: document.getElementById('rAuthor').value.trim(),
+                year: parseInt(document.getElementById('rYear').value) || null,
+                category: document.getElementById('rCategory').value.trim() || 'Boshqa',
+                isAvailable: document.getElementById('rAvailable').checked,
+                imageUrl: document.getElementById('rImageUrl').value
+            };
+            if (!dto.title || !dto.author) {
+                status.className = 'status-msg error';
+                status.textContent = '❌ Nom va muallif majburiy';
+                return;
+            }
+            try {
+                const res = await fetch(`${API}/books/${currentReadEditId}`, {
+                    method: 'PUT',
+                    headers: authHeaders(),
+                    body: JSON.stringify(dto)
+                });
+                if (!res.ok) throw new Error(`Xato: ${res.status}`);
+                status.className = 'status-msg success';
+                status.textContent = '✅ Saqlandi';
+                await loadBooks();
+                setTimeout(() => closeReadBookEdit(), 800);
+            } catch (err) {
+                status.className = 'status-msg error';
+                status.textContent = '❌ ' + err.message;
+            }
+        }
+        // Drag & drop for read edit
+        document.addEventListener('DOMContentLoaded', () => {
+            const picker = document.getElementById('rImagePicker');
+            if (!picker) return;
+            picker.addEventListener('dragover', (e) => { e.preventDefault(); picker.classList.add('dragover'); });
+            picker.addEventListener('dragleave', () => picker.classList.remove('dragover'));
+            picker.addEventListener('drop', async (e) => {
+                e.preventDefault(); picker.classList.remove('dragover');
+                if (e.dataTransfer.files[0]) {
+                    try { setReadEditPreview(await fileToDataUrl(e.dataTransfer.files[0])); }
+                    catch (err) { alert(err.message); }
+                }
+            });
+        });
 
         async function handlePdfSelected(event) {
             const file = event.target.files[0];

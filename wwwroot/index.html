@@ -193,15 +193,24 @@
                 border-color: transparent;
             }
 
+        /* ===== SEARCH BAR (lupa ichida + Qidirish tugma) ===== */
         .search-wrap {
-            max-width: 640px;
-            margin: 0 auto 32px;
+            max-width: 720px;
+            margin: 0 auto 8px;
+            position: relative;
+            display: flex;
+            gap: 10px;
+            align-items: stretch;
+        }
+
+        .search-box {
+            flex: 1;
             position: relative;
         }
 
         .search-input {
             width: 100%;
-            padding: 14px 48px 14px 48px;
+            padding: 14px 16px 14px 46px;
             background: var(--bg-glass);
             border: 1px solid var(--border);
             border-radius: 12px;
@@ -228,8 +237,30 @@
             top: 50%;
             transform: translateY(-50%);
             color: var(--text-dim);
-            font-size: 18px;
+            font-size: 17px;
             pointer-events: none;
+        }
+
+        .search-btn {
+            padding: 0 28px;
+            background: var(--text);
+            color: var(--bg-base);
+            border: none;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 600;
+            font-family: inherit;
+            cursor: pointer;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+        .search-btn:hover {
+            background: var(--primary);
+            color: #fff;
+        }
+
+        @media (max-width: 640px) {
+            .search-btn { padding: 0 18px; font-size: 14px; }
         }
 
         .continue-card {
@@ -731,15 +762,71 @@
         .book-card-cover {
             display: flex;
             justify-content: center;
+            align-items: center;
             margin-bottom: 14px;
             transition: transform 0.3s;
+            height: 200px;
+            border-radius: 8px;
+            overflow: hidden;
+            background: rgba(20, 20, 27, 0.3);
         }
         .book-card-cover svg {
             border-radius: 6px;
             box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
         }
+        .book-card-cover img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 6px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+        }
         .book-card:hover .book-card-cover {
             transform: translateY(-4px);
+        }
+
+        /* ===== SECTION SPACING (kutubxona tartibi) ===== */
+        #newBooksSection,
+        .challenges-section,
+        #categoriesWrap,
+        #booksWrap {
+            margin-top: 40px;
+        }
+        .row-header h3,
+        .section-title {
+            font-size: 20px;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .row-header {
+            padding: 0 4px;
+        }
+
+        /* Kitob kartochkasi ichidagi tipografiya */
+        .book-card h2 {
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 4px;
+            letter-spacing: -0.01em;
+            line-height: 1.3;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        .book-card .author {
+            font-size: 12px;
+            margin-bottom: 10px;
+        }
+        .book-card .meta {
+            margin-bottom: 8px;
+        }
+        .book-card .rating-row {
+            padding: 8px 0;
+            margin-bottom: 10px;
         }
 
         .book-grid {
@@ -992,7 +1079,7 @@
            ============================================ */
         .book-wrapper {
             margin: 0 auto;
-            max-width: 1100px;
+            max-width: 560px;   /* Single-page — muqova va sahifa yolg'iz ko'rinadi */
             position: relative;
             padding: 20px 0;
         }
@@ -1020,6 +1107,65 @@
         .flip-page.--left {
             box-shadow: inset -15px 0 25px rgba(0, 0, 0, 0.1);
             border-radius: 6px 0 0 6px;
+        }
+
+        /* ===== COVER PAGE (kitob yuzi) ===== */
+        .flip-cover {
+            padding: 0 !important;
+            background: linear-gradient(135deg, #1a1a2e, #0f0f1e) !important;
+            align-items: center;
+            justify-content: center;
+        }
+        .cover-full-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+        .cover-generated {
+            width: 100%; height: 100%;
+            background: linear-gradient(135deg, #7c3aed, #0891b2);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 40px;
+            text-align: center;
+            position: relative;
+        }
+        .cover-generated::before {
+            content: '';
+            position: absolute;
+            left: 0; top: 0; bottom: 0;
+            width: 12px;
+            background: rgba(0, 0, 0, 0.25);
+        }
+        .cover-gen-top {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 14px;
+            font-weight: 700;
+            letter-spacing: 4px;
+            margin-bottom: 40px;
+        }
+        .cover-gen-title {
+            color: #fff;
+            font-size: 34px;
+            font-weight: 800;
+            font-family: 'Crimson Pro', Georgia, serif;
+            line-height: 1.2;
+            margin-bottom: 20px;
+        }
+        .cover-gen-author {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 18px;
+            font-style: italic;
+            font-family: 'Crimson Pro', Georgia, serif;
+        }
+        .cover-gen-hint {
+            position: absolute;
+            bottom: 30px;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 13px;
         }
 
         .flip-content {
@@ -1765,6 +1911,15 @@
             </div>
         </header>
 
+        <!-- ===== SEARCH — nav ostida ===== -->
+        <div class="search-wrap">
+            <div class="search-box">
+                <span class="search-icon-left">🔍</span>
+                <input type="text" id="searchInput" class="search-input" placeholder="Kitob yoki muallif qidirish..." oninput="onSearchInput()">
+            </div>
+            <button class="search-btn" onclick="doSearch()">Qidirish</button>
+        </div>
+
         <!-- ===== HERO: HAFTANING KITOBI ===== -->
         <div class="hero-featured" id="heroFeatured" style="display:none;">
             <div class="hero-cover-wrap">
@@ -1838,11 +1993,6 @@
             <div class="quote-dots" id="quoteDots"></div>
         </div>
 
-        <div class="search-wrap">
-            <span class="search-icon-left">🔍</span>
-            <input type="text" id="searchInput" class="search-input" placeholder="Kitob nomi yoki muallifni qidiring..." oninput="onSearchInput()">
-        </div>
-
         <div class="continue-card" id="continueSection">
             <div class="continue-info">
                 <div class="continue-label">📖 Davom eting</div>
@@ -1850,14 +2000,6 @@
                 <div class="continue-meta" id="continueMeta"></div>
             </div>
             <button class="continue-btn" id="continueBtn">Davom etish →</button>
-        </div>
-
-        <!-- ===== YAQINDA QO'SHILDI (Netflix uslubi) ===== -->
-        <div id="newBooksSection" style="display:none;">
-            <div class="row-header">
-                <h3>🆕 Yaqinda qo'shildi</h3>
-            </div>
-            <div class="netflix-row" id="newBooksRow"></div>
         </div>
 
         <!-- ===== CHALLENGES ===== -->
@@ -2147,6 +2289,19 @@
             }, 400);
         }
 
+        // "Qidirish" tugmasi bosilganda — darrov qidiradi + kitoblarga scroll
+        function doSearch() {
+            clearTimeout(searchTimeout);
+            searchQuery = document.getElementById('searchInput').value.trim();
+            loadBooks(true);
+            document.getElementById('booksWrap')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        // Enter tugmasi bilan ham qidirish
+        document.getElementById('searchInput')?.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') doSearch();
+        });
+
         function renderBooks() {
             const bookListEl = document.getElementById('bookList');
             const titleText = document.getElementById('booksTitleText');
@@ -2176,10 +2331,17 @@
                             </div>`;
                     readBtnText = percent >= 100 ? '🔄 Qayta o\'qish' : '▶ Davom etish';
                 }
+                // Rasm bo'lsa img, aks holda avto-generatsiya SVG
+                const svgFallback = generateBookCover(book.title, book.author, 140, 200);
+                const isValidUrl = book.imageUrl && (book.imageUrl.startsWith('http') || book.imageUrl.startsWith('data:'));
+                const coverInner = isValidUrl
+                    ? `<img src="${escapeHtml(book.imageUrl)}" alt="" onerror="showBookCoverFallback(${book.id})">`
+                    : svgFallback;
+
                 return `
                         <div class="book-card">
-                            <div class="book-card-cover" onclick="openBook(${book.id})" style="cursor:pointer;">
-                                ${generateBookCover(book.title, book.author, 100, 140)}
+                            <div class="book-card-cover" id="bkc-${book.id}" onclick="openBook(${book.id})" style="cursor:pointer;">
+                                ${coverInner}
                             </div>
                             <h2>${escapeHtml(book.title)}</h2>
                             <p class="author">✍️ ${escapeHtml(book.author)}</p>
@@ -2200,6 +2362,13 @@
             }).join('');
         }
 
+        // Rasm URL noto'g'ri bo'lsa — SVG cover'ga o'tkazish
+        function showBookCoverFallback(bookId) {
+            const book = allBooks.find(b => b.id === bookId);
+            if (!book) return;
+            const el = document.getElementById(`bkc-${bookId}`);
+            if (el) el.innerHTML = generateBookCover(book.title, book.author, 140, 200);
+        }
         function updateContinueSection() {
             const recent = getMostRecentBook();
             const section = document.getElementById('continueSection');
@@ -2231,6 +2400,9 @@
         const BATCH_SIZE = 40;
         const RELOAD_THRESHOLD = 4;
 
+        // Joriy kitob muqovasi ma'lumoti (cover page uchun)
+        let currentBookMeta = { title: '', author: '', imageUrl: '' };
+
         async function openBook(bookId) {
             try {
                 const response = await fetch(`${API_BASE}/api/books/${bookId}/pages`);
@@ -2241,8 +2413,17 @@
                 currentBook = bookId;
                 totalPagesCount = meta.totalPages;
 
+                // Kitob muqovasi ma'lumotini allBooks'dan olish
+                const bookInfo = (allBooks || []).find(b => b.id === bookId);
+                currentBookMeta = {
+                    title: meta.bookTitle,
+                    author: meta.bookAuthor,
+                    imageUrl: bookInfo?.imageUrl || ''
+                };
+
                 const progress = getBookProgress(bookId);
-                let startPage = (progress && progress.page >= 1 && progress.page <= meta.totalPages) ? progress.page : 1;
+                // Davom etish bo'lsa o'sha sahifa, aks holda 0 (muqova)
+                let startPage = (progress && progress.page >= 1 && progress.page <= meta.totalPages) ? progress.page : 0;
                 currentPageNumber = startPage;
 
                 // Header ma'lumotini o'rnatish
@@ -2331,6 +2512,32 @@
             container.style.height = '720px';
 
             const pageEls = [];
+
+            // ===== COVER PAGE (faqat kitob boshida, batchStart === 1) =====
+            const hasCover = (batchStart === 1);
+            if (hasCover) {
+                const coverDiv = document.createElement('div');
+                coverDiv.className = 'flip-page flip-cover';
+                coverDiv.style.width = '100%';
+                coverDiv.style.height = '100%';
+                const validImg = currentBookMeta.imageUrl &&
+                    (currentBookMeta.imageUrl.startsWith('http') || currentBookMeta.imageUrl.startsWith('data:'));
+                if (validImg) {
+                    coverDiv.innerHTML = `<img class="cover-full-img" src="${currentBookMeta.imageUrl}" alt="${escapeHtml(currentBookMeta.title)}">`;
+                } else {
+                    // Rasm yo'q — chiroyli generativ muqova
+                    coverDiv.innerHTML = `
+                        <div class="cover-generated">
+                            <div class="cover-gen-top">KUTUBXONA</div>
+                            <div class="cover-gen-title">${escapeHtml(currentBookMeta.title)}</div>
+                            <div class="cover-gen-author">${escapeHtml(currentBookMeta.author)}</div>
+                            <div class="cover-gen-hint">Ochish uchun ➜ bosing</div>
+                        </div>`;
+                }
+                container.appendChild(coverDiv);
+                pageEls.push(coverDiv);
+            }
+
             pagesData.forEach((data, idx) => {
                 const pageNum = batchStart + idx;
                 const pageDiv = document.createElement('div');
@@ -2349,22 +2556,20 @@
                 pageEls.push(pageDiv);
             });
 
-            // Container o'lchamlarini olish
-            const wrapperWidth = container.clientWidth || 800;
-            const pageWidth = Math.min(600, wrapperWidth * 0.9);
+            const wrapperWidth = container.clientWidth || 520;
 
             try {
-                // StPageFlip yaratish
+                // StPageFlip — PORTRAIT (single page) rejimida
                 pageFlip = new PageFlipClass(container, {
-                    width: pageWidth,
+                    width: Math.min(520, wrapperWidth),
                     height: 720,
                     size: 'stretch',
-                    minWidth: 300,
-                    maxWidth: 1200,
+                    minWidth: 280,
+                    maxWidth: 560,       // Kichik → portrait (yolg'iz sahifa)
                     minHeight: 400,
-                    maxHeight: 1350,
+                    maxHeight: 900,
                     maxShadowOpacity: 0.5,
-                    showCover: false,
+                    showCover: hasCover, // Muqova bor batch'da yolg'iz ko'rinadi
                     mobileScrollSupport: false,
                     usePortrait: true,
                     startZIndex: 0,
@@ -2383,13 +2588,15 @@
                     if (isInitializing) return; // Init paytida e'tiborsiz qoldirish
 
                     const localIdx = e.data;
-                    const globalPage = batchStart + localIdx;
+                    // Cover mavjud bo'lsa localIdx 0 = muqova (globalPage 0)
+                    const globalPage = hasCover ? (batchStart + localIdx - 1) : (batchStart + localIdx);
 
                     // Agar sahifa o'zgarmagan bo'lsa — hech nima qilmaslik
                     if (globalPage === currentPageNumber) return;
 
                     currentPageNumber = globalPage;
-                    saveProgress(bookId, globalPage, totalPagesCount);
+                    // Muqova sahifasi (0) uchun progress saqlamaymiz
+                    if (globalPage >= 1) saveProgress(bookId, globalPage, totalPagesCount);
                     updateReaderProgress(globalPage);
 
                     // Batch chegarasiga yaqinlashsa — keyingi batch'ni yuklash
@@ -2405,8 +2612,11 @@
                     }
                 });
 
-                // Target sahifaga sakrash — event triggerlanadi lekin isInitializing rad qiladi
-                const localIndex = targetPage - batchStart;
+                // Target sahifaga sakrash — cover hisobga olingan
+                // targetPage 0 = muqova; cover bo'lsa localIndex = targetPage - batchStart + 1
+                const localIndex = hasCover
+                    ? (targetPage <= 0 ? 0 : targetPage - batchStart + 1)
+                    : (targetPage - batchStart);
                 currentPageNumber = targetPage;
                 if (localIndex > 0) {
                     setTimeout(() => {
@@ -2429,9 +2639,18 @@
         }
 
         function updateReaderProgress(pageNum) {
+            // Muqova sahifasi (0) uchun maxsus ko'rsatish
+            if (pageNum <= 0) {
+                document.getElementById('currentPage').textContent = '📖';
+                document.getElementById('totalPages').textContent = totalPagesCount;
+                document.getElementById('prevBtn').disabled = true;
+                document.getElementById('nextBtn').disabled = false;
+                document.getElementById('readerProgressFill').style.width = '0%';
+                return;
+            }
             document.getElementById('currentPage').textContent = pageNum;
             document.getElementById('totalPages').textContent = totalPagesCount;
-            document.getElementById('prevBtn').disabled = pageNum <= 1;
+            document.getElementById('prevBtn').disabled = pageNum <= 0;
             document.getElementById('nextBtn').disabled = pageNum >= totalPagesCount;
             const percent = Math.round((pageNum / totalPagesCount) * 100);
             document.getElementById('readerProgressFill').style.width = percent + '%';
@@ -2888,7 +3107,12 @@
                 document.getElementById('heroAuthor').textContent = `${featured.author} • ${featured.category} • ${featured.year || ''}`;
                 document.getElementById('heroDesc').textContent =
                     `${featured.category} janridagi ajoyib asar. Bugun o'qishni boshlang va yangi olamga sho'ng'ing.`;
-                document.getElementById('heroCover').innerHTML = generateBookCover(featured.title, featured.author);
+                // Hero muqovasi: real rasm bor bo'lsa img, aks holda SVG
+                const heroSvg = generateBookCover(featured.title, featured.author, 200, 280);
+                const heroValidUrl = featured.imageUrl && (featured.imageUrl.startsWith('http') || featured.imageUrl.startsWith('data:'));
+                document.getElementById('heroCover').innerHTML = heroValidUrl
+                    ? `<img src="${featured.imageUrl}" alt="" style="width:200px; height:280px; object-fit:cover; border-radius:8px; box-shadow:0 20px 50px rgba(0,0,0,.6);" onerror="this.outerHTML='${heroSvg.replace(/'/g, '&#39;')}'">`
+                    : heroSvg;
 
                 const stats = [];
                 if (featured.averageRating > 0)
@@ -2914,13 +3138,19 @@
                 if (books.length === 0) return;
 
                 const row = document.getElementById('newBooksRow');
-                row.innerHTML = books.map(book => `
+                row.innerHTML = books.map(book => {
+                    const svg = generateBookCover(book.title, book.author, 140, 200);
+                    const isValid = book.imageUrl && (book.imageUrl.startsWith('http') || book.imageUrl.startsWith('data:'));
+                    const cover = isValid
+                        ? `<img src="${escapeHtml(book.imageUrl)}" alt="" style="width:140px; height:200px; object-fit:cover; border-radius:8px; box-shadow:0 8px 20px rgba(0,0,0,.4);" onerror="this.outerHTML='${svg.replace(/'/g, '&#39;')}'">`
+                        : svg;
+                    return `
                     <div class="netflix-card" onclick="openBook(${book.id})">
-                        <div class="cover">${generateBookCover(book.title, book.author, 140, 200)}</div>
+                        <div class="cover">${cover}</div>
                         <div class="title">${escapeHtml(book.title)}</div>
                         <div class="author">${escapeHtml(book.author)}</div>
-                    </div>
-                `).join('');
+                    </div>`;
+                }).join('');
                 document.getElementById('newBooksSection').style.display = 'block';
             } catch (err) { console.error(err); }
         }
@@ -2981,7 +3211,6 @@
         loadCategories();
         loadBooks(true);
         renderHeroFeatured();
-        renderNewBooksRow();
         renderQuoteOfDay();
         renderStatsPanel();
         renderChallenges();

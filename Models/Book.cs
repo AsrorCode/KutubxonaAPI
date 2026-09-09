@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace KutubxonaAPI.Models;
 
@@ -50,6 +51,13 @@ public class Book : ISoftDelete
     /// Kitob holati: true = mavjud, false = olingan.
     /// </summary>
     public bool IsAvailable { get; set; } = true;
+
+    /// <summary>
+    /// Kitob muqovasi rasmi (URL yoki base64 data URL).
+    /// Ixtiyoriy — bo'lmasa avtomatik SVG generatsiya qilinadi.
+    /// </summary>
+    [Column(TypeName = "nvarchar(max)")]
+    public string ImageUrl { get; set; } = string.Empty;
 
     /// <summary>
     /// Yozuv qachon yaratilgani.
