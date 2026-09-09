@@ -3,6 +3,8 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
+using KutubxonaAPI.Common.Constants;
+using KutubxonaAPI.Common.Extensions;
 using KutubxonaAPI.Data;
 using KutubxonaAPI.DTOs.Auth;
 using KutubxonaAPI.DTOs.Mapping;
@@ -17,8 +19,13 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace KutubxonaAPI.Controllers;
 
+/// <summary>
+/// Autentifikatsiya va foydalanuvchi hisobini boshqarish.
+/// Register, login, refresh, logout, current user.
+/// </summary>
 [ApiController]
-[Route("api/[controller]")]
+[Route("api/auth")]
+[Produces("application/json")]
 public class AuthController : ControllerBase
 {
     private readonly AppDbContext _context;
@@ -200,9 +207,8 @@ public class AuthController : ControllerBase
     [Authorize]
     public async Task<IActionResult> LogoutAll()
     {
-        var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-        if (!int.TryParse(userIdClaim, out var userId))
-            return Unauthorized();
+        var userId = User.GetUserId();
+        if (userId is null) return Unauthorized();
 
         var tokens = await _context.RefreshTokens
             .Where(rt => rt.UserId == userId && !rt.IsRevoked)
@@ -228,9 +234,8 @@ public class AuthController : ControllerBase
     [Authorize]
     public async Task<IActionResult> Me()
     {
-        var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-        if (!int.TryParse(userIdClaim, out var userId))
-            return Unauthorized();
+        var userId = User.GetUserId();
+        if (userId is null) return Unauthorized();
 
         var user = await _context.Users.FindAsync(userId);
         if (user == null)
@@ -243,15 +248,13 @@ public class AuthController : ControllerBase
     // YORDAMCHI METODLAR
     // ============================================
 
+    /// <summary>Access token muddati (daqiqa). Konfiguratsiyadan yoki default.</summary>
     private int GetAccessTokenMinutes()
-    {
-        return int.Parse(_config["Jwt:AccessMinutes"] ?? "15");
-    }
+        => int.TryParse(_config["Jwt:AccessMinutes"], out var m) ? m : AuthConstants.AccessTokenMinutes;
 
+    /// <summary>Refresh token muddati (kun). Konfiguratsiyadan yoki default.</summary>
     private int GetRefreshTokenDays()
-    {
-        return int.Parse(_config["Jwt:RefreshDays"] ?? "7");
-    }
+        => int.TryParse(_config["Jwt:RefreshDays"], out var d) ? d : AuthConstants.RefreshTokenDays;
 
     private string GenerateAccessToken(User user)
     {
@@ -286,7 +289,7 @@ public class AuthController : ControllerBase
     private async Task<RefreshToken> CreateRefreshToken(int userId)
     {
         // 64 byte = 512 bit crypto-random
-        var randomBytes = new byte[64];
+        var randomBytes = new byte[AuthConstants.RefreshTokenBytes];
         using (var rng = RandomNumberGenerator.Create())
         {
             rng.GetBytes(randomBytes);

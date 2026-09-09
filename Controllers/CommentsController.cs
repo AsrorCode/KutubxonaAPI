@@ -1,5 +1,5 @@
 using System.ComponentModel.DataAnnotations;
-using System.Security.Claims;
+using KutubxonaAPI.Common.Extensions;
 using KutubxonaAPI.Data;
 using KutubxonaAPI.DTOs.Comments;
 using KutubxonaAPI.DTOs.Mapping;
@@ -88,9 +88,9 @@ public class CommentsController : ControllerBase
             return BadRequest(ModelState);
         }
 
-        // JWT tokendan user ID va ismni olish
-        var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-        if (!int.TryParse(userIdClaim, out var userId))
+        // JWT tokendan user ID olish
+        var userId = User.GetUserId();
+        if (userId is null)
         {
             return Unauthorized(new { message = "Foydalanuvchi identifikatsiyasi topilmadi" });
         }
@@ -127,7 +127,7 @@ public class CommentsController : ControllerBase
         var newComment = new Comment
         {
             BookId = bookId,
-            UserId = userId,
+            UserId = userId.Value,
             AuthorName = user.FullName,  // Avtomatik ismdan olindi
             Content = dto.Content,
             Rating = dto.Rating,
@@ -162,13 +162,9 @@ public class CommentsController : ControllerBase
         }
 
         // Tekshirish: Admin YOKI izoh muallifi
-        var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-        var isAdmin = User.IsInRole("Admin");
-
-        if (!int.TryParse(userIdClaim, out var userId))
-        {
-            return Unauthorized();
-        }
+        var userId = User.GetUserId();
+        var isAdmin = User.IsAdmin();
+        if (userId is null) return Unauthorized();
 
         if (!isAdmin && comment.UserId != userId)
         {

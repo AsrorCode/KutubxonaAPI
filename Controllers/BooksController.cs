@@ -1,8 +1,10 @@
-using System.Security.Claims;
+using KutubxonaAPI.Common.Constants;
+using KutubxonaAPI.Common.Extensions;
 using KutubxonaAPI.Data;
 using KutubxonaAPI.DTOs;
 using KutubxonaAPI.DTOs.Books;
 using KutubxonaAPI.DTOs.Mapping;
+using KutubxonaAPI.Exceptions;
 using KutubxonaAPI.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -10,8 +12,13 @@ using Microsoft.EntityFrameworkCore;
 
 namespace KutubxonaAPI.Controllers;
 
+/// <summary>
+/// Kitoblar bilan ishlash uchun kontroller.
+/// Ro'yxat, qidiruv, kategoriyalar, CRUD, soft delete/restore.
+/// </summary>
 [ApiController]
-[Route("api/[controller]")]
+[Route("api/books")]
+[Produces("application/json")]
 public class BooksController : ControllerBase
 {
     private readonly AppDbContext _context;
@@ -199,7 +206,7 @@ public class BooksController : ControllerBase
         if (book == null)
             return NotFound(new { message = "Kitob topilmadi" });
 
-        book.DeletedByUserId = GetCurrentUserId();
+        book.DeletedByUserId = User.GetUserId();
 
         _context.Books.Remove(book); // AppDbContext.ApplySoftDelete avtomatik marklaydi
         await _context.SaveChangesAsync();
@@ -281,9 +288,4 @@ public class BooksController : ControllerBase
         return NoContent();
     }
 
-    private int? GetCurrentUserId()
-    {
-        var idStr = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-        return int.TryParse(idStr, out var id) ? id : null;
-    }
 }

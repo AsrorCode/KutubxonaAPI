@@ -1,4 +1,5 @@
-using System.Security.Claims;
+using KutubxonaAPI.Common.Constants;
+using KutubxonaAPI.Common.Extensions;
 using KutubxonaAPI.Data;
 using KutubxonaAPI.DTOs.Mapping;
 using KutubxonaAPI.DTOs.Orders;
@@ -10,6 +11,11 @@ using Microsoft.EntityFrameworkCore;
 
 namespace KutubxonaAPI.Controllers;
 
+/// <summary>
+/// Buyurtmalar bilan ishlash uchun kontroller.
+/// Buyurtma yaratish (transactional + concurrency safe),
+/// tarixni ko'rish, status yangilash.
+/// </summary>
 [ApiController]
 [Route("api/orders")]
 [Produces("application/json")]
@@ -19,19 +25,10 @@ public class OrdersController : ControllerBase
     private readonly AppDbContext _context;
     private readonly ILogger<OrdersController> _logger;
 
-    // Concurrency conflict bo'lganda qayta urinish soni
-    private const int MaxRetries = 3;
-
     public OrdersController(AppDbContext context, ILogger<OrdersController> logger)
     {
         _context = context;
         _logger = logger;
-    }
-
-    private int GetUserId()
-    {
-        var idStr = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-        return int.TryParse(idStr, out var id) ? id : 0;
     }
 
     // ============================================
@@ -46,11 +43,11 @@ public class OrdersController : ControllerBase
         if (dto.Items == null || dto.Items.Count == 0)
             return BadRequest(new { message = "Buyurtmada hech bo'lmaganda 1 ta kitob bo'lishi kerak" });
 
-        var userId = GetUserId();
+        var userId = User.GetUserId() ?? 0;
         if (userId == 0) return Unauthorized();
 
         // Bir necha marta urinish (concurrency conflict bo'lganda)
-        for (int attempt = 1; attempt <= MaxRetries; attempt++)
+        for (int attempt = 1; attempt <= OrderConstants.MaxOrderRetries; attempt++)
         {
             try
             {
@@ -62,9 +59,9 @@ public class OrdersController : ControllerBase
             {
                 _logger.LogWarning(
                     "Concurrency conflict, urinish {Attempt}/{Max}: {Message}",
-                    attempt, MaxRetries, ex.Message);
+                    attempt, OrderConstants.MaxOrderRetries, ex.Message);
 
-                if (attempt == MaxRetries)
+                if (attempt == OrderConstants.MaxOrderRetries)
                 {
                     return Conflict(new
                     {
@@ -78,7 +75,7 @@ public class OrdersController : ControllerBase
                     entry.State = EntityState.Detached;
                 }
 
-                await Task.Delay(50 * attempt); // Progressive backoff
+                await Task.Delay(OrderConstants.RetryBackoffMs * attempt); // Progressive backoff
             }
         }
 
@@ -193,7 +190,7 @@ public class OrdersController : ControllerBase
     [HttpGet("my")]
     public async Task<IActionResult> GetMyOrders()
     {
-        var userId = GetUserId();
+        var userId = User.GetUserId() ?? 0;
         if (userId == 0) return Unauthorized();
 
         var orders = await _context.Orders
@@ -248,8 +245,8 @@ public class OrdersController : ControllerBase
 
         if (order == null) return NotFound();
 
-        var userId = GetUserId();
-        var isAdmin = User.IsInRole("Admin");
+        var userId = User.GetUserId() ?? 0;
+        var isAdmin = User.IsAdmin();
         if (!isAdmin && order.UserId != userId)
             return Forbid();
 
