@@ -40,6 +40,22 @@ public class SaleBook : ISoftDelete
     [Range(1000, 2100)]
     public int? Year { get; set; }
 
+    /// <summary>Nashriyot nomi (masalan "Huzur", "Sharq").</summary>
+    [StringLength(150)]
+    public string Publisher { get; set; } = string.Empty;
+
+    /// <summary>Muqova turi ("Yumshoq" yoki "Qattiq").</summary>
+    [StringLength(50)]
+    public string CoverType { get; set; } = string.Empty;
+
+    /// <summary>Sahifalar soni.</summary>
+    [Range(0, 100000)]
+    public int? PageCount { get; set; }
+
+    /// <summary>ISBN / shtrix-kod.</summary>
+    [StringLength(50)]
+    public string Isbn { get; set; } = string.Empty;
+
     public bool IsActive { get; set; } = true;
 
     /// <summary>Chegirma foizi (0-100). Ixtiyoriy — 0 bo'lsa yo'q.</summary>

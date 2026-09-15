@@ -1,5 +1,3 @@
-using KutubxonaAPI.DTOs.Books;
-using KutubxonaAPI.DTOs.Comments;
 using KutubxonaAPI.DTOs.Orders;
 using KutubxonaAPI.DTOs.SaleBooks;
 using KutubxonaAPI.DTOs.Users;
@@ -26,31 +24,6 @@ public static class MappingExtensions
         LastLoginAt = u.LastLoginAt
     };
 
-    // ===== BOOK =====
-    public static BookResponseDto ToDto(this Book b) => new()
-    {
-        Id = b.Id,
-        Title = b.Title,
-        Author = b.Author,
-        Year = b.Year,
-        Category = b.Category,
-        IsAvailable = b.IsAvailable,
-        ImageUrl = b.ImageUrl,
-        CreatedAt = b.CreatedAt,
-        UpdatedAt = b.UpdatedAt
-    };
-
-    // ===== COMMENT =====
-    public static CommentResponseDto ToDto(this Comment c) => new()
-    {
-        Id = c.Id,
-        AuthorName = c.AuthorName,
-        Content = c.Content,
-        Rating = c.Rating,
-        CreatedAt = c.CreatedAt,
-        UserId = c.UserId
-    };
-
     // ===== SALEBOOK =====
     public static SaleBookResponseDto ToDto(this SaleBook s)
     {
@@ -75,6 +48,10 @@ public static class MappingExtensions
             Discount = isDiscountActive ? s.Discount : 0,
             DiscountEndsAt = s.DiscountEndsAt,
             FinalPrice = Math.Round(finalPrice, 0),
+            Publisher = s.Publisher,
+            CoverType = s.CoverType,
+            PageCount = s.PageCount,
+            Isbn = s.Isbn,
             CreatedAt = s.CreatedAt,
             UpdatedAt = s.UpdatedAt
         };

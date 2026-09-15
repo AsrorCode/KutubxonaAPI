@@ -9,22 +9,136 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-base: #0a0a0f;
-            --bg-elevated: #14141b;
-            --bg-card: rgba(20, 20, 27, 0.6);
-            --bg-glass: rgba(255, 255, 255, 0.03);
-            --border: rgba(255, 255, 255, 0.08);
-            --border-hover: rgba(139, 92, 246, 0.4);
-            --primary: #8b5cf6;
-            --primary-glow: rgba(139, 92, 246, 0.4);
-            --secondary: #06b6d4;
-            --accent: #ec4899;
+            --bg-base: #f4f5f7;
+            --bg-elevated: #ffffff;
+            --bg-card: #ffffff;
+            --bg-glass: #f1f3f5;
+            --border: #e6e8ec;
+            --border-hover: #0d6efd;
+            --primary: #0d6efd;
+            --primary-glow: rgba(13, 110, 253, 0.22);
+            --secondary: #0aa2c0;
+            --accent: #0d6efd;
             --warning: #f59e0b;
-            --success: #10b981;
-            --danger: #ef4444;
-            --text: #fafafa;
-            --text-dim: #a1a1aa;
-            --text-faint: #71717a;
+            --success: #16a34a;
+            --danger: #dc3545;
+            --text: #1a1d21;
+            --text-dim: #5f6b7a;
+            --text-faint: #9aa4b2;
+        }
+
+        /* ===== QORONG'I MAVZU ===== */
+        :root[data-theme="dark"] {
+            --bg-base: #0b0b10;
+            --bg-elevated: #15151c;
+            --bg-card: #15151c;
+            --bg-glass: #1c1c25;
+            --border: #262631;
+            --border-hover: #3b82f6;
+            --text: #f1f5f9;
+            --text-dim: #94a3b8;
+            --text-faint: #64748b;
+        }
+        [data-theme="dark"] .quote-banner { background: #15151c; }
+        [data-theme="dark"] .quote-banner-text { color: #e2e8f0; }
+        [data-theme="dark"] .qb-dot { background: rgba(255, 255, 255, 0.15); }
+        [data-theme="dark"] .wish-btn { background: #1c1c25; border-color: #262631; color: #94a3b8; box-shadow: none; }
+        [data-theme="dark"] .wish-btn.active { background: rgba(220, 53, 69, 0.18); border-color: rgba(220, 53, 69, 0.4); color: #f87171; }
+        [data-theme="dark"] .cart-total { background: rgba(13, 110, 253, 0.12); border-color: rgba(13, 110, 253, 0.3); }
+        [data-theme="dark"] .admin-bar .icon-btn.image { background: rgba(10, 162, 192, 0.15); border-color: rgba(10, 162, 192, 0.35); color: #67e8f9; }
+        [data-theme="dark"] .admin-bar .icon-btn.edit { background: rgba(13, 110, 253, 0.18); border-color: rgba(13, 110, 253, 0.4); color: #93c5fd; }
+        [data-theme="dark"] .admin-bar .icon-btn.delete { background: rgba(220, 53, 69, 0.15); border-color: rgba(220, 53, 69, 0.35); color: #fca5a5; }
+        [data-theme="dark"] .book-card, [data-theme="dark"] .filter-sidebar { box-shadow: none; }
+
+        /* ===== STICKY NAVBAR (Klassik do'kon) ===== */
+        .navbar {
+            position: sticky; top: 0; z-index: 200;
+            background: var(--bg-elevated);
+            border-bottom: 1px solid var(--border);
+        }
+        .navbar-inner {
+            max-width: 1280px; margin: 0 auto;
+            padding: 10px 24px;
+            display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
+        }
+        .nav-logo {
+            display: flex; align-items: center; gap: 8px;
+            text-decoration: none; color: var(--text);
+            font-weight: 800; font-size: 18px; letter-spacing: -0.02em;
+            white-space: nowrap;
+        }
+        .nav-logo-icon {
+            width: 34px; height: 34px; background: var(--primary);
+            border-radius: 9px; display: flex; align-items: center; justify-content: center;
+            font-size: 18px;
+        }
+        .nav-search {
+            flex: 1 1 300px; min-width: 200px;
+            display: flex; align-items: stretch; gap: 8px; position: relative;
+        }
+        .nav-search .search-input {
+            flex: 1; width: auto; min-width: 0;
+            padding: 10px 14px 10px 40px;
+            border-radius: 10px; font-size: 14px;
+        }
+        .nav-search .search-icon-left { left: 14px; font-size: 15px; }
+        .nav-search .search-btn { padding: 0 20px; border-radius: 10px; font-size: 14px; }
+        .nav-right { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+        .nav-link {
+            display: flex; align-items: center; gap: 5px;
+            text-decoration: none; color: var(--text-dim);
+            font-size: 13px; font-weight: 600;
+            padding: 8px 10px; border-radius: 8px; white-space: nowrap;
+            transition: all 0.2s;
+        }
+        .nav-link:hover { background: var(--bg-glass); color: var(--text); }
+        .nav-auth { display: flex; align-items: center; gap: 10px; }
+        @media (max-width: 820px) {
+            .nav-link-text { display: none; }
+        }
+
+        /* ===== KATEGORIYA CHIPLARI ===== */
+        .categories {
+            display: flex; gap: 8px; flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+
+        /* ===== FOOTER IQTIBOS ===== */
+        .quote-footer { margin-top: 48px; }
+
+        /* ===== YUQORI BOSHQARUV (til + mavzu) ===== */
+        .ui-controls {
+            display: flex; gap: 10px; align-items: center;
+        }
+        .lang-switch {
+            display: flex;
+            background: var(--bg-elevated);
+            border: 1px solid var(--border);
+            border-radius: 999px;
+            padding: 3px;
+            box-shadow: 0 2px 8px rgba(15, 23, 42, 0.06);
+        }
+        .lang-btn {
+            border: none; background: none;
+            padding: 6px 14px; border-radius: 999px;
+            font-size: 13px; font-weight: 600;
+            color: var(--text-dim); cursor: pointer;
+            font-family: inherit; transition: all 0.2s;
+        }
+        .lang-btn.active { background: var(--primary); color: #fff; }
+        .theme-btn {
+            width: 38px; height: 38px;
+            border-radius: 50%;
+            background: var(--bg-elevated);
+            border: 1px solid var(--border);
+            cursor: pointer; font-size: 16px;
+            box-shadow: 0 2px 8px rgba(15, 23, 42, 0.06);
+            display: flex; align-items: center; justify-content: center;
+        }
+        .theme-btn:hover { border-color: var(--border-hover); }
+        @media (max-width: 640px) {
+            .ui-controls { top: 12px; left: 12px; gap: 6px; }
+            .lang-btn { padding: 5px 10px; font-size: 12px; }
         }
 
         * {
@@ -40,8 +154,6 @@
         body {
             min-height: 100vh;
             background: var(--bg-base);
-            background-image: radial-gradient(at 20% 0%, rgba(139, 92, 246, 0.15) 0px, transparent 50%), radial-gradient(at 80% 0%, rgba(6, 182, 212, 0.1) 0px, transparent 50%), radial-gradient(at 50% 100%, rgba(236, 72, 153, 0.08) 0px, transparent 50%);
-            background-attachment: fixed;
             color: var(--text);
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
             line-height: 1.5;
@@ -63,23 +175,20 @@
             display: inline-flex;
             width: 56px;
             height: 56px;
-            background: linear-gradient(135deg, var(--accent), var(--warning));
+            background: var(--primary);
             border-radius: 14px;
             align-items: center;
             justify-content: center;
             font-size: 32px;
-            box-shadow: 0 8px 32px rgba(236, 72, 153, 0.4);
+            box-shadow: 0 6px 20px rgba(13, 110, 253, 0.25);
             margin-bottom: 12px;
         }
 
         h1 {
-            font-size: 48px;
+            font-size: 44px;
             font-weight: 800;
             letter-spacing: -0.03em;
-            background: linear-gradient(135deg, #fff 0%, #f9a8d4 50%, #fbbf24 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+            color: var(--text);
         }
 
         .subtitle {
@@ -114,7 +223,7 @@
 
             .nav-pill:hover {
                 border-color: var(--border-hover);
-                background: rgba(139, 92, 246, 0.1);
+                background: rgba(13, 110, 253, 0.08);
                 transform: translateY(-1px);
             }
 
@@ -148,7 +257,7 @@
         }
 
         .admin-tag {
-            background: linear-gradient(135deg, var(--accent), var(--warning));
+            background: var(--warning);
             color: #fff;
             padding: 2px 8px;
             border-radius: 6px;
@@ -174,13 +283,13 @@
 
             .auth-btn:hover {
                 border-color: var(--border-hover);
-                background: rgba(139, 92, 246, 0.1);
+                background: rgba(13, 110, 253, 0.08);
             }
 
         .cart-icon {
             position: relative;
             z-index: 9999;
-            background: linear-gradient(135deg, var(--accent), var(--warning));
+            background: var(--primary);
             color: #fff;
             padding: 10px 18px;
             border-radius: 999px;
@@ -189,7 +298,7 @@
             font-size: 14px;
             font-weight: 600;
             font-family: inherit;
-            box-shadow: 0 8px 24px rgba(236, 72, 153, 0.4);
+            box-shadow: 0 4px 14px rgba(13, 110, 253, 0.25);
             display: flex;
             align-items: center;
             gap: 8px;
@@ -198,7 +307,7 @@
 
             .cart-icon:hover {
                 transform: translateY(-2px);
-                box-shadow: 0 12px 32px rgba(236, 72, 153, 0.5);
+                box-shadow: 0 8px 20px rgba(13, 110, 253, 0.35);
             }
 
         .cart-badge {
@@ -236,7 +345,7 @@
             .search-input::placeholder { color: var(--text-faint); }
             .search-input:focus {
                 border-color: var(--primary);
-                box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.1);
+                box-shadow: 0 0 0 4px rgba(13, 110, 253, 0.08);
             }
 
         .search-icon-left {
@@ -251,8 +360,8 @@
 
         .search-btn {
             padding: 0 28px;
-            background: var(--text);
-            color: var(--bg-base);
+            background: var(--primary);
+            color: #fff;
             border: none;
             border-radius: 12px;
             font-size: 15px;
@@ -262,7 +371,7 @@
             transition: all 0.2s;
             white-space: nowrap;
         }
-        .search-btn:hover { background: var(--primary); color: #fff; }
+        .search-btn:hover { background: #0b5ed7; }
         @media (max-width: 640px) { .search-btn { padding: 0 18px; font-size: 14px; } }
 
         .categories {
@@ -289,7 +398,7 @@
 
             .cat-chip:hover {
                 border-color: var(--border-hover);
-                background: rgba(139, 92, 246, 0.08);
+                background: rgba(13, 110, 253, 0.06);
             }
 
             .cat-chip.active {
@@ -308,6 +417,294 @@
         /* ============================================
            HYBRID MARKETPLACE STYLES
            ============================================ */
+        /* ============================================
+           PRODUCT DETAIL MODAL (qmar.uz uslubi)
+           ============================================ */
+        .detail-overlay {
+            display: none;
+            position: fixed; inset: 0;
+            background: rgba(15, 23, 42, 0.5);
+            backdrop-filter: blur(6px);
+            z-index: 2000;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 40px 20px;
+            overflow-y: auto;
+        }
+        .detail-overlay.active { display: flex; }
+        .detail-modal {
+            background: var(--bg-elevated);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            max-width: 900px;
+            width: 100%;
+            padding: 32px;
+            position: relative;
+            box-shadow: 0 20px 60px rgba(15, 23, 42, 0.18);
+        }
+        .detail-close {
+            position: absolute;
+            top: 20px; right: 20px;
+            width: 36px; height: 36px;
+            border-radius: 10px;
+            background: var(--bg-glass);
+            border: 1px solid var(--border);
+            color: var(--text);
+            font-size: 22px;
+            cursor: pointer;
+            z-index: 5;
+        }
+        .detail-close:hover { border-color: var(--border-hover); }
+
+        .detail-grid {
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            gap: 32px;
+        }
+        @media (max-width: 720px) {
+            .detail-grid { grid-template-columns: 1fr; }
+            .detail-cover-col { display: flex; justify-content: center; }
+        }
+
+        .detail-cover {
+            width: 260px; height: 370px;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 12px 30px rgba(15, 23, 42, 0.15);
+            background: var(--bg-glass);
+        }
+        .detail-cover img { width: 100%; height: 100%; object-fit: cover; }
+
+        .detail-breadcrumb {
+            font-size: 12px; color: var(--text-dim);
+            margin-bottom: 10px;
+        }
+        .detail-title {
+            font-size: 26px; font-weight: 800;
+            letter-spacing: -0.02em; margin-bottom: 4px;
+            line-height: 1.2;
+        }
+        .detail-author {
+            color: var(--text-dim); font-size: 14px; margin-bottom: 18px;
+        }
+        .detail-price-row {
+            display: flex; align-items: baseline; gap: 12px;
+            margin-bottom: 12px;
+        }
+        .detail-price {
+            font-size: 26px; font-weight: 800; color: var(--text);
+        }
+        .detail-old-price {
+            font-size: 15px; color: var(--text-faint);
+            text-decoration: line-through;
+        }
+        .detail-stock {
+            font-size: 13px; color: var(--success);
+            display: flex; align-items: center; gap: 4px;
+        }
+        .detail-hot {
+            font-size: 13px; color: var(--warning);
+            background: rgba(245, 158, 11, 0.1);
+            border: 1px solid rgba(245, 158, 11, 0.25);
+            padding: 8px 14px; border-radius: 10px;
+            margin-bottom: 16px;
+            display: inline-block;
+        }
+        .detail-specs {
+            display: flex; gap: 0;
+            background: var(--bg-glass);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            margin-bottom: 16px;
+            overflow: hidden;
+        }
+        .detail-spec {
+            flex: 1; padding: 12px 16px;
+            border-right: 1px solid var(--border);
+        }
+        .detail-spec:last-child { border-right: none; }
+        .detail-spec-label { font-size: 11px; color: var(--text-dim); margin-bottom: 4px; }
+        .detail-spec-value { font-size: 13px; font-weight: 600; color: var(--text); }
+
+        .detail-rank {
+            font-size: 13px; color: var(--warning);
+            margin-bottom: 16px;
+            display: flex; align-items: center; gap: 6px;
+        }
+        .detail-cart-btn {
+            width: 100%;
+            padding: 14px;
+            background: var(--primary);
+            color: #fff;
+            border: none;
+            border-radius: 12px;
+            font-size: 15px; font-weight: 700;
+            cursor: pointer; font-family: inherit;
+            transition: all 0.2s;
+            margin-bottom: 16px;
+        }
+        .detail-cart-btn:hover { background: #0b5ed7; }
+        .detail-cart-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        .detail-delivery {
+            background: var(--bg-glass);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 14px 16px;
+            font-size: 12px;
+            color: var(--text-dim);
+            display: flex; flex-direction: column; gap: 8px;
+            margin-bottom: 16px;
+        }
+        .detail-delivery strong { color: var(--text); }
+        .detail-actions-row {
+            display: flex; gap: 20px;
+            font-size: 13px; color: var(--text-dim);
+        }
+        .detail-rating {
+            background: var(--bg-glass);
+            border: 1px solid var(--border);
+            padding: 6px 14px; border-radius: 999px;
+        }
+        .detail-share { cursor: pointer; padding: 6px 0; }
+        .detail-share:hover { color: var(--primary); }
+
+        .detail-section {
+            margin-top: 28px;
+            padding-top: 24px;
+            border-top: 1px solid var(--border);
+        }
+        .detail-section h3 {
+            font-size: 17px; font-weight: 700; margin-bottom: 14px;
+        }
+        .detail-desc {
+            color: var(--text-dim); line-height: 1.7; font-size: 14px;
+        }
+        .detail-table {
+            width: 100%; border-collapse: collapse;
+        }
+        .detail-table tr { border-bottom: 1px solid var(--border); }
+        .detail-table td {
+            padding: 12px 0; font-size: 14px;
+        }
+        .detail-table td:first-child { color: var(--text-dim); width: 200px; }
+        .detail-table td:last-child { color: var(--text); font-weight: 600; }
+
+        /* ===== IQTIBOS BANNER (katta) ===== */
+        .quote-banner {
+            position: relative;
+            background: linear-gradient(135deg, #eef4ff, #ffffff 60%);
+            border: 1px solid var(--border);
+            border-radius: 18px;
+            padding: 32px 40px 24px;
+            margin-bottom: 24px;
+            overflow: hidden;
+        }
+        .quote-banner-mark {
+            position: absolute;
+            top: 4px; left: 24px;
+            font-size: 72px;
+            color: var(--primary);
+            opacity: 0.18;
+            font-family: Georgia, serif;
+            line-height: 1;
+        }
+        .quote-banner-body {
+            position: relative;
+            min-height: 68px;
+            transition: opacity 0.5s ease, transform 0.5s ease;
+            padding-left: 44px;
+        }
+        .quote-banner-body.fading { opacity: 0; transform: translateY(-6px); }
+        .quote-banner-text {
+            font-family: 'Crimson Pro', Georgia, serif;
+            font-size: 22px;
+            font-style: italic;
+            line-height: 1.45;
+            color: #1e293b;
+            margin-bottom: 8px;
+        }
+        .quote-banner-author {
+            text-align: right;
+            color: var(--text-dim);
+            font-size: 13px;
+            font-weight: 500;
+        }
+        .quote-banner-dots {
+            display: flex; justify-content: center; gap: 6px;
+            margin-top: 14px;
+        }
+        .qb-dot {
+            width: 6px; height: 6px; border-radius: 50%;
+            background: rgba(15, 23, 42, 0.14);
+            transition: all 0.3s;
+        }
+        .qb-dot.active { background: var(--primary); width: 20px; border-radius: 3px; }
+
+        @media (max-width: 640px) {
+            .quote-banner { padding: 24px 20px 18px; }
+            .quote-banner-text { font-size: 17px; }
+        }
+
+        /* ===== BESTSELLER ROW ===== */
+        .bestseller-row {
+            display: flex;
+            gap: 16px;
+            overflow-x: auto;
+            padding: 4px 2px 16px;
+            scroll-snap-type: x mandatory;
+        }
+        .bestseller-row::-webkit-scrollbar { height: 6px; }
+        .bestseller-row::-webkit-scrollbar-thumb {
+            background: rgba(245, 158, 11, 0.4); border-radius: 3px;
+        }
+        .bestseller-card {
+            flex: 0 0 auto;
+            width: 150px;
+            scroll-snap-align: start;
+            cursor: pointer;
+            position: relative;
+            transition: transform 0.3s;
+        }
+        .bestseller-card:hover { transform: translateY(-5px); }
+        .bestseller-rank {
+            position: absolute;
+            top: -8px; left: -8px;
+            width: 34px; height: 34px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #f59e0b, #ef4444);
+            color: #fff;
+            font-size: 16px; font-weight: 800;
+            display: flex; align-items: center; justify-content: center;
+            z-index: 3;
+            box-shadow: 0 6px 16px rgba(245, 158, 11, 0.5);
+            border: 2px solid var(--bg-base);
+        }
+        .bestseller-cover {
+            width: 150px; height: 210px;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 8px 20px rgba(15, 23, 42, 0.12);
+            margin-bottom: 8px;
+            background: var(--bg-glass);
+        }
+        .bestseller-cover img { width: 100%; height: 100%; object-fit: cover; }
+        .bestseller-title {
+            font-size: 13px; font-weight: 600; color: var(--text);
+            display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden;
+        }
+        .bestseller-meta {
+            font-size: 11px; color: var(--text-dim);
+            display: flex; justify-content: space-between; margin-top: 3px;
+        }
+        .bestseller-sold { color: var(--warning); font-weight: 600; }
+
+        .row-header {
+            display: flex; justify-content: space-between; align-items: center;
+            margin: 8px 0 14px;
+        }
+        .row-header h3 { font-size: 20px; font-weight: 700; letter-spacing: -0.02em; }
+
         .flash-banner {
             background: linear-gradient(135deg, #f59e0b, #ef4444, #ec4899);
             border-radius: 16px;
@@ -347,11 +744,10 @@
             display: flex; justify-content: space-between; align-items: center;
             gap: 12px; flex-wrap: wrap;
             padding: 12px 16px;
-            background: rgba(20, 20, 27, 0.6);
+            background: var(--bg-elevated);
             border: 1px solid var(--border);
             border-radius: 12px;
             margin-bottom: 16px;
-            backdrop-filter: blur(20px);
         }
         .sort-left, .sort-right {
             display: flex; align-items: center; gap: 10px;
@@ -380,7 +776,7 @@
             font-family: inherit;
             transition: all 0.2s;
         }
-        .chip:hover { border-color: var(--border-hover); background: rgba(139, 92, 246, 0.1); }
+        .chip:hover { border-color: var(--border-hover); background: rgba(13, 110, 253, 0.08); }
         .chip.primary { background: linear-gradient(135deg, var(--primary), var(--accent)); border-color: transparent; }
         .chip.full { width: 100%; padding: 10px; margin-top: 12px; }
 
@@ -397,11 +793,11 @@
         }
 
         .filter-sidebar {
-            background: rgba(20, 20, 27, 0.6);
+            background: var(--bg-elevated);
             border: 1px solid var(--border);
             border-radius: 14px;
             padding: 18px;
-            backdrop-filter: blur(20px);
+            box-shadow: 0 2px 10px rgba(15, 23, 42, 0.04);
             position: sticky;
             top: 90px;
         }
@@ -444,7 +840,7 @@
             padding: 16px;
             display: flex;
             flex-direction: column;
-            backdrop-filter: blur(20px);
+            box-shadow: 0 2px 10px rgba(15, 23, 42, 0.04);
             transition: all 0.3s;
             position: relative;
             overflow: hidden;
@@ -456,21 +852,21 @@
             top: 12px; right: 12px;
             width: 34px; height: 34px;
             border-radius: 50%;
-            background: rgba(20, 20, 27, 0.7);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            color: rgba(255, 255, 255, 0.6);
+            background: #ffffff;
+            border: 1px solid var(--border);
+            color: #9aa4b2;
             cursor: pointer;
             font-size: 16px;
             display: flex; align-items: center; justify-content: center;
             transition: all 0.2s;
             z-index: 3;
-            backdrop-filter: blur(10px);
+            box-shadow: 0 2px 8px rgba(15, 23, 42, 0.08);
         }
         .wish-btn:hover { transform: scale(1.1); }
         .wish-btn.active {
-            background: rgba(239, 68, 68, 0.15);
-            border-color: rgba(239, 68, 68, 0.4);
-            color: #ef4444;
+            background: #fde8e8;
+            border-color: rgba(220, 53, 69, 0.4);
+            color: #dc3545;
         }
 
         /* Chegirma badge */
@@ -493,8 +889,7 @@
         }
         .price-final {
             font-size: 20px; font-weight: 800;
-            background: linear-gradient(135deg, var(--primary), var(--accent));
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            color: var(--primary);
         }
         .price-old {
             font-size: 13px;
@@ -519,14 +914,14 @@
             margin-bottom: 12px;
             border-radius: 10px;
             overflow: hidden;
-            background: rgba(20, 20, 27, 0.4);
+            background: var(--bg-glass);
         }
         .book-cover-wrap img {
             width: 100%; height: 100%;
             object-fit: cover;
         }
         .book-cover-wrap svg {
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
+            box-shadow: 0 6px 18px rgba(15, 23, 42, 0.12);
             border-radius: 6px;
         }
 
@@ -539,9 +934,9 @@
             flex: 1;
             padding: 8px 4px;
             border-radius: 8px;
-            background: rgba(20, 20, 27, 0.85);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            color: #e5e5e5;
+            background: var(--bg-glass);
+            border: 1px solid var(--border);
+            color: var(--text-dim);
             cursor: pointer;
             font-size: 12px;
             display: flex; align-items: center; justify-content: center;
@@ -550,9 +945,9 @@
             font-family: inherit;
         }
         .admin-bar .icon-btn:hover { transform: translateY(-2px); }
-        .admin-bar .icon-btn.image { background: rgba(6, 182, 212, 0.15); border-color: rgba(6, 182, 212, 0.35); color: #67e8f9; }
-        .admin-bar .icon-btn.edit { background: rgba(139, 92, 246, 0.18); border-color: rgba(139, 92, 246, 0.4); color: #c4b5fd; }
-        .admin-bar .icon-btn.delete { background: rgba(239, 68, 68, 0.15); border-color: rgba(239, 68, 68, 0.35); color: #fca5a5; }
+        .admin-bar .icon-btn.image { background: #e0f5fa; border-color: rgba(10, 162, 192, 0.3); color: #0a7d94; }
+        .admin-bar .icon-btn.edit { background: #e7f0ff; border-color: rgba(13, 110, 253, 0.3); color: #0b5ed7; }
+        .admin-bar .icon-btn.delete { background: #fde8e8; border-color: rgba(220, 53, 69, 0.3); color: #b02a37; }
 
         /* Empty state */
         .empty-state {
@@ -560,7 +955,7 @@
             text-align: center;
             padding: 60px 20px;
             color: var(--text-dim);
-            background: rgba(20, 20, 27, 0.4);
+            background: var(--bg-glass);
             border-radius: 12px;
         }
         .empty-state-emoji { font-size: 48px; margin-bottom: 12px; }
@@ -580,7 +975,7 @@
             .book-card:hover {
                 border-color: var(--border-hover);
                 transform: translateY(-3px);
-                box-shadow: 0 16px 40px rgba(139, 92, 246, 0.15);
+                box-shadow: 0 12px 28px rgba(13, 110, 253, 0.12);
             }
 
                 .book-card:hover::before {
@@ -590,7 +985,7 @@
         .book-image {
             width: 100%;
             height: 220px;
-            background: linear-gradient(135deg, rgba(139, 92, 246, 0.1), rgba(6, 182, 212, 0.05));
+            background: linear-gradient(135deg, rgba(13, 110, 253, 0.08), rgba(6, 182, 212, 0.05));
             border: 1px solid var(--border);
             border-radius: 12px;
             display: flex;
@@ -640,9 +1035,7 @@
         .book-price {
             font-size: 22px;
             font-weight: 800;
-            background: linear-gradient(135deg, var(--warning), var(--accent));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            color: var(--primary);
             margin-bottom: 6px;
             letter-spacing: -0.02em;
         }
@@ -726,8 +1119,8 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(10, 10, 15, 0.8);
-            backdrop-filter: blur(10px);
+            background: rgba(15, 23, 42, 0.5);
+            backdrop-filter: blur(6px);
             z-index: 1000;
             justify-content: center;
             align-items: flex-start;
@@ -746,7 +1139,7 @@
             max-width: 600px;
             width: 100%;
             padding: 28px;
-            box-shadow: 0 24px 60px rgba(0, 0, 0, 0.6);
+            box-shadow: 0 20px 50px rgba(15, 23, 42, 0.18);
         }
 
         .modal-header {
@@ -837,8 +1230,8 @@
         }
 
         .cart-total {
-            background: linear-gradient(135deg, rgba(245, 158, 11, 0.1), rgba(236, 72, 153, 0.08));
-            border: 1px solid rgba(245, 158, 11, 0.3);
+            background: #eef4ff;
+            border: 1px solid rgba(13, 110, 253, 0.2);
             border-radius: 12px;
             padding: 18px;
             margin: 16px 0;
@@ -853,9 +1246,7 @@
             .cart-total .amount {
                 font-size: 32px;
                 font-weight: 800;
-                background: linear-gradient(135deg, var(--warning), var(--accent));
-                -webkit-background-clip: text;
-                -webkit-text-fill-color: transparent;
+                color: var(--primary);
                 margin-top: 4px;
                 letter-spacing: -0.02em;
             }
@@ -972,12 +1363,11 @@
             border-radius: 10px;
             font-size: 14px;
             font-weight: 500;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+            box-shadow: 0 10px 30px rgba(15, 23, 42, 0.18);
             border: 1px solid var(--border);
             opacity: 0;
             transition: all 0.3s;
             z-index: 2000;
-            backdrop-filter: blur(20px);
         }
 
             .toast.show {
@@ -1009,26 +1399,43 @@
             }
         }
     </style>
+    <script>
+        // Mavzuni miltillashsiz darrov o'rnatish
+        (function () {
+            try { document.documentElement.setAttribute('data-theme', localStorage.getItem('theme') || 'light'); } catch (e) { }
+        })();
+    </script>
 </head>
 <body>
-    <div class="auth-bar" id="authBar"></div>
     <script src="/auth.js"></script>
+    <script src="/quotes.js"></script>
+
+    <!-- ===== STICKY NAVBAR ===== -->
+    <nav class="navbar">
+        <div class="navbar-inner">
+            <a href="/market.html" class="nav-logo"><span class="nav-logo-icon">🛒</span><span>Marketplace</span></a>
+            <div class="nav-search">
+                <span class="search-icon-left">🔍</span>
+                <input type="text" id="searchInput" class="search-input" placeholder="Kitob yoki muallif qidirish..." oninput="onSearchInput()">
+                <button class="search-btn" onclick="doSearch()">Qidirish</button>
+            </div>
+            <div class="nav-right">
+                <a href="/my-orders.html" class="nav-link">📦 <span class="nav-link-text">Buyurtmalarim</span></a>
+                <a href="/admin.html" class="nav-link" id="adminLink" style="display:none;">⚙️ <span class="nav-link-text">Admin</span></a>
+                <div class="ui-controls" data-no-translit>
+                    <div class="lang-switch">
+                        <button class="lang-btn active" id="langLatin" onclick="setScript('latin')">Lot</button>
+                        <button class="lang-btn" id="langCyr" onclick="setScript('cyrillic')">Kir</button>
+                    </div>
+                    <button class="theme-btn" id="themeBtn" onclick="toggleTheme()" title="Mavzu" aria-label="Mavzu">☀️</button>
+                </div>
+                <div class="nav-auth" id="authBar"></div>
+            </div>
+        </div>
+    </nav>
 
     <div class="container">
-        <header>
-            <div class="logo-icon">🛒</div>
-            <h1>Marketplace</h1>
-            <p class="subtitle">Kitoblarni xarid qiling — uyga yetkazib beriladi</p>
-            <div class="top-nav">
-                <a href="/" class="nav-pill">📚 O'qish bo'limi</a>
-                <a href="/my-orders.html" class="nav-pill">📦 Mening buyurtmalarim</a>
-                <a href="/admin.html" class="nav-pill" id="adminLink" style="display:none;">⚙️ Admin panel</a>
-            </div>
-        </header>
-
-        <!-- ============================================
-             FLASH SALE BANNER (chegirmali kitoblar bo'lsa)
-             ============================================ -->
+        <!-- ===== FLASH SALE BANNER ===== -->
         <div class="flash-banner" id="flashBanner" style="display:none;">
             <div class="flash-icon">⚡</div>
             <div class="flash-info">
@@ -1045,12 +1452,15 @@
             </div>
         </div>
 
-        <div class="search-wrap">
-            <div class="search-box">
-                <span class="search-icon-left">🔍</span>
-                <input type="text" id="searchInput" class="search-input" placeholder="Kitob yoki muallif qidirish..." oninput="onSearchInput()">
+        <!-- ===== KATEGORIYA CHIPLARI ===== -->
+        <div class="categories" id="categoriesBar"></div>
+
+        <!-- ===== ENG KO'P SOTILGAN KITOBLAR ===== -->
+        <div id="bestsellerSection" style="display:none;">
+            <div class="row-header">
+                <h3>🏆 Eng ko'p sotilgan kitoblar</h3>
             </div>
-            <button class="search-btn" onclick="doSearch()">Qidirish</button>
+            <div class="bestseller-row" id="bestsellerRow"></div>
         </div>
 
         <!-- Sort bar -->
@@ -1085,11 +1495,6 @@
                 </div>
 
                 <div class="filter-section">
-                    <div class="filter-title">🏷️ Kategoriyalar</div>
-                    <div id="filterCategories"></div>
-                </div>
-
-                <div class="filter-section">
                     <div class="filter-title">🎁 Aksiyalar</div>
                     <label class="checkbox">
                         <input type="checkbox" id="filterDiscount" onchange="renderBooks()">
@@ -1112,6 +1517,16 @@
             <div id="bookGrid" class="book-grid">
                 <div class="loading"><div class="spinner"></div><p>Kitoblar yuklanmoqda...</p></div>
             </div>
+        </div>
+
+        <!-- ===== FOOTER IQTIBOS (5 sekundda almashadi) ===== -->
+        <div class="quote-banner quote-footer" id="quoteBanner">
+            <div class="quote-banner-mark">"</div>
+            <div class="quote-banner-body" id="qbBody">
+                <div class="quote-banner-text" id="qbText"></div>
+                <div class="quote-banner-author" id="qbAuthor"></div>
+            </div>
+            <div class="quote-banner-dots" id="qbDots"></div>
         </div>
     </div>
 
@@ -1163,6 +1578,26 @@
                     <label>Chegirma tugash (ixtiyoriy)</label>
                     <input type="datetime-local" id="eDiscountEnds">
                 </div>
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+                    <div class="form-field">
+                        <label>Nashriyot</label>
+                        <input type="text" id="ePublisher" placeholder="Sharq">
+                    </div>
+                    <div class="form-field">
+                        <label>Muqova turi</label>
+                        <input type="text" id="eCoverType" placeholder="Qattiq / Yumshoq">
+                    </div>
+                </div>
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+                    <div class="form-field">
+                        <label>Sahifalar soni</label>
+                        <input type="number" id="ePageCount" min="0" max="100000">
+                    </div>
+                    <div class="form-field">
+                        <label>ISBN</label>
+                        <input type="text" id="eIsbn" placeholder="978-9943-...">
+                    </div>
+                </div>
                 <div class="form-field">
                     <label>Rasm URL</label>
                     <input type="text" id="eImageUrl" placeholder="https://... yoki data:image/...">
@@ -1206,6 +1641,64 @@
         </div>
     </div>
 
+    <!-- ============================================
+         PRODUCT DETAIL MODAL (qmar.uz uslubi)
+         ============================================ -->
+    <div class="detail-overlay" id="detailOverlay" onclick="if(event.target===this) closeDetail()">
+        <div class="detail-modal">
+            <button class="detail-close" onclick="closeDetail()">×</button>
+            <div class="detail-grid">
+                <!-- Chap: rasm -->
+                <div class="detail-cover-col">
+                    <div class="detail-cover" id="dCover"></div>
+                </div>
+                <!-- O'ng: ma'lumot -->
+                <div class="detail-info-col">
+                    <div class="detail-breadcrumb" id="dBreadcrumb"></div>
+                    <h1 class="detail-title" id="dTitle"></h1>
+                    <div class="detail-author" id="dAuthor"></div>
+
+                    <div class="detail-price-row">
+                        <span class="detail-price" id="dPrice"></span>
+                        <span class="detail-old-price" id="dOldPrice"></span>
+                        <span class="detail-stock" id="dStock"></span>
+                    </div>
+
+                    <div class="detail-hot" id="dHot" style="display:none;"></div>
+
+                    <div class="detail-specs" id="dSpecs"></div>
+
+                    <div class="detail-rank" id="dRank" style="display:none;"></div>
+
+                    <button class="detail-cart-btn" id="dCartBtn">🛒 Savatga qo'shish</button>
+
+                    <div class="detail-delivery">
+                        <div>🚚 <strong>Bepul yetkazish</strong> — Toshkent shahar ichida 1-2 kun</div>
+                        <div>📦 Viloyatlarga pochta — 3-5 kun, 15 000 so'mdan</div>
+                        <div>💳 Naqd yoki karta orqali to'lov</div>
+                    </div>
+
+                    <div class="detail-actions-row">
+                        <span class="detail-rating" id="dRating">⭐ Yangi</span>
+                        <span class="detail-share" onclick="shareBook()">🔗 Ulashish</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tavsif -->
+            <div class="detail-section">
+                <h3>Kitob haqida</h3>
+                <p class="detail-desc" id="dDesc"></p>
+            </div>
+
+            <!-- Tafsilotlar jadvali -->
+            <div class="detail-section">
+                <h3>Mahsulot tafsilotlari</h3>
+                <table class="detail-table" id="dTable"></table>
+            </div>
+        </div>
+    </div>
+
     <div class="toast" id="toast"></div>
 
     <script>
@@ -1213,6 +1706,91 @@
         let allBooks = [];
         let selectedCategory = null;
         let searchQuery = '';
+
+        // ============================================
+        //  TIL (LOTINCHA / KIRILCHA) + MAVZU
+        // ============================================
+        const LAT2CYR = [
+            ["O‘","Ў"],["O'","Ў"],["Oʻ","Ў"],["O’","Ў"],["o‘","ў"],["o'","ў"],["oʻ","ў"],["o’","ў"],
+            ["G‘","Ғ"],["G'","Ғ"],["Gʻ","Ғ"],["G’","Ғ"],["g‘","ғ"],["g'","ғ"],["gʻ","ғ"],["g’","ғ"],
+            ["Sh","Ш"],["SH","Ш"],["sh","ш"],["Ch","Ч"],["CH","Ч"],["ch","ч"],
+            ["Yo","Ё"],["YO","Ё"],["yo","ё"],["Yu","Ю"],["YU","Ю"],["yu","ю"],
+            ["Ya","Я"],["YA","Я"],["ya","я"],["Ye","Е"],["YE","Е"],["ye","е"],["Ts","Ц"],["ts","ц"],
+            ["A","А"],["a","а"],["B","Б"],["b","б"],["D","Д"],["d","д"],["E","Э"],["e","е"],
+            ["F","Ф"],["f","ф"],["G","Г"],["g","г"],["H","Ҳ"],["h","ҳ"],["I","И"],["i","и"],
+            ["J","Ж"],["j","ж"],["K","К"],["k","к"],["L","Л"],["l","л"],["M","М"],["m","м"],
+            ["N","Н"],["n","н"],["O","О"],["o","о"],["P","П"],["p","п"],["Q","Қ"],["q","қ"],
+            ["R","Р"],["r","р"],["S","С"],["s","с"],["T","Т"],["t","т"],["U","У"],["u","у"],
+            ["V","В"],["v","в"],["X","Х"],["x","х"],["Y","Й"],["y","й"],["Z","З"],["z","з"],
+            ["C","К"],["c","к"],["'","ъ"]
+        ];
+        function latinToCyrillic(s) {
+            if (!s || !/[A-Za-z']/.test(s)) return s;
+            let out = "", i = 0;
+            while (i < s.length) {
+                let matched = false;
+                for (const [lat, cyr] of LAT2CYR) {
+                    if (s.startsWith(lat, i)) { out += cyr; i += lat.length; matched = true; break; }
+                }
+                if (!matched) { out += s[i]; i++; }
+            }
+            return out;
+        }
+        function translitEl(root) {
+            if (!root) return;
+            const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
+                acceptNode(n) {
+                    const p = n.parentNode;
+                    if (!p) return NodeFilter.FILTER_REJECT;
+                    const tag = p.nodeName;
+                    if (tag === 'SCRIPT' || tag === 'STYLE' || tag === 'TEXTAREA') return NodeFilter.FILTER_REJECT;
+                    if (p.closest && p.closest('[data-no-translit]')) return NodeFilter.FILTER_REJECT;
+                    return NodeFilter.FILTER_ACCEPT;
+                }
+            });
+            const nodes = []; let n;
+            while (n = walker.nextNode()) nodes.push(n);
+            nodes.forEach(t => { t.nodeValue = latinToCyrillic(t.nodeValue); });
+            (root.querySelectorAll ? root.querySelectorAll('input[placeholder]') : []).forEach(el => {
+                if (!el.closest('[data-no-translit]')) el.placeholder = latinToCyrillic(el.placeholder);
+            });
+        }
+        let _translitObserver = null;
+        function enableCyrillic() {
+            translitEl(document.body);
+            if (_translitObserver) return;
+            _translitObserver = new MutationObserver(muts => {
+                muts.forEach(m => m.addedNodes.forEach(node => {
+                    if (node.nodeType === 1) translitEl(node);
+                    else if (node.nodeType === 3 && !(node.parentNode && node.parentNode.closest('[data-no-translit]')))
+                        node.nodeValue = latinToCyrillic(node.nodeValue);
+                }));
+            });
+            _translitObserver.observe(document.body, { childList: true, subtree: true });
+        }
+        function setScript(s) {
+            localStorage.setItem('script', s);
+            location.reload();
+        }
+        function toggleTheme() {
+            const cur = document.documentElement.getAttribute('data-theme') || 'light';
+            const next = cur === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', next);
+            localStorage.setItem('theme', next);
+            const btn = document.getElementById('themeBtn');
+            if (btn) btn.textContent = next === 'dark' ? '🌙' : '☀️';
+        }
+        (function initUiControls() {
+            document.addEventListener('DOMContentLoaded', () => {
+                const script = localStorage.getItem('script') || 'latin';
+                const lat = document.getElementById('langLatin'), cyr = document.getElementById('langCyr');
+                if (lat) lat.classList.toggle('active', script === 'latin');
+                if (cyr) cyr.classList.toggle('active', script === 'cyrillic');
+                const btn = document.getElementById('themeBtn');
+                if (btn) btn.textContent = (document.documentElement.getAttribute('data-theme') === 'dark') ? '🌙' : '☀️';
+                if (script === 'cyrillic') enableCyrillic();
+            });
+        })();
 
         function getCurrentUser() {
             const userStr = localStorage.getItem('auth_user');
@@ -1295,6 +1873,129 @@
             saveCart(getCart().filter(i => i.id !== bookId));
             renderCart();
         }
+
+        // ============================================
+        //  PRODUCT DETAIL MODAL (qmar.uz uslubi)
+        // ============================================
+        let currentDetailBook = null;
+
+        async function openDetail(bookId) {
+            const book = allBooks.find(b => b.id === bookId);
+            if (!book) return;
+            currentDetailBook = book;
+
+            const overlay = document.getElementById('detailOverlay');
+            overlay.classList.add('active');
+            document.body.style.overflow = 'hidden';
+
+            // --- Rasm ---
+            const coverEl = document.getElementById('dCover');
+            const hasImg = (book.imageUrl && book.imageUrl.startsWith('http')) || book.imageUrl?.startsWith('data:');
+            coverEl.innerHTML = hasImg
+                ? `<img src="${escapeHtml(book.imageUrl)}" alt="" onerror="this.parentElement.innerHTML='${generateCover(book.title, book.author, 260, 370).replace(/'/g, '&#39;')}'">`
+                : generateCover(book.title, book.author, 260, 370);
+
+            // --- Asosiy maydonlar ---
+            document.getElementById('dBreadcrumb').textContent = `Bosh sahifa › ${book.category || 'Kitoblar'}`;
+            document.getElementById('dTitle').textContent = book.title;
+            document.getElementById('dAuthor').textContent = `✍️ ${book.author}`;
+
+            const finalPrice = book.finalPrice || book.price;
+            const hasDiscount = book.discount > 0;
+            document.getElementById('dPrice').textContent = `${formatPrice(finalPrice)} so'm`;
+            const oldEl = document.getElementById('dOldPrice');
+            oldEl.textContent = hasDiscount ? `${formatPrice(book.price)} so'm` : '';
+            oldEl.style.display = hasDiscount ? 'inline' : 'none';
+
+            const stockEl = document.getElementById('dStock');
+            if (book.stock === 0) { stockEl.textContent = '❌ Tugagan'; stockEl.style.color = 'var(--danger)'; }
+            else if (book.stock < 5) { stockEl.textContent = `⚠️ Faqat ${book.stock} ta`; stockEl.style.color = 'var(--warning)'; }
+            else { stockEl.textContent = `✅ ${book.stock} ta mavjud`; stockEl.style.color = 'var(--success)'; }
+
+            // --- Tavsif ---
+            document.getElementById('dDesc').textContent = book.description || 'Bu kitob haqida tavsif hozircha kiritilmagan.';
+
+            // --- Specs box (muqova / sahifa / nashriyot) ---
+            const specs = [];
+            if (book.coverType) specs.push({ label: 'Muqova', value: book.coverType });
+            if (book.pageCount) specs.push({ label: 'Sahifalar', value: `${book.pageCount} bet` });
+            if (book.publisher) specs.push({ label: 'Nashriyot', value: book.publisher });
+            const specsEl = document.getElementById('dSpecs');
+            specsEl.innerHTML = specs.length
+                ? specs.map(s => `<div class="detail-spec"><div class="detail-spec-label">${escapeHtml(s.label)}</div><div class="detail-spec-value">${escapeHtml(s.value)}</div></div>`).join('')
+                : '';
+            specsEl.style.display = specs.length ? 'flex' : 'none';
+
+            // --- Tafsilotlar jadvali ---
+            const rows = [
+                ['Muallif', book.author],
+                ['Nashriyot', book.publisher],
+                ['Muqova turi', book.coverType],
+                ['Sahifalar soni', book.pageCount ? `${book.pageCount} bet` : null],
+                ['Bo\'lim', book.category],
+                ['Nashr yili', book.year],
+                ['ISBN / shtrix-kod', book.isbn]
+            ].filter(r => r[1]);
+            document.getElementById('dTable').innerHTML = rows
+                .map(r => `<tr><td>${escapeHtml(r[0])}</td><td>${escapeHtml(String(r[1]))}</td></tr>`).join('');
+
+            // --- Savatga qo'shish tugmasi ---
+            const cartBtn = document.getElementById('dCartBtn');
+            cartBtn.disabled = book.stock === 0;
+            cartBtn.textContent = book.stock === 0 ? 'Tugagan' : "🛒 Savatga qo'shish";
+            cartBtn.onclick = () => addToCart({ ...book, price: finalPrice });
+
+            // --- Server: sotilgan soni + reyting (hot badge) ---
+            const hotEl = document.getElementById('dHot');
+            const rankEl = document.getElementById('dRank');
+            hotEl.style.display = 'none';
+            rankEl.style.display = 'none';
+            try {
+                const res = await fetch(`${API_BASE}/api/salebooks/${bookId}/detail`);
+                if (res.ok) {
+                    const d = await res.json();
+                    if (d.soldThisWeek > 0) {
+                        hotEl.textContent = `🔥 Bu hafta ${d.soldThisWeek} marta sotib olindi`;
+                        hotEl.style.display = 'inline-block';
+                    } else if (d.soldCount > 0) {
+                        hotEl.textContent = `📦 Jami ${d.soldCount} marta sotildi`;
+                        hotEl.style.display = 'inline-block';
+                    }
+                    if (d.categoryRank && d.categoryRank <= 10) {
+                        rankEl.textContent = `🏆 "${d.category}" toifasida #${d.categoryRank}-o'rin`;
+                        rankEl.style.display = 'flex';
+                    }
+                }
+            } catch (_) { /* statistikasiz ham modal ishlaydi */ }
+        }
+
+        function closeDetail() {
+            document.getElementById('detailOverlay').classList.remove('active');
+            document.body.style.overflow = '';
+            currentDetailBook = null;
+        }
+
+        function shareBook() {
+            if (!currentDetailBook) return;
+            const url = `${window.location.origin}/market.html#book-${currentDetailBook.id}`;
+            const shareData = {
+                title: currentDetailBook.title,
+                text: `"${currentDetailBook.title}" — ${currentDetailBook.author}. KutubxonaAPI marketplace'da ko'ring:`,
+                url
+            };
+            if (navigator.share) {
+                navigator.share(shareData).catch(() => {});
+            } else if (navigator.clipboard) {
+                navigator.clipboard.writeText(url).then(() => showToast('Havola nusxalandi! 📋', 'success'));
+            } else {
+                showToast(url, 'success');
+            }
+        }
+
+        // ESC bilan yopish
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && document.getElementById('detailOverlay')?.classList.contains('active')) closeDetail();
+        });
 
         async function deleteSaleBook(bookId, title) {
             if (!confirm(`"${title}" kitobini sotuvdan o'chirmoqchimisiz?`)) return;
@@ -1609,8 +2310,8 @@
                     <div class="book-card">
                         ${hasDiscount ? `<div class="discount-badge">-${book.discount}%</div>` : ''}
                         ${wishBtn}
-                        <div class="book-cover-wrap" id="cover-${book.id}">${coverInner}</div>
-                        <div class="book-title" style="font-size:15px;font-weight:600;margin-bottom:4px;">${escapeHtml(book.title)}</div>
+                        <div class="book-cover-wrap" id="cover-${book.id}" onclick="openDetail(${book.id})" style="cursor:pointer;">${coverInner}</div>
+                        <div class="book-title" onclick="openDetail(${book.id})" style="font-size:15px;font-weight:600;margin-bottom:4px;cursor:pointer;">${escapeHtml(book.title)}</div>
                         <div class="book-author" style="color:var(--text-dim);font-size:12px;margin-bottom:8px;">✍️ ${escapeHtml(book.author)}</div>
                         <div class="book-meta" style="display:flex;justify-content:space-between;font-size:11px;color:var(--text-faint);margin-bottom:8px;">
                             <span class="badge" style="background:var(--bg-glass);border:1px solid var(--border);padding:2px 8px;border-radius:999px;">${escapeHtml(book.category)}</span>
@@ -1705,6 +2406,10 @@
             document.getElementById('eDiscountEnds').value = book.discountEndsAt
                 ? new Date(book.discountEndsAt).toISOString().slice(0, 16)
                 : '';
+            document.getElementById('ePublisher').value = book.publisher || '';
+            document.getElementById('eCoverType').value = book.coverType || '';
+            document.getElementById('ePageCount').value = book.pageCount || '';
+            document.getElementById('eIsbn').value = book.isbn || '';
             document.getElementById('editModal').classList.add('active');
         }
         function closeEdit() {
@@ -1726,6 +2431,10 @@
                     ? new Date(document.getElementById('eDiscountEnds').value).toISOString()
                     : null,
                 imageUrl: document.getElementById('eImageUrl').value.trim(),
+                publisher: document.getElementById('ePublisher').value.trim(),
+                coverType: document.getElementById('eCoverType').value.trim(),
+                pageCount: parseInt(document.getElementById('ePageCount').value) || null,
+                isbn: document.getElementById('eIsbn').value.trim(),
                 isActive: true
             };
             try {
@@ -1831,9 +2540,96 @@
         }
         function escapeJs(text) { return String(text).replace(/\\/g, '\\\\').replace(/'/g, "\\'"); }
 
+        // ============================================
+        // IQTIBOS BANNER — 5 sekundda almashadi
+        // ============================================
+        let qbIndex = 0;
+        let qbTimer = null;
+        const QUOTES = window.BOOK_QUOTES || [];
+        const QB_INTERVAL = 5000;
+        const QB_DOTS_SHOWN = 8; // Faqat 8 ta nuqta (ko'p bo'lgani uchun)
+
+        function qbShow(idx) {
+            if (QUOTES.length === 0) return;
+            qbIndex = ((idx % QUOTES.length) + QUOTES.length) % QUOTES.length;
+            const body = document.getElementById('qbBody');
+            body.classList.add('fading');
+            setTimeout(() => {
+                const q = QUOTES[qbIndex];
+                document.getElementById('qbText').textContent = q.text;
+                document.getElementById('qbAuthor').textContent = `— ${q.author}`;
+                body.classList.remove('fading');
+                qbRenderDots();
+            }, 300);
+        }
+        function qbRenderDots() {
+            // Ko'p iqtibos bor — faqat joriy atrofidagi nuqtalarni ko'rsatamiz
+            const dots = document.getElementById('qbDots');
+            const total = QUOTES.length;
+            const half = Math.floor(QB_DOTS_SHOWN / 2);
+            let html = '';
+            for (let i = 0; i < QB_DOTS_SHOWN; i++) {
+                const isActive = i === half;
+                html += `<div class="qb-dot ${isActive ? 'active' : ''}"></div>`;
+            }
+            dots.innerHTML = html;
+        }
+        function qbStart() {
+            if (QUOTES.length === 0) {
+                document.getElementById('quoteBanner').style.display = 'none';
+                return;
+            }
+            // Kun bo'yicha boshlang'ich
+            qbIndex = Math.floor(Date.now() / 86400000) % QUOTES.length;
+            const q = QUOTES[qbIndex];
+            document.getElementById('qbText').textContent = q.text;
+            document.getElementById('qbAuthor').textContent = `— ${q.author}`;
+            qbRenderDots();
+            if (qbTimer) clearInterval(qbTimer);
+            qbTimer = setInterval(() => qbShow(qbIndex + 1), QB_INTERVAL);
+        }
+
+        // ============================================
+        // ENG KO'P SOTILGAN — bestseller row
+        // ============================================
+        async function loadBestsellers() {
+            try {
+                const res = await fetch(`${API_BASE}/api/salebooks/bestsellers?count=8`);
+                if (!res.ok) return;
+                const items = await res.json();
+                if (!items || items.length === 0) return;
+
+                const row = document.getElementById('bestsellerRow');
+                row.innerHTML = items.map((item, i) => {
+                    const b = item.book;
+                    const sold = item.soldCount;
+                    const isImg = b.imageUrl && (b.imageUrl.startsWith('http') || b.imageUrl.startsWith('data:'));
+                    const cover = isImg
+                        ? `<img src="${escapeHtml(b.imageUrl)}" alt="" onerror="this.parentElement.innerHTML='${generateCover(b.title, b.author, 150, 210).replace(/'/g, '&#39;')}'">`
+                        : generateCover(b.title, b.author, 150, 210);
+                    const soldText = sold > 0 ? `🔥 ${sold} sotilgan` : 'Yangi';
+                    return `
+                        <div class="bestseller-card" onclick='addToCart(${JSON.stringify({...b, price: b.finalPrice || b.price}).replace(/'/g, "&#39;")})'>
+                            <div class="bestseller-rank">${i + 1}</div>
+                            <div class="bestseller-cover">${cover}</div>
+                            <div class="bestseller-title">${escapeHtml(b.title)}</div>
+                            <div class="bestseller-meta">
+                                <span>${formatPrice(b.finalPrice || b.price)} so'm</span>
+                            </div>
+                            <div class="bestseller-meta">
+                                <span class="bestseller-sold">${soldText}</span>
+                            </div>
+                        </div>`;
+                }).join('');
+                document.getElementById('bestsellerSection').style.display = 'block';
+            } catch (err) { console.error('Bestseller xato:', err); }
+        }
+
         renderAuthBar();
         updateCartBadge();
         loadBooks();
+        qbStart();
+        loadBestsellers();
 
         document.addEventListener('keydown', e => { if (e.key === 'Escape') closeCart(); });
     </script>
