@@ -38,6 +38,100 @@ public class SaleBooksController : ControllerBase
         return Ok(books.Select(b => b.ToDto()));
     }
 
+    // ======== GET /api/salebooks/bestsellers ========
+    /// <summary>
+    /// Eng ko'p sotilgan kitoblar — buyurtmalardagi jami miqdor bo'yicha.
+    /// Sotuv bo'lmasa, eng yangi faol kitoblar qaytariladi.
+    /// </summary>
+    [HttpGet("bestsellers")]
+    public async Task<ActionResult<IEnumerable<object>>> GetBestsellers(
+        [FromQuery] int count = 6,
+        CancellationToken ct = default)
+    {
+        if (count < 1) count = 6;
+        if (count > 20) count = 20;
+
+        // OrderItem'lar bo'yicha sotilgan miqdorni hisoblash
+        var soldCounts = await _context.OrderItems
+            .GroupBy(oi => oi.SaleBookId)
+            .Select(g => new { SaleBookId = g.Key, Sold = g.Sum(x => x.Quantity) })
+            .OrderByDescending(x => x.Sold)
+            .Take(count)
+            .ToListAsync(ct);
+
+        var soldMap = soldCounts.ToDictionary(x => x.SaleBookId, x => x.Sold);
+        var bestsellerIds = soldCounts.Select(x => x.SaleBookId).ToList();
+
+        var books = await _context.SaleBooks
+            .Where(b => b.IsActive && bestsellerIds.Contains(b.Id))
+            .ToListAsync(ct);
+
+        // Sotuv tartibida
+        var ordered = books
+            .OrderByDescending(b => soldMap.GetValueOrDefault(b.Id, 0))
+            .Select(b => new
+            {
+                book = b.ToDto(),
+                soldCount = soldMap.GetValueOrDefault(b.Id, 0)
+            })
+            .ToList();
+
+        // Agar sotuv yetarli bo'lmasa — eng yangilar bilan to'ldirish
+        if (ordered.Count < count)
+        {
+            var existingIds = ordered.Select(o => o.book.Id).ToHashSet();
+            var fillers = await _context.SaleBooks
+                .Where(b => b.IsActive && !existingIds.Contains(b.Id))
+                .OrderByDescending(b => b.CreatedAt)
+                .Take(count - ordered.Count)
+                .ToListAsync(ct);
+            ordered.AddRange(fillers.Select(b => new { book = b.ToDto(), soldCount = 0 }));
+        }
+
+        return Ok(ordered);
+    }
+
+    // ======== GET /api/salebooks/{id}/detail ========
+    /// <summary>
+    /// Mahsulot to'liq sahifasi uchun: kitob + sotilgan soni + kategoriyadagi o'rni.
+    /// </summary>
+    [HttpGet("{id:int}/detail")]
+    public async Task<ActionResult<object>> GetDetail(int id, CancellationToken ct = default)
+    {
+        var book = await _context.SaleBooks.FirstOrDefaultAsync(b => b.Id == id, ct);
+        if (book == null) return NotFound(new { message = "Kitob topilmadi" });
+
+        // Sotilgan soni
+        var soldCount = await _context.OrderItems
+            .Where(oi => oi.SaleBookId == id)
+            .SumAsync(oi => (int?)oi.Quantity, ct) ?? 0;
+
+        // So'nggi 7 kunda sotilgan
+        var weekAgo = DateTime.UtcNow.AddDays(-7);
+        var soldThisWeek = await _context.OrderItems
+            .Where(oi => oi.SaleBookId == id && oi.Order!.CreatedAt >= weekAgo)
+            .SumAsync(oi => (int?)oi.Quantity, ct) ?? 0;
+
+        // Kategoriyadagi sotuv reytingi (#N-o'rin)
+        var categorySales = await _context.OrderItems
+            .Where(oi => oi.SaleBook!.Category == book.Category)
+            .GroupBy(oi => oi.SaleBookId)
+            .Select(g => new { Id = g.Key, Sold = g.Sum(x => x.Quantity) })
+            .OrderByDescending(x => x.Sold)
+            .ToListAsync(ct);
+
+        var rank = categorySales.FindIndex(x => x.Id == id) + 1;
+
+        return Ok(new
+        {
+            book = book.ToDto(),
+            soldCount,
+            soldThisWeek,
+            categoryRank = rank > 0 ? rank : (int?)null,
+            category = book.Category
+        });
+    }
+
     // ======== GET /api/salebooks/{id} ========
     [HttpGet("{id:int}")]
     public async Task<ActionResult<SaleBookResponseDto>> GetOne(int id)
@@ -93,6 +187,10 @@ public class SaleBooksController : ControllerBase
             IsActive = dto.IsActive,
             Discount = dto.Discount,
             DiscountEndsAt = dto.DiscountEndsAt,
+            Publisher = dto.Publisher ?? "",
+            CoverType = dto.CoverType ?? "",
+            PageCount = dto.PageCount,
+            Isbn = dto.Isbn ?? "",
             CreatedAt = DateTime.UtcNow
         };
 
@@ -124,6 +222,10 @@ public class SaleBooksController : ControllerBase
         book.IsActive = dto.IsActive;
         book.Discount = dto.Discount;
         book.DiscountEndsAt = dto.DiscountEndsAt;
+        book.Publisher = dto.Publisher ?? "";
+        book.CoverType = dto.CoverType ?? "";
+        book.PageCount = dto.PageCount;
+        book.Isbn = dto.Isbn ?? "";
         book.UpdatedAt = DateTime.UtcNow;
 
         await _context.SaveChangesAsync();

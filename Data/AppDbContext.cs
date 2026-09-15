@@ -10,9 +10,6 @@ public class AppDbContext : DbContext
     public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
 
     // ===== DbSet lar =====
-    public DbSet<Book> Books { get; set; }
-    public DbSet<BookPage> BookPages { get; set; }
-    public DbSet<Comment> Comments { get; set; }
     public DbSet<User> Users { get; set; }
     public DbSet<SaleBook> SaleBooks { get; set; }
     public DbSet<Order> Orders { get; set; }
@@ -65,24 +62,6 @@ public class AppDbContext : DbContext
             .HasForeignKey(oi => oi.SaleBookId)
             .OnDelete(DeleteBehavior.Restrict);
 
-        modelBuilder.Entity<BookPage>()
-            .HasOne(p => p.Book)
-            .WithMany(b => b.Pages)
-            .HasForeignKey(p => p.BookId)
-            .OnDelete(DeleteBehavior.Cascade);
-
-        modelBuilder.Entity<Comment>()
-            .HasOne(c => c.Book)
-            .WithMany(b => b.Comments)
-            .HasForeignKey(c => c.BookId)
-            .OnDelete(DeleteBehavior.Cascade);
-
-        modelBuilder.Entity<Comment>()
-            .HasOne(c => c.User)
-            .WithMany()
-            .HasForeignKey(c => c.UserId)
-            .OnDelete(DeleteBehavior.Restrict);
-
         modelBuilder.Entity<RefreshToken>()
             .HasOne(rt => rt.User)
             .WithMany()
@@ -100,46 +79,15 @@ public class AppDbContext : DbContext
         // GLOBAL QUERY FILTERS — Soft Delete
         // O'chirilgan yozuvlar avtomatik filtrlanadi
         // ============================================
-        modelBuilder.Entity<Book>().HasQueryFilter(b => !b.IsDeleted);
         modelBuilder.Entity<SaleBook>().HasQueryFilter(s => !s.IsDeleted);
         modelBuilder.Entity<Order>().HasQueryFilter(o => !o.IsDeleted);
-        modelBuilder.Entity<Comment>().HasQueryFilter(c => !c.IsDeleted);
         modelBuilder.Entity<User>().HasQueryFilter(u => !u.IsDeleted);
 
         // ===== Indexes =====
-        modelBuilder.Entity<Book>().HasIndex(b => b.Category);
-        modelBuilder.Entity<Book>().HasIndex(b => b.CreatedAt);
-        modelBuilder.Entity<Book>().HasIndex(b => b.IsDeleted);
-        modelBuilder.Entity<Comment>().HasIndex(c => c.BookId);
-        modelBuilder.Entity<BookPage>().HasIndex(p => p.BookId);
         modelBuilder.Entity<SaleBook>().HasIndex(s => s.Category);
         modelBuilder.Entity<SaleBook>().HasIndex(s => s.IsDeleted);
         modelBuilder.Entity<Order>().HasIndex(o => o.UserId);
         modelBuilder.Entity<Order>().HasIndex(o => o.Status);
-
-        // ===== Seed Books =====
-        modelBuilder.Entity<Book>().HasData(
-            new Book
-            {
-                Id = 1,
-                Title = "O'tkan kunlar",
-                Author = "Abdulla Qodiriy",
-                Year = 1925,
-                Category = "Klassika",
-                IsAvailable = true,
-                CreatedAt = new DateTime(2024, 1, 1)
-            },
-            new Book
-            {
-                Id = 2,
-                Title = "Mehrobdan chayon",
-                Author = "Abdulla Qodiriy",
-                Year = 1929,
-                Category = "Klassika",
-                IsAvailable = true,
-                CreatedAt = new DateTime(2024, 1, 1)
-            }
-        );
     }
 
     // ============================================

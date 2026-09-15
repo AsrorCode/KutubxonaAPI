@@ -17,6 +17,10 @@ public class SaleBookResponseDto
     public int Discount { get; set; }
     public DateTime? DiscountEndsAt { get; set; }
     public decimal FinalPrice { get; set; }  // Chegirma bilan hisoblangan
+    public string Publisher { get; set; } = string.Empty;
+    public string CoverType { get; set; } = string.Empty;
+    public int? PageCount { get; set; }
+    public string Isbn { get; set; } = string.Empty;
     public DateTime CreatedAt { get; set; }
     public DateTime? UpdatedAt { get; set; }
 }
@@ -55,4 +59,16 @@ public class SaleBookCreateDto
     public int Discount { get; set; } = 0;
 
     public DateTime? DiscountEndsAt { get; set; }
+
+    [StringLength(150)]
+    public string Publisher { get; set; } = string.Empty;
+
+    [StringLength(50)]
+    public string CoverType { get; set; } = string.Empty;
+
+    [Range(0, 100000)]
+    public int? PageCount { get; set; }
+
+    [StringLength(50)]
+    public string Isbn { get; set; } = string.Empty;
 }

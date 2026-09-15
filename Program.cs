@@ -292,7 +292,9 @@ try
 
     app.Run();
 }
-catch (Exception ex)
+// HostAbortedException — EF Core migratsiya asboblari (design-time) host'ni
+// ataylab to'xtatganda tashlanadi. Bu XATO EMAS, shuning uchun loglamaymiz.
+catch (Exception ex) when (ex.GetType().Name != "HostAbortedException")
 {
     Log.Fatal(ex, "💥 KutubxonaAPI ishga tushmadi");
 }
