@@ -1,4 +1,5 @@
 using KutubxonaAPI.DTOs.Orders;
+using KutubxonaAPI.DTOs.Reviews;
 using KutubxonaAPI.DTOs.SaleBooks;
 using KutubxonaAPI.DTOs.Users;
 using KutubxonaAPI.Models;
@@ -56,6 +57,17 @@ public static class MappingExtensions
             UpdatedAt = s.UpdatedAt
         };
     }
+
+    // ===== REVIEW =====
+    public static ReviewResponseDto ToDto(this Review r) => new()
+    {
+        Id = r.Id,
+        AuthorName = r.AuthorName,
+        Content = r.Content,
+        Rating = r.Rating,
+        CreatedAt = r.CreatedAt,
+        UserId = r.UserId
+    };
 
     // ===== ORDER ITEM =====
     public static OrderItemDto ToDto(this OrderItem i) => new()

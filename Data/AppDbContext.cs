@@ -15,6 +15,7 @@ public class AppDbContext : DbContext
     public DbSet<Order> Orders { get; set; }
     public DbSet<OrderItem> OrderItems { get; set; }
     public DbSet<RefreshToken> RefreshTokens { get; set; }
+    public DbSet<Review> Reviews { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -62,6 +63,19 @@ public class AppDbContext : DbContext
             .HasForeignKey(oi => oi.SaleBookId)
             .OnDelete(DeleteBehavior.Restrict);
 
+        // ===== Review → SaleBook / User =====
+        modelBuilder.Entity<Review>()
+            .HasOne(r => r.SaleBook)
+            .WithMany()
+            .HasForeignKey(r => r.SaleBookId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<Review>()
+            .HasOne(r => r.User)
+            .WithMany()
+            .HasForeignKey(r => r.UserId)
+            .OnDelete(DeleteBehavior.Restrict);
+
         modelBuilder.Entity<RefreshToken>()
             .HasOne(rt => rt.User)
             .WithMany()
@@ -82,9 +96,11 @@ public class AppDbContext : DbContext
         modelBuilder.Entity<SaleBook>().HasQueryFilter(s => !s.IsDeleted);
         modelBuilder.Entity<Order>().HasQueryFilter(o => !o.IsDeleted);
         modelBuilder.Entity<User>().HasQueryFilter(u => !u.IsDeleted);
+        modelBuilder.Entity<Review>().HasQueryFilter(r => !r.IsDeleted);
 
         // ===== Indexes =====
         modelBuilder.Entity<SaleBook>().HasIndex(s => s.Category);
+        modelBuilder.Entity<Review>().HasIndex(r => r.SaleBookId);
         modelBuilder.Entity<SaleBook>().HasIndex(s => s.IsDeleted);
         modelBuilder.Entity<Order>().HasIndex(o => o.UserId);
         modelBuilder.Entity<Order>().HasIndex(o => o.Status);
