@@ -83,6 +83,17 @@
         }
         .nav-search .search-icon-left { left: 14px; font-size: 15px; }
         .nav-search .search-btn { padding: 0 20px; border-radius: 10px; font-size: 14px; }
+        .search-suggest {
+            display: none; position: absolute; top: 46px; left: 0; right: 0;
+            background: var(--bg-elevated); border: 1px solid var(--border);
+            border-radius: 10px; box-shadow: 0 12px 30px rgba(15, 23, 42, 0.15);
+            z-index: 250; overflow: hidden;
+        }
+        .search-suggest.open { display: block; }
+        .suggest-item { padding: 10px 14px; cursor: pointer; }
+        .suggest-item:hover { background: var(--bg-glass); }
+        .suggest-title { font-size: 14px; font-weight: 600; color: var(--text); }
+        .suggest-author { font-size: 12px; color: var(--text-dim); }
         .nav-right { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
         .nav-link {
             display: flex; align-items: center; gap: 5px;
@@ -1441,8 +1452,9 @@
             <a href="/market.html" class="nav-logo"><span class="nav-logo-icon">🛒</span><span>Marketplace</span></a>
             <div class="nav-search">
                 <span class="search-icon-left">🔍</span>
-                <input type="text" id="searchInput" class="search-input" placeholder="Kitob yoki muallif qidirish..." oninput="onSearchInput()">
+                <input type="text" id="searchInput" class="search-input" placeholder="Kitob yoki muallif qidirish..." autocomplete="off" oninput="onSearchInput()">
                 <button class="search-btn" onclick="doSearch()">Qidirish</button>
+                <div class="search-suggest" id="searchSuggest"></div>
             </div>
             <div class="nav-right">
                 <a href="/my-orders.html" class="nav-link">📦 <span class="nav-link-text">Buyurtmalarim</span></a>
@@ -2359,11 +2371,40 @@
         let searchTimeout;
         function onSearchInput() {
             clearTimeout(searchTimeout);
+            const val = document.getElementById('searchInput').value.trim();
             searchTimeout = setTimeout(() => {
-                searchQuery = document.getElementById('searchInput').value.trim().toLowerCase();
+                searchQuery = val.toLowerCase();
                 renderBooks();
-            }, 300);
+                loadSuggest(val);
+            }, 250);
         }
+
+        // ===== QIDIRUV AUTOCOMPLETE =====
+        async function loadSuggest(q) {
+            const box = document.getElementById('searchSuggest');
+            if (!box) return;
+            if (!q || q.length < 2) { box.classList.remove('open'); box.innerHTML = ''; return; }
+            try {
+                const res = await fetch(`${API_BASE}/api/salebooks/suggest?q=${encodeURIComponent(q)}`);
+                if (!res.ok) return;
+                const items = await res.json();
+                if (!items.length) { box.classList.remove('open'); box.innerHTML = ''; return; }
+                box.innerHTML = items.map(it => `
+                    <div class="suggest-item" onclick="pickSuggest(${it.id})">
+                        <div class="suggest-title">${escapeHtml(it.title)}</div>
+                        <div class="suggest-author">✍️ ${escapeHtml(it.author)}</div>
+                    </div>`).join('');
+                box.classList.add('open');
+            } catch (_) { }
+        }
+        function pickSuggest(id) {
+            document.getElementById('searchSuggest').classList.remove('open');
+            openDetail(id);
+        }
+        document.addEventListener('click', (e) => {
+            const ns = document.querySelector('.nav-search');
+            if (ns && !ns.contains(e.target)) document.getElementById('searchSuggest')?.classList.remove('open');
+        });
         function doSearch() {
             clearTimeout(searchTimeout);
             searchQuery = document.getElementById('searchInput').value.trim().toLowerCase();
@@ -2371,14 +2412,42 @@
         }
 
         // ===== WISHLIST (localStorage) =====
-        function getWishlist() { return JSON.parse(localStorage.getItem('wishlist') || '[]'); }
-        function isWished(bookId) { return getWishlist().includes(bookId); }
-        function toggleWishlist(bookId) {
-            let list = getWishlist();
-            if (list.includes(bookId)) list = list.filter(id => id !== bookId);
-            else list.push(bookId);
-            localStorage.setItem('wishlist', JSON.stringify(list));
+        // ===== WISHLIST (server-side) =====
+        let wishSet = new Set();
+        function getWishlist() { return [...wishSet]; }
+        function isWished(bookId) { return wishSet.has(bookId); }
+
+        async function loadWishlistServer() {
+            if (!getCurrentUser()) { wishSet = new Set(); return; }
+            try {
+                const res = await apiFetch(`${API_BASE}/api/wishlist`, {});
+                if (!res.ok) return;
+                const books = await res.json();
+                wishSet = new Set(books.map(b => b.id));
+                renderBooks();
+            } catch (_) { }
+        }
+
+        async function toggleWishlist(bookId) {
+            if (!getCurrentUser()) {
+                showToast('Sevimlilarga qo\'shish uchun tizimga kiring', 'error');
+                return;
+            }
+            const adding = !wishSet.has(bookId);
+            // Optimistik yangilash
+            if (adding) wishSet.add(bookId); else wishSet.delete(bookId);
             renderBooks();
+            try {
+                const res = await apiFetch(`${API_BASE}/api/wishlist/${bookId}`, {
+                    method: adding ? 'POST' : 'DELETE'
+                });
+                if (!res.ok && res.status !== 204) throw new Error();
+            } catch (_) {
+                // Xato bo'lsa — orqaga qaytarish
+                if (adding) wishSet.delete(bookId); else wishSet.add(bookId);
+                renderBooks();
+                showToast('Xato yuz berdi', 'error');
+            }
         }
 
         // ===== FILTERLAR =====
@@ -2965,6 +3034,7 @@
         loadBestsellers();
         loadNotifications();
         loadCollections();
+        loadWishlistServer();
 
         document.addEventListener('keydown', e => { if (e.key === 'Escape') closeCart(); });
     </script>

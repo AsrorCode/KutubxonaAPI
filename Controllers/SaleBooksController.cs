@@ -178,6 +178,26 @@ public class SaleBooksController : ControllerBase
         return Ok(book.ToDto());
     }
 
+    // ======== GET /api/salebooks/suggest — autocomplete ========
+    /// <summary>Qidiruv uchun jonli takliflar (top 6 mos kitob).</summary>
+    [HttpGet("suggest")]
+    public async Task<ActionResult<IEnumerable<object>>> Suggest(
+        [FromQuery] string q = "", CancellationToken ct = default)
+    {
+        var term = (q ?? "").Trim();
+        if (term.Length < 2) return Ok(Array.Empty<object>());
+
+        var lower = term.ToLower();
+        var books = await _context.SaleBooks
+            .Where(b => b.IsActive && (b.Title.ToLower().Contains(lower) || b.Author.ToLower().Contains(lower)))
+            .OrderByDescending(b => b.CreatedAt)
+            .Take(6)
+            .Select(b => new { id = b.Id, title = b.Title, author = b.Author })
+            .ToListAsync(ct);
+
+        return Ok(books);
+    }
+
     // ======== GET /api/salebooks/search ========
     [HttpGet("search")]
     public async Task<ActionResult<IEnumerable<SaleBookResponseDto>>> Search(
