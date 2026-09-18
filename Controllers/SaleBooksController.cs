@@ -132,6 +132,43 @@ public class SaleBooksController : ControllerBase
         });
     }
 
+    // ======== GET /api/salebooks/{id}/similar ========
+    /// <summary>
+    /// O'xshash kitoblar — shu kategoriyadagilar (o'zini chiqarib).
+    /// Yetarli bo'lmasa, boshqa kategoriyalardan to'ldiriladi.
+    /// </summary>
+    [HttpGet("{id:int}/similar")]
+    public async Task<ActionResult<IEnumerable<SaleBookResponseDto>>> GetSimilar(
+        int id, [FromQuery] int count = 6, CancellationToken ct = default)
+    {
+        var book = await _context.SaleBooks.FirstOrDefaultAsync(b => b.Id == id, ct);
+        if (book == null) return NotFound(new { message = "Kitob topilmadi" });
+
+        if (count < 1) count = 6;
+        if (count > 20) count = 20;
+
+        var similar = await _context.SaleBooks
+            .Where(b => b.IsActive && b.Id != id && b.Category == book.Category)
+            .OrderByDescending(b => b.CreatedAt)
+            .Take(count)
+            .ToListAsync(ct);
+
+        // Yetarli bo'lmasa — boshqa kategoriyalardan to'ldirish
+        if (similar.Count < count)
+        {
+            var excludeIds = similar.Select(s => s.Id).ToHashSet();
+            excludeIds.Add(id);
+            var fillers = await _context.SaleBooks
+                .Where(b => b.IsActive && !excludeIds.Contains(b.Id))
+                .OrderByDescending(b => b.CreatedAt)
+                .Take(count - similar.Count)
+                .ToListAsync(ct);
+            similar.AddRange(fillers);
+        }
+
+        return Ok(similar.Select(b => b.ToDto()));
+    }
+
     // ======== GET /api/salebooks/{id} ========
     [HttpGet("{id:int}")]
     public async Task<ActionResult<SaleBookResponseDto>> GetOne(int id)
@@ -197,6 +234,8 @@ public class SaleBooksController : ControllerBase
         _context.SaleBooks.Add(book);
         await _context.SaveChangesAsync();
 
+        await AddBookNotificationAsync(book, isNew: true);
+
         _logger.LogInformation("Yangi sotuv kitobi qo'shildi: {Title}", book.Title);
         return CreatedAtAction(nameof(GetOne), new { id = book.Id }, book.ToDto());
     }
@@ -210,6 +249,8 @@ public class SaleBooksController : ControllerBase
 
         var book = await _context.SaleBooks.FindAsync(id);
         if (book == null) return NotFound(new { message = "Kitob topilmadi" });
+
+        var oldDiscount = book.Discount;
 
         book.Title = dto.Title.Trim();
         book.Author = dto.Author.Trim();
@@ -230,7 +271,46 @@ public class SaleBooksController : ControllerBase
 
         await _context.SaveChangesAsync();
 
+        // Yangi aksiya qo'yilganda (0 dan >0 ga) bildirishnoma
+        if (oldDiscount == 0 && book.Discount > 0)
+            await AddBookNotificationAsync(book, isNew: false);
+
         return Ok(book.ToDto());
+    }
+
+    // ======== Yordamchi: aksiya/yangi kitob bildirishnomasi ========
+    private async Task AddBookNotificationAsync(SaleBook book, bool isNew)
+    {
+        if (!book.IsActive) return;
+
+        Notification n;
+        if (book.Discount > 0)
+        {
+            var final = Math.Round(book.Price - (book.Price * book.Discount / 100m), 0);
+            n = new Notification
+            {
+                Title = "🔥 Yangi aksiya!",
+                Message = $"{book.Title} — endi {final:#,0} so'm ({book.Discount}% chegirma)",
+                Type = "discount",
+                SaleBookId = book.Id,
+                CreatedAt = DateTime.UtcNow
+            };
+        }
+        else if (isNew)
+        {
+            n = new Notification
+            {
+                Title = "🆕 Yangi kitob",
+                Message = $"{book.Title} — {book.Author}",
+                Type = "new",
+                SaleBookId = book.Id,
+                CreatedAt = DateTime.UtcNow
+            };
+        }
+        else return;
+
+        _context.Notifications.Add(n);
+        await _context.SaveChangesAsync();
     }
 
     // ======== DELETE /api/salebooks/{id} — Soft Delete (Admin) ========
