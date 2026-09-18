@@ -468,10 +468,10 @@
             const s = localStorage.getItem('auth_user');
             return s ? JSON.parse(s) : null;
         }
+        // apiFetch (auth.js) Authorization'ni o'zi qo'shadi va 401'da tokenni yangilaydi.
+        // Bu yerda faqat Content-Type qaytaramiz.
         function authHeaders(json = true) {
-            const h = { 'Authorization': `Bearer ${getToken()}` };
-            if (json) h['Content-Type'] = 'application/json';
-            return h;
+            return json ? { 'Content-Type': 'application/json' } : {};
         }
         function escapeHtml(text) {
             const div = document.createElement('div');
@@ -511,7 +511,7 @@
             try {
                 const [saleRes, ordersRes] = await Promise.all([
                     fetch(`${API}/salebooks`),
-                    fetch(`${API}/orders`, { headers: authHeaders(false) })
+                    apiFetch(`${API}/orders`, { headers: authHeaders(false) })
                 ]);
 
                 const saleBooks = saleRes.ok ? await saleRes.json() : [];
@@ -567,7 +567,7 @@
                         </div>
                         <div class="item-actions">
                             <button class="btn btn-warning btn-sm" onclick="toggleSaleActive(${b.id})">🔄 Toggle</button>
-                            <button class="btn btn-danger btn-sm" onclick="deleteSaleBook(${b.id}, '${escapeHtml(b.title).replace(/'/g, "\\'")}')">🗑️</button>
+                            <button class="btn btn-danger btn-sm" onclick="deleteSaleBook(${b.id})">🗑️</button>
                         </div>
                     </div>
                 `).join('');
@@ -701,7 +701,7 @@
             }
 
             try {
-                const res = await fetch(`${API}/salebooks`, {
+                const res = await apiFetch(`${API}/salebooks`, {
                     method: 'POST',
                     headers: authHeaders(),
                     body: JSON.stringify({ title, author, description, price, stock, category, year, imageUrl, isActive, discount, discountEndsAt, publisher, coverType, pageCount, isbn })
@@ -724,10 +724,10 @@
             }
         }
 
-        async function deleteSaleBook(id, title) {
-            if (!confirm(`"${title}" ni marketplace'dan o'chirmoqchimisiz?`)) return;
+        async function deleteSaleBook(id) {
+            if (!confirm(`Bu kitobni marketplace'dan o'chirmoqchimisiz?`)) return;
             try {
-                const res = await fetch(`${API}/salebooks/${id}`, {
+                const res = await apiFetch(`${API}/salebooks/${id}`, {
                     method: 'DELETE',
                     headers: authHeaders(false)
                 });
@@ -739,7 +739,7 @@
 
         async function toggleSaleActive(id) {
             try {
-                const res = await fetch(`${API}/salebooks/${id}/toggle`, {
+                const res = await apiFetch(`${API}/salebooks/${id}/toggle`, {
                     method: 'PATCH',
                     headers: authHeaders(false)
                 });
@@ -755,7 +755,7 @@
             try {
                 const filter = document.getElementById('orderStatusFilter').value;
                 const url = filter ? `${API}/orders?status=${filter}` : `${API}/orders`;
-                const res = await fetch(url, { headers: authHeaders(false) });
+                const res = await apiFetch(url, { headers: authHeaders(false) });
 
                 if (!res.ok) throw new Error('Buyurtmalar yuklanmadi');
                 const orders = await res.json();
@@ -816,7 +816,7 @@
                 return;
             }
             try {
-                const res = await fetch(`${API}/orders/${orderId}/status?status=${newStatus}`, {
+                const res = await apiFetch(`${API}/orders/${orderId}/status?status=${newStatus}`, {
                     method: 'PATCH',
                     headers: authHeaders(false)
                 });
