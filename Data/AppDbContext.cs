@@ -16,6 +16,7 @@ public class AppDbContext : DbContext
     public DbSet<OrderItem> OrderItems { get; set; }
     public DbSet<RefreshToken> RefreshTokens { get; set; }
     public DbSet<Review> Reviews { get; set; }
+    public DbSet<Notification> Notifications { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -101,6 +102,7 @@ public class AppDbContext : DbContext
         // ===== Indexes =====
         modelBuilder.Entity<SaleBook>().HasIndex(s => s.Category);
         modelBuilder.Entity<Review>().HasIndex(r => r.SaleBookId);
+        modelBuilder.Entity<Notification>().HasIndex(n => n.CreatedAt);
         modelBuilder.Entity<SaleBook>().HasIndex(s => s.IsDeleted);
         modelBuilder.Entity<Order>().HasIndex(o => o.UserId);
         modelBuilder.Entity<Order>().HasIndex(o => o.Status);
