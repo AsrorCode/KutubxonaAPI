@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profil — Kutubxona</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', sans-serif; background: var(--bg-base); color: var(--text);
+            min-height: 100vh; line-height: 1.5;
+        }
+        .wrap { max-width: 900px; margin: 0 auto; padding: 70px 20px 60px; }
+        .back {
+            display: inline-flex; align-items: center; gap: 6px; text-decoration: none;
+            color: var(--text-dim); font-size: 14px; margin-bottom: 20px;
+            background: var(--bg-elevated); border: 1px solid var(--border);
+            padding: 8px 14px; border-radius: 10px;
+        }
+        .back:hover { border-color: var(--border-hover); }
+        .card {
+            background: var(--bg-elevated); border: 1px solid var(--border);
+            border-radius: 16px; padding: 22px; margin-bottom: 18px;
+            box-shadow: 0 2px 10px rgba(15, 23, 42, 0.04);
+        }
+        .profile-head { display: flex; align-items: center; gap: 18px; }
+        .avatar {
+            width: 72px; height: 72px; border-radius: 50%; flex: 0 0 auto;
+            background: var(--primary); color: #fff;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 30px; font-weight: 800;
+        }
+        .pf-name { font-size: 24px; font-weight: 800; letter-spacing: -0.02em; }
+        .pf-meta { font-size: 14px; color: var(--text-dim); margin-top: 4px; }
+        .role-tag {
+            display: inline-block; font-size: 11px; font-weight: 700; letter-spacing: .05em;
+            padding: 2px 10px; border-radius: 6px; margin-left: 8px;
+            background: var(--warning); color: #fff;
+        }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+        @media (max-width: 640px) { .grid { grid-template-columns: 1fr; } }
+        .card h3 { font-size: 16px; font-weight: 700; margin-bottom: 14px; }
+        .field { margin-bottom: 12px; }
+        .field label { display: block; font-size: 12px; color: var(--text-dim); margin-bottom: 6px; font-weight: 500; }
+        .field input {
+            width: 100%; padding: 10px 14px; background: var(--bg-base);
+            border: 1px solid var(--border); border-radius: 10px; color: var(--text);
+            font-family: inherit; font-size: 14px; outline: none;
+        }
+        .field input:focus { border-color: var(--primary); }
+        .field input:disabled { opacity: .7; }
+        .btn {
+            background: var(--primary); color: #fff; border: none; padding: 11px 20px;
+            border-radius: 10px; font-size: 14px; font-weight: 700; cursor: pointer; font-family: inherit;
+        }
+        .btn:hover { background: #0b5ed7; }
+        .btn:disabled { opacity: .5; cursor: not-allowed; }
+        .quick-links { display: flex; flex-direction: column; gap: 10px; }
+        .qlink {
+            display: flex; align-items: center; justify-content: space-between;
+            text-decoration: none; color: var(--text);
+            background: var(--bg-glass); border: 1px solid var(--border);
+            padding: 12px 14px; border-radius: 10px; font-size: 14px; font-weight: 500;
+        }
+        .qlink:hover { border-color: var(--border-hover); }
+        .stat-mini { display: flex; gap: 14px; margin-top: 4px; }
+        .stat-mini .m { flex: 1; background: var(--bg-glass); border-radius: 10px; padding: 12px; text-align: center; }
+        .stat-mini .v { font-size: 22px; font-weight: 800; color: var(--primary); }
+        .stat-mini .l { font-size: 12px; color: var(--text-dim); }
+        .rev-item, .wish-item { padding: 12px 0; border-bottom: 1px solid var(--border); }
+        .rev-item:last-child, .wish-item:last-child { border-bottom: none; }
+        .rev-top { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
+        .rev-book { font-size: 14px; font-weight: 600; cursor: pointer; }
+        .rev-book:hover { color: var(--primary); }
+        .rev-stars { color: #f59e0b; font-size: 13px; }
+        .rev-content { font-size: 13px; color: var(--text-dim); }
+        .empty { color: var(--text-faint); font-size: 13px; padding: 8px 0; }
+        .wish-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 12px; }
+        .wish-card { cursor: pointer; }
+        .wish-cover { height: 160px; border-radius: 8px; overflow: hidden; background: var(--bg-glass); margin-bottom: 6px; }
+        .wish-cover img { width: 100%; height: 100%; object-fit: cover; }
+        .wish-title { font-size: 12px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .wish-price { font-size: 12px; color: var(--primary); font-weight: 700; }
+        .status-msg { font-size: 13px; margin-top: 8px; }
+        .status-msg.ok { color: var(--success); }
+        .status-msg.err { color: var(--danger); }
+    </style>
+    <link rel="stylesheet" href="/theme.css">
+    <script src="/ui.js"></script>
+</head>
+<body>
+    <div class="wrap">
+        <a href="/market.html" class="back">← Marketplace</a>
+
+        <div class="card profile-head">
+            <div class="avatar" id="pfAvatar">?</div>
+            <div>
+                <div class="pf-name" id="pfName">—</div>
+                <div class="pf-meta" id="pfMeta"></div>
+            </div>
+        </div>
+
+        <div class="grid">
+            <div class="card">
+                <h3>✏️ Mening ma'lumotlarim</h3>
+                <div class="field"><label>Ism</label><input type="text" id="fFirst"></div>
+                <div class="field"><label>Familiya</label><input type="text" id="fLast"></div>
+                <div class="field"><label>Email</label><input type="email" id="fEmail" disabled></div>
+                <button class="btn" id="saveBtn" onclick="saveProfile()">💾 Saqlash</button>
+                <div class="status-msg" id="saveStatus"></div>
+            </div>
+
+            <div class="card">
+                <h3>🔗 Tez havolalar</h3>
+                <div class="quick-links">
+                    <a href="/my-orders.html" class="qlink">📦 Mening buyurtmalarim <span>→</span></a>
+                    <a href="/market.html" class="qlink">🛒 Marketplace <span>→</span></a>
+                </div>
+                <div class="stat-mini">
+                    <div class="m"><div class="v" id="statOrders">0</div><div class="l">Buyurtma</div></div>
+                    <div class="m"><div class="v" id="statReviews">0</div><div class="l">Sharh</div></div>
+                    <div class="m"><div class="v" id="statWish">0</div><div class="l">Sevimli</div></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3>⭐ Mening sharhlarim</h3>
+            <div id="myReviews"><div class="empty">Yuklanmoqda...</div></div>
+        </div>
+
+        <div class="card">
+            <h3>❤️ Sevimlilar</h3>
+            <div id="myWishlist" class="wish-grid"></div>
+        </div>
+    </div>
+
+    <script src="/auth.js"></script>
+    <script>
+        const API = window.location.origin;
+
+        function esc(t) { const d = document.createElement('div'); d.textContent = String(t ?? ''); return d.innerHTML; }
+        function fmtDate(d) { return new Date(d).toLocaleDateString('uz-UZ'); }
+        function fmtPrice(n) { return Number(n).toLocaleString('uz-UZ'); }
+        function stars(n) { return '★★★★★'.slice(0, n) + '☆☆☆☆☆'.slice(0, 5 - n); }
+        function getWishlist() { try { return JSON.parse(localStorage.getItem('wishlist') || '[]'); } catch { return []; } }
+
+        // Login tekshiruvi
+        if (!getCurrentUser()) { location.href = '/login.html'; }
+
+        async function loadProfile() {
+            try {
+                const res = await apiFetch(`${API}/api/auth/me`, {});
+                if (!res.ok) throw new Error();
+                const u = await res.json();
+                const initials = ((u.firstName || '?').charAt(0) + (u.lastName || '').charAt(0)).toUpperCase();
+                document.getElementById('pfAvatar').textContent = initials;
+                document.getElementById('pfName').textContent = `${u.firstName} ${u.lastName}`;
+                const roleTag = u.role === 'Admin' ? '<span class="role-tag">ADMIN</span>' : '';
+                document.getElementById('pfMeta').innerHTML =
+                    `${esc(u.email)} ${roleTag}<br>Ro'yxatdan o'tган: ${fmtDate(u.createdAt)}`;
+                document.getElementById('fFirst').value = u.firstName || '';
+                document.getElementById('fLast').value = u.lastName || '';
+                document.getElementById('fEmail').value = u.email || '';
+            } catch (_) { document.getElementById('pfName').textContent = 'Yuklab bo\'lmadi'; }
+        }
+
+        async function saveProfile() {
+            const firstName = document.getElementById('fFirst').value.trim();
+            const lastName = document.getElementById('fLast').value.trim();
+            const status = document.getElementById('saveStatus');
+            if (firstName.length < 2 || lastName.length < 2) { status.className = 'status-msg err'; status.textContent = 'Ism va familiya kamida 2 belgi'; return; }
+            const btn = document.getElementById('saveBtn'); btn.disabled = true;
+            try {
+                const res = await apiFetch(`${API}/api/auth/me`, {
+                    method: 'PUT', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ firstName, lastName })
+                });
+                if (!res.ok) throw new Error(`Status ${res.status}`);
+                const u = await res.json();
+                // localStorage'даги user'ни yangilash
+                const stored = getCurrentUser(); if (stored) { stored.firstName = u.firstName; stored.lastName = u.lastName; localStorage.setItem('auth_user', JSON.stringify(stored)); }
+                document.getElementById('pfName').textContent = `${u.firstName} ${u.lastName}`;
+                status.className = 'status-msg ok'; status.textContent = '✅ Saqlandi';
+            } catch (err) { status.className = 'status-msg err'; status.textContent = 'Xato: ' + err.message; }
+            finally { btn.disabled = false; }
+        }
+
+        async function loadMyReviews() {
+            const box = document.getElementById('myReviews');
+            try {
+                const res = await apiFetch(`${API}/api/my-reviews`, {});
+                if (!res.ok) throw new Error();
+                const reviews = await res.json();
+                document.getElementById('statReviews').textContent = reviews.length;
+                box.innerHTML = reviews.length
+                    ? reviews.map(r => `
+                        <div class="rev-item">
+                            <div class="rev-top">
+                                <span class="rev-book" onclick="location.href='/market.html#book-${r.saleBookId}'">${esc(r.bookTitle)}</span>
+                                <span class="rev-stars">${stars(r.rating)}</span>
+                            </div>
+                            <div class="rev-content">${esc(r.content)}</div>
+                        </div>`).join('')
+                    : '<div class="empty">Hali sharh yozmadingiz.</div>';
+            } catch (_) { box.innerHTML = '<div class="empty">Sharhlarni yuklab bo\'lmadi.</div>'; }
+        }
+
+        async function loadWishlist() {
+            const ids = getWishlist();
+            document.getElementById('statWish').textContent = ids.length;
+            const box = document.getElementById('myWishlist');
+            if (!ids.length) { box.innerHTML = '<div class="empty">Sevimlilar bo\'sh.</div>'; return; }
+            try {
+                const res = await fetch(`${API}/api/salebooks`);
+                const all = res.ok ? await res.json() : [];
+                const books = all.filter(b => ids.includes(b.id));
+                box.innerHTML = books.length
+                    ? books.map(b => {
+                        const price = b.finalPrice || b.price;
+                        const img = (b.imageUrl && (b.imageUrl.startsWith('http') || b.imageUrl.startsWith('data:')))
+                            ? `<img src="${esc(b.imageUrl)}" alt="">` : '';
+                        return `<div class="wish-card" onclick="location.href='/market.html#book-${b.id}'">
+                            <div class="wish-cover">${img}</div>
+                            <div class="wish-title">${esc(b.title)}</div>
+                            <div class="wish-price">${fmtPrice(price)} so'm</div>
+                        </div>`;
+                    }).join('')
+                    : '<div class="empty">Sevimlilar bo\'sh.</div>';
+            } catch (_) { box.innerHTML = '<div class="empty">Yuklab bo\'lmadi.</div>'; }
+        }
+
+        async function loadOrderCount() {
+            try {
+                const res = await apiFetch(`${API}/api/orders/my`, {});
+                if (res.ok) { const o = await res.json(); document.getElementById('statOrders').textContent = o.length; }
+            } catch (_) { }
+        }
+
+        loadProfile();
+        loadMyReviews();
+        loadWishlist();
+        loadOrderCount();
+    </script>
+</body>
+</html>

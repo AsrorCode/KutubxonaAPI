@@ -245,6 +245,29 @@ public class AuthController : ControllerBase
     }
 
     // ============================================
+    // PUT ME — profil ma'lumotini tahrirlash (ism)
+    // ============================================
+    [HttpPut("me")]
+    [Authorize]
+    public async Task<IActionResult> UpdateMe([FromBody] UpdateProfileDto dto)
+    {
+        var userId = User.GetUserId();
+        if (userId is null) return Unauthorized();
+
+        var user = await _context.Users.FindAsync(userId);
+        if (user == null) return NotFound(new { message = "Foydalanuvchi topilmadi" });
+
+        if (string.IsNullOrWhiteSpace(dto.FirstName) || string.IsNullOrWhiteSpace(dto.LastName))
+            return BadRequest(new { message = "Ism va familiya bo'sh bo'lmasligi kerak" });
+
+        user.FirstName = dto.FirstName.Trim();
+        user.LastName = dto.LastName.Trim();
+        await _context.SaveChangesAsync();
+
+        return Ok(user.ToDto());
+    }
+
+    // ============================================
     // YORDAMCHI METODLAR
     // ============================================
 
@@ -357,4 +380,15 @@ public class RefreshDto
 {
     [Required]
     public string RefreshToken { get; set; } = string.Empty;
+}
+
+public class UpdateProfileDto
+{
+    [Required(ErrorMessage = "Ism kerak")]
+    [StringLength(50, MinimumLength = 2, ErrorMessage = "Ism 2-50 belgi")]
+    public string FirstName { get; set; } = string.Empty;
+
+    [Required(ErrorMessage = "Familiya kerak")]
+    [StringLength(50, MinimumLength = 2, ErrorMessage = "Familiya 2-50 belgi")]
+    public string LastName { get; set; } = string.Empty;
 }

@@ -59,6 +59,31 @@ public class ReviewsController : ControllerBase
         });
     }
 
+    // ======== GET /api/my-reviews — joriy foydalanuvchi sharhlari ========
+    [HttpGet("/api/my-reviews")]
+    [Authorize]
+    public async Task<IActionResult> GetMyReviews(CancellationToken ct = default)
+    {
+        var userId = User.GetUserId();
+        if (userId is null) return Unauthorized();
+
+        var reviews = await _context.Reviews
+            .Where(r => r.UserId == userId)
+            .OrderByDescending(r => r.CreatedAt)
+            .Select(r => new
+            {
+                id = r.Id,
+                saleBookId = r.SaleBookId,
+                bookTitle = r.SaleBook!.Title,
+                content = r.Content,
+                rating = r.Rating,
+                createdAt = r.CreatedAt
+            })
+            .ToListAsync(ct);
+
+        return Ok(reviews);
+    }
+
     // ======== POST — sharh qo'shish (login kerak) ========
     [HttpPost]
     [Authorize]

@@ -1495,6 +1495,9 @@
             <div class="bestseller-row" id="bestsellerRow"></div>
         </div>
 
+        <!-- ===== KOLLEKSIYALAR ===== -->
+        <div id="collectionsSection"></div>
+
         <!-- Sort bar -->
         <div class="sort-bar">
             <div class="sort-left">
@@ -1876,7 +1879,7 @@
                         <button class="cart-icon" id="cartIcon" onclick="openCart()">
                             🛒 <span class="cart-badge" id="cartBadge">0</span>
                         </button>
-                        <span class="user-pill">👤 ${escapeHtml(user.firstName)} ${badge}</span>
+                        <a href="/profile.html" class="user-pill" style="text-decoration:none;" title="Profil">👤 ${escapeHtml(user.firstName)} ${badge}</a>
                         <button class="auth-btn" onclick="logout()">Chiqish</button>
                     `;
                 if (adminLink) adminLink.style.display = isAdmin ? 'inline-flex' : 'none';
@@ -2927,12 +2930,41 @@
             }
         });
 
+        // ===== KOLLEKSIYALAR (tematik to'plamlar) =====
+        async function loadCollections() {
+            const section = document.getElementById('collectionsSection');
+            if (!section) return;
+            try {
+                const res = await fetch(`${API_BASE}/api/collections`);
+                if (!res.ok) return;
+                const collections = await res.json();
+                if (!collections.length) { section.innerHTML = ''; return; }
+                section.innerHTML = collections.map(col => {
+                    const cards = col.books.map(b => {
+                        const price = b.finalPrice || b.price;
+                        const isImg = b.imageUrl && (b.imageUrl.startsWith('http') || b.imageUrl.startsWith('data:'));
+                        const cover = isImg
+                            ? `<img src="${escapeHtml(b.imageUrl)}" alt="" data-t="${escapeHtml(b.title)}" data-a="${escapeHtml(b.author)}" onerror="coverFallback(this,150,210)">`
+                            : generateCover(b.title, b.author, 150, 210);
+                        return `<div class="bestseller-card" onclick="openDetail(${b.id})">
+                            <div class="bestseller-cover">${cover}</div>
+                            <div class="bestseller-title">${escapeHtml(b.title)}</div>
+                            <div class="bestseller-meta"><span>${formatPrice(price)} so'm</span></div>
+                        </div>`;
+                    }).join('');
+                    return `<div class="row-header"><h3>📚 ${escapeHtml(col.name)}</h3></div>
+                            <div class="bestseller-row">${cards}</div>`;
+                }).join('');
+            } catch (_) { /* kolleksiyasiz ham ishlaydi */ }
+        }
+
         renderAuthBar();
         updateCartBadge();
         loadBooks();
         qbStart();
         loadBestsellers();
         loadNotifications();
+        loadCollections();
 
         document.addEventListener('keydown', e => { if (e.key === 'Escape') closeCart(); });
     </script>
