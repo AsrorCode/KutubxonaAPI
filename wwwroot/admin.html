@@ -285,7 +285,26 @@
             display: flex; gap: 8px; justify-content: center;
             flex-wrap: wrap;
         }
+
+        /* ===== DASHBOARD ===== */
+        .dash-charts {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px;
+        }
+        @media (max-width: 720px) { .dash-charts { grid-template-columns: 1fr; } }
+        .dash-card { margin-bottom: 0; }
+        .chart-box { position: relative; height: 260px; margin-top: 8px; }
+        .lowstock-row {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 10px 0; border-bottom: 1px solid var(--border); font-size: 14px;
+        }
+        .lowstock-row:last-child { border-bottom: none; }
+        .lowstock-badge {
+            font-size: 12px; font-weight: 700; padding: 3px 10px; border-radius: 999px;
+        }
+        .lowstock-badge.zero { background: rgba(220,53,69,.15); color: #dc3545; }
+        .lowstock-badge.low { background: rgba(245,158,11,.15); color: #b45309; }
     </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 </head>
 <body>
     <div class="container">
@@ -303,14 +322,41 @@
 
             <!-- TABS -->
             <div class="tabs">
-                <button class="tab-btn active" onclick="switchTab('market', this)">🛒 Marketplace</button>
+                <button class="tab-btn active" onclick="switchTab('stats', this)">📊 Statistika</button>
+                <button class="tab-btn" onclick="switchTab('market', this)">🛒 Marketplace</button>
                 <button class="tab-btn" onclick="switchTab('orders', this)">📦 Buyurtmalar</button>
+            </div>
+
+            <!-- ============================================ -->
+            <!-- TAB: STATISTIKA (dashboard) -->
+            <!-- ============================================ -->
+            <div class="tab-panel active" id="tab-stats">
+                <div class="dash-charts">
+                    <div class="card dash-card">
+                        <div class="card-title">💰 So'nggi 14 kun daromadi</div>
+                        <div class="chart-box"><canvas id="chartRevenue"></canvas></div>
+                    </div>
+                    <div class="card dash-card">
+                        <div class="card-title">📦 Buyurtmalar holati</div>
+                        <div class="chart-box"><canvas id="chartStatus"></canvas></div>
+                    </div>
+                </div>
+                <div class="dash-charts">
+                    <div class="card dash-card">
+                        <div class="card-title">🏆 Eng ko'p sotilgan kitoblar</div>
+                        <div class="chart-box"><canvas id="chartTop"></canvas></div>
+                    </div>
+                    <div class="card dash-card">
+                        <div class="card-title">⚠️ Kam qolgan kitoblar</div>
+                        <div id="lowStockList"><div class="empty">Yuklanmoqda...</div></div>
+                    </div>
+                </div>
             </div>
 
             <!-- ============================================ -->
             <!-- TAB: MARKETPLACE (SaleBooks) -->
             <!-- ============================================ -->
-            <div class="tab-panel active" id="tab-market">
+            <div class="tab-panel" id="tab-market">
                 <div class="card">
                     <div class="card-title">🛒 Marketplace'ga kitob qo'shish</div>
                     <div class="form-row cols-2">
@@ -502,6 +548,64 @@
             if (btn) btn.classList.add('active');
             const panel = document.getElementById('tab-' + name);
             if (panel) panel.classList.add('active');
+            if (name === 'stats') loadDashboard();
+        }
+
+        // ==========================================
+        // DASHBOARD — grafiklar (Chart.js)
+        // ==========================================
+        const dashCharts = {};
+        function renderChart(id, type, data, extra = {}) {
+            const ctx = document.getElementById(id);
+            if (!ctx || typeof Chart === 'undefined') return;
+            if (dashCharts[id]) dashCharts[id].destroy();
+            dashCharts[id] = new Chart(ctx, {
+                type, data,
+                options: Object.assign({
+                    responsive: true, maintainAspectRatio: false,
+                    plugins: { legend: { display: type !== 'bar' } }
+                }, extra)
+            });
+        }
+
+        async function loadDashboard() {
+            try {
+                const res = await apiFetch(`${API}/admin/stats`, { headers: authHeaders(false) });
+                if (!res.ok) return;
+                const s = await res.json();
+
+                renderChart('chartRevenue', 'line', {
+                    labels: s.revenueByDay.map(d => d.date),
+                    datasets: [{
+                        label: 'Daromad', data: s.revenueByDay.map(d => d.amount),
+                        borderColor: '#0d6efd', backgroundColor: 'rgba(13,110,253,.12)',
+                        fill: true, tension: 0.3
+                    }]
+                });
+
+                const sLabels = Object.keys(s.orders.byStatus || {});
+                renderChart('chartStatus', 'doughnut', {
+                    labels: sLabels,
+                    datasets: [{
+                        data: sLabels.map(k => s.orders.byStatus[k]),
+                        backgroundColor: ['#f59e0b', '#0d6efd', '#8b5cf6', '#16a34a', '#dc3545', '#6b7280']
+                    }]
+                });
+
+                renderChart('chartTop', 'bar', {
+                    labels: s.topBooks.map(b => b.title),
+                    datasets: [{ label: 'Sotilgan', data: s.topBooks.map(b => b.sold), backgroundColor: '#16a34a', borderRadius: 6 }]
+                }, { indexAxis: 'y' });
+
+                const low = document.getElementById('lowStockList');
+                low.innerHTML = (s.lowStockBooks && s.lowStockBooks.length)
+                    ? s.lowStockBooks.map(b => `
+                        <div class="lowstock-row">
+                            <span>${escapeHtml(b.title)}</span>
+                            <span class="lowstock-badge ${b.stock === 0 ? 'zero' : 'low'}">${b.stock === 0 ? 'Tugagan' : b.stock + ' ta'}</span>
+                        </div>`).join('')
+                    : '<div class="empty">Hammasi yetarli 👍</div>';
+            } catch (err) { console.error(err); }
         }
 
         // ==========================================
@@ -831,6 +935,7 @@
         // ==========================================
         if (checkAdmin()) {
             loadStats();
+            loadDashboard();
             loadSaleBooks();
             loadOrders();
         }
