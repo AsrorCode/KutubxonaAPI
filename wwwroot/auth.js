@@ -94,17 +94,17 @@ async function apiFetch(url, options = {}) {
     let token = getAccessToken();
     let response = await doFetch(token);
 
-    // 401 bo'lsa refresh qilib qayta uring
-    if (response.status === 401 && getRefreshToken()) {
-        const newToken = await refreshAccessToken();
+    // 401 bo'lsa: refresh token bo'lsa yangilab qayta uramiz.
+    if (response.status === 401) {
+        const newToken = getRefreshToken() ? await refreshAccessToken() : null;
         if (newToken) {
             response = await doFetch(newToken);
         } else {
-            // Refresh ham amal qilmaydi — logout
+            // Sessiya tiklanmaydi (refresh yo'q yoki eskirgan) — tozalab, login'ga
             clearAuth();
-            // Auth kerak bo'lgan sahifada ekan — login'ga yo'naltiring
             const requiresAuth = ['/admin.html', '/my-orders.html'];
             if (requiresAuth.some(p => window.location.pathname.startsWith(p))) {
+                alert('Sessiyangiz tugagan. Iltimos qaytadan kiring.');
                 window.location.href = '/login.html';
             }
         }

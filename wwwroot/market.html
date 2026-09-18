@@ -165,83 +165,6 @@
             padding: 24px 24px 80px;
         }
 
-        header {
-            text-align: center;
-            padding: 40px 0 32px;
-            position: relative;
-        }
-
-        .logo-icon {
-            display: inline-flex;
-            width: 56px;
-            height: 56px;
-            background: var(--primary);
-            border-radius: 14px;
-            align-items: center;
-            justify-content: center;
-            font-size: 32px;
-            box-shadow: 0 6px 20px rgba(13, 110, 253, 0.25);
-            margin-bottom: 12px;
-        }
-
-        h1 {
-            font-size: 44px;
-            font-weight: 800;
-            letter-spacing: -0.03em;
-            color: var(--text);
-        }
-
-        .subtitle {
-            font-size: 16px;
-            color: var(--text-dim);
-            margin-bottom: 24px;
-        }
-
-        .top-nav {
-            display: flex;
-            gap: 12px;
-            justify-content: center;
-            flex-wrap: wrap;
-            margin-top: 20px;
-        }
-
-        .nav-pill {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            color: var(--text);
-            text-decoration: none;
-            padding: 10px 18px;
-            background: var(--bg-glass);
-            border: 1px solid var(--border);
-            border-radius: 999px;
-            font-size: 14px;
-            font-weight: 500;
-            backdrop-filter: blur(10px);
-            transition: all 0.2s;
-        }
-
-            .nav-pill:hover {
-                border-color: var(--border-hover);
-                background: rgba(13, 110, 253, 0.08);
-                transform: translateY(-1px);
-            }
-
-            .nav-pill.primary {
-                background: linear-gradient(135deg, var(--primary), var(--accent));
-                border-color: transparent;
-            }
-
-        .auth-bar {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            z-index: 9999;
-            display: flex;
-            gap: 10px;
-            align-items: center;
-        }
-
         .user-pill {
             display: inline-flex;
             align-items: center;
@@ -319,15 +242,6 @@
             font-weight: 700;
         }
 
-        .search-wrap {
-            max-width: 720px;
-            margin: 0 auto 8px;
-            position: relative;
-            display: flex;
-            gap: 10px;
-            align-items: stretch;
-        }
-        .search-box { flex: 1; position: relative; }
 
         .search-input {
             width: 100%;
@@ -373,14 +287,6 @@
         }
         .search-btn:hover { background: #0b5ed7; }
         @media (max-width: 640px) { .search-btn { padding: 0 18px; font-size: 14px; } }
-
-        .categories {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-            margin-bottom: 32px;
-            justify-content: center;
-        }
 
         .cat-chip {
             background: var(--bg-glass);
@@ -1383,21 +1289,6 @@
                 border-color: var(--danger);
             }
 
-        @media (max-width: 600px) {
-            .cart-icon {
-                right: 10px;
-                top: 70px;
-            }
-
-            .auth-bar {
-                top: 15px;
-                right: 10px;
-            }
-
-            h1 {
-                font-size: 36px;
-            }
-        }
     </style>
     <script>
         // Mavzuni miltillashsiz darrov o'rnatish
@@ -1842,7 +1733,12 @@
             const count = cart.reduce((sum, item) => sum + item.quantity, 0);
             document.getElementById('cartBadge').textContent = count;
         }
-        function addToCart(book) {
+        // bookId (raqam) qabul qiladi — ma'lumotni allBooks'dan izlaydi.
+        // Shu tufayli onclick'ga JSON joylashtirilmaydi (sintaksis xatolari yo'q).
+        function addToCart(bookId) {
+            const book = allBooks.find(b => b.id === bookId);
+            if (!book) { showToast('Kitob topilmadi', 'error'); return; }
+            const price = book.finalPrice || book.price;
             const cart = getCart();
             const existing = cart.find(i => i.id === book.id);
             if (existing) {
@@ -1854,7 +1750,7 @@
                     return;
                 }
             } else {
-                cart.push({ id: book.id, title: book.title, author: book.author, price: book.price, stock: book.stock, quantity: 1 });
+                cart.push({ id: book.id, title: book.title, author: book.author, price: price, stock: book.stock, quantity: 1 });
                 showToast(`"${book.title}" savatchaga qo'shildi!`, 'success');
             }
             saveCart(cart);
@@ -1892,7 +1788,7 @@
             const coverEl = document.getElementById('dCover');
             const hasImg = (book.imageUrl && book.imageUrl.startsWith('http')) || book.imageUrl?.startsWith('data:');
             coverEl.innerHTML = hasImg
-                ? `<img src="${escapeHtml(book.imageUrl)}" alt="" onerror="this.parentElement.innerHTML='${generateCover(book.title, book.author, 260, 370).replace(/'/g, '&#39;')}'">`
+                ? `<img src="${escapeHtml(book.imageUrl)}" alt="" data-t="${escapeHtml(book.title)}" data-a="${escapeHtml(book.author)}" onerror="coverFallback(this,260,370)">`
                 : generateCover(book.title, book.author, 260, 370);
 
             // --- Asosiy maydonlar ---
@@ -1943,7 +1839,7 @@
             const cartBtn = document.getElementById('dCartBtn');
             cartBtn.disabled = book.stock === 0;
             cartBtn.textContent = book.stock === 0 ? 'Tugagan' : "🛒 Savatga qo'shish";
-            cartBtn.onclick = () => addToCart({ ...book, price: finalPrice });
+            cartBtn.onclick = () => addToCart(book.id);
 
             // --- Server: sotilgan soni + reyting (hot badge) ---
             const hotEl = document.getElementById('dHot');
@@ -1997,14 +1893,13 @@
             if (e.key === 'Escape' && document.getElementById('detailOverlay')?.classList.contains('active')) closeDetail();
         });
 
-        async function deleteSaleBook(bookId, title) {
+        async function deleteSaleBook(bookId) {
+            const book = allBooks.find(b => b.id === bookId);
+            const title = book ? book.title : 'Kitob';
             if (!confirm(`"${title}" kitobini sotuvdan o'chirmoqchimisiz?`)) return;
-            const token = getToken();
-            if (!token) { showToast('Avval tizimga kiring', 'error'); return; }
             try {
-                const response = await fetch(`${API_BASE}/api/salebooks/${bookId}`, {
-                    method: 'DELETE',
-                    headers: { 'Authorization': `Bearer ${token}` }
+                const response = await apiFetch(`${API_BASE}/api/salebooks/${bookId}`, {
+                    method: 'DELETE'
                 });
                 if (response.status === 403 || response.status === 401) { showToast('Faqat Admin o\'chira oladi', 'error'); return; }
                 if (!response.ok && response.status !== 204) throw new Error(`Status ${response.status}`);
@@ -2075,9 +1970,9 @@
             const token = getToken();
             if (!token) { showToast('Avval tizimga kiring', 'error'); return; }
             try {
-                const response = await fetch(`${API_BASE}/api/salebooks/${bookId}`, {
+                const response = await apiFetch(`${API_BASE}/api/salebooks/${bookId}`, {
                     method: 'PUT',
-                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         title: book.title, author: book.author, description: book.description,
                         price: book.price, stock: book.stock, imageUrl: newImageUrl,
@@ -2302,7 +2197,7 @@
                     ? `<div class="admin-bar">
                          <button class="icon-btn image" onclick="updateImage(${book.id})" title="Rasm o'zgartirish">📷 Rasm</button>
                          <button class="icon-btn edit" onclick="openEdit(${book.id})" title="Tahrirlash">✏️ Tahrir</button>
-                         <button class="icon-btn delete" onclick="deleteSaleBook(${book.id}, '${escapeJs(book.title)}')" title="O'chirish">🗑️</button>
+                         <button class="icon-btn delete" onclick="deleteSaleBook(${book.id})" title="O'chirish">🗑️</button>
                        </div>`
                     : '';
 
@@ -2323,7 +2218,7 @@
                         </div>
                         <div class="delivery-badge">🚚 Bepul yetkazish • 1-2 kun</div>
                         <div class="book-stock ${book.stock === 0 ? 'out' : (book.stock < 5 ? 'low' : '')}">${stockText}</div>
-                        <button class="add-cart-btn" onclick='addToCart(${JSON.stringify({...book, price: finalPrice}).replace(/'/g, "&#39;")})' ${book.stock === 0 ? 'disabled' : ''}>
+                        <button class="add-cart-btn" onclick="addToCart(${book.id})" ${book.stock === 0 ? 'disabled' : ''}>
                             ${book.stock === 0 ? 'Tugagan' : "🛒 Savatchaga qo'shish"}
                         </button>
                         ${adminBar}
@@ -2339,6 +2234,14 @@
             if (!book) return;
             const el = document.getElementById(`cover-${bookId}`);
             if (el) el.innerHTML = generateCover(book.title, book.author, 140, 200);
+        }
+        // Rasm yuklanmasa — SVG muqovaga o'tkazish (title/author data-atributdan).
+        // SVG'ni onerror ichiga joylashtirmaymiz (sintaksis xatosini oldini oladi).
+        function coverFallback(img, w, h) {
+            const t = img.getAttribute('data-t') || '';
+            const a = img.getAttribute('data-a') || '';
+            const p = img.parentElement;
+            if (p) p.innerHTML = generateCover(t, a, w, h);
         }
 
         // ===== FLASH SALE BANNER + TIMER =====
@@ -2438,10 +2341,9 @@
                 isActive: true
             };
             try {
-                const token = getToken();
-                const res = await fetch(`${API_BASE}/api/salebooks/${currentEditId}`, {
+                const res = await apiFetch(`${API_BASE}/api/salebooks/${currentEditId}`, {
                     method: 'PUT',
-                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(dto)
                 });
                 if (!res.ok) throw new Error(`Xato: ${res.status}`);
@@ -2501,9 +2403,9 @@
             const btn = document.getElementById('checkoutBtn');
             btn.disabled = true; btn.textContent = 'Yuborilmoqda...';
             try {
-                const response = await fetch(`${API_BASE}/api/orders`, {
+                const response = await apiFetch(`${API_BASE}/api/orders`, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${getToken()}` },
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         customerName: name, customerPhone: phone, deliveryAddress: address,
                         notes: notes || null,
@@ -2536,7 +2438,8 @@
         function escapeHtml(text) {
             const div = document.createElement('div');
             div.textContent = String(text ?? '');
-            return div.innerHTML;
+            // Atribut ichida ham xavfsiz bo'lishi uchun qo'shtirnoqlarni ham escape qilamiz
+            return div.innerHTML.replace(/"/g, '&quot;').replace(/'/g, '&#39;');
         }
         function escapeJs(text) { return String(text).replace(/\\/g, '\\\\').replace(/'/g, "\\'"); }
 
@@ -2605,11 +2508,11 @@
                     const sold = item.soldCount;
                     const isImg = b.imageUrl && (b.imageUrl.startsWith('http') || b.imageUrl.startsWith('data:'));
                     const cover = isImg
-                        ? `<img src="${escapeHtml(b.imageUrl)}" alt="" onerror="this.parentElement.innerHTML='${generateCover(b.title, b.author, 150, 210).replace(/'/g, '&#39;')}'">`
+                        ? `<img src="${escapeHtml(b.imageUrl)}" alt="" data-t="${escapeHtml(b.title)}" data-a="${escapeHtml(b.author)}" onerror="coverFallback(this,150,210)">`
                         : generateCover(b.title, b.author, 150, 210);
                     const soldText = sold > 0 ? `🔥 ${sold} sotilgan` : 'Yangi';
                     return `
-                        <div class="bestseller-card" onclick='addToCart(${JSON.stringify({...b, price: b.finalPrice || b.price}).replace(/'/g, "&#39;")})'>
+                        <div class="bestseller-card" onclick="addToCart(${b.id})">
                             <div class="bestseller-rank">${i + 1}</div>
                             <div class="bestseller-cover">${cover}</div>
                             <div class="bestseller-title">${escapeHtml(b.title)}</div>
