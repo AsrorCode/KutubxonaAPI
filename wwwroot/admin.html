@@ -303,6 +303,26 @@
         }
         .lowstock-badge.zero { background: rgba(220,53,69,.15); color: #dc3545; }
         .lowstock-badge.low { background: rgba(245,158,11,.15); color: #b45309; }
+
+        /* ===== KOLLEKSIYALAR ===== */
+        .col-card {
+            border: 1px solid var(--border); border-radius: 12px;
+            padding: 14px; margin-bottom: 12px; background: var(--bg-glass);
+        }
+        .col-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; margin-bottom: 10px; }
+        .col-head .meta { font-size: 12px; color: var(--text-dim); margin-top: 4px; }
+        .col-books { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
+        .col-book {
+            display: inline-flex; align-items: center; gap: 6px;
+            background: var(--bg-elevated); border: 1px solid var(--border);
+            border-radius: 999px; padding: 5px 12px; font-size: 13px;
+        }
+        .col-book button {
+            background: none; border: none; color: var(--danger);
+            cursor: pointer; font-size: 15px; line-height: 1;
+        }
+        .col-add { display: flex; gap: 8px; align-items: center; }
+        .col-add select { flex: 1; padding: 8px 10px; }
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
     <link rel="stylesheet" href="/theme.css">
@@ -327,6 +347,7 @@
                 <button class="tab-btn active" onclick="switchTab('stats', this)">📊 Statistika</button>
                 <button class="tab-btn" onclick="switchTab('market', this)">🛒 Marketplace</button>
                 <button class="tab-btn" onclick="switchTab('orders', this)">📦 Buyurtmalar</button>
+                <button class="tab-btn" onclick="switchTab('collections', this)">📚 Kolleksiyalar</button>
             </div>
 
             <!-- ============================================ -->
@@ -495,6 +516,36 @@
                     <div id="ordersList"><div class="empty">Yuklanmoqda...</div></div>
                 </div>
             </div>
+
+            <!-- ============================================ -->
+            <!-- TAB: KOLLEKSIYALAR -->
+            <!-- ============================================ -->
+            <div class="tab-panel" id="tab-collections">
+                <div class="card">
+                    <div class="card-title">📚 Yangi to'plam</div>
+                    <div class="form-row cols-3">
+                        <div class="form-field">
+                            <label>Nomi *</label>
+                            <input type="text" id="colName" placeholder="Masalan: Yil top-100">
+                        </div>
+                        <div class="form-field">
+                            <label>Tavsif</label>
+                            <input type="text" id="colDesc" placeholder="Qisqacha">
+                        </div>
+                        <div class="form-field">
+                            <label>Tartib (kichik = yuqorida)</label>
+                            <input type="number" id="colSort" value="0">
+                        </div>
+                    </div>
+                    <button class="btn btn-primary" onclick="createCollection()">+ Yaratish</button>
+                    <div class="status-msg" id="colStatus"></div>
+                </div>
+
+                <div class="card">
+                    <div class="card-title">🗂️ Mavjud to'plamlar</div>
+                    <div id="collectionsList"><div class="empty">Yuklanmoqda...</div></div>
+                </div>
+            </div>
         </div>
 
         <div id="accessDenied" class="access-denied" style="display:none;">
@@ -551,6 +602,97 @@
             const panel = document.getElementById('tab-' + name);
             if (panel) panel.classList.add('active');
             if (name === 'stats') loadDashboard();
+            if (name === 'collections') loadCollectionsAdmin();
+        }
+
+        // ==========================================
+        // KOLLEKSIYALAR (admin)
+        // ==========================================
+        let allSaleBooksCache = [];
+
+        async function loadCollectionsAdmin() {
+            try {
+                const bRes = await fetch(`${API}/salebooks`);
+                allSaleBooksCache = bRes.ok ? await bRes.json() : [];
+            } catch { allSaleBooksCache = []; }
+
+            const list = document.getElementById('collectionsList');
+            try {
+                const res = await apiFetch(`${API}/collections/admin`, { headers: authHeaders(false) });
+                if (!res.ok) throw new Error();
+                const cols = await res.json();
+                if (!cols.length) { list.innerHTML = '<div class="empty">Hali to\'plam yo\'q</div>'; return; }
+                const options = allSaleBooksCache.map(b => `<option value="${b.id}">${escapeHtml(b.title)}</option>`).join('');
+                list.innerHTML = cols.map(c => {
+                    const books = c.books.length
+                        ? c.books.map(b => `<span class="col-book">${escapeHtml(b.title)} <button onclick="removeBookFromCollection(${c.id}, ${b.id})" title="Olib tashlash">×</button></span>`).join('')
+                        : '<span class="empty">Kitob yo\'q</span>';
+                    return `
+                        <div class="col-card">
+                            <div class="col-head">
+                                <div>
+                                    <strong>${escapeHtml(c.name)}</strong>
+                                    ${c.isActive ? '<span class="badge badge-success">Faol</span>' : '<span class="badge badge-danger">Nofaol</span>'}
+                                    <div class="meta">${escapeHtml(c.description || '')}</div>
+                                </div>
+                                <button class="btn btn-danger btn-sm" onclick="deleteCollection(${c.id})">🗑️</button>
+                            </div>
+                            <div class="col-books">${books}</div>
+                            <div class="col-add">
+                                <select id="colSel-${c.id}">${options}</select>
+                                <button class="btn btn-secondary btn-sm" onclick="addBookToCollection(${c.id})">+ Kitob</button>
+                            </div>
+                        </div>`;
+                }).join('');
+            } catch (_) { list.innerHTML = '<div class="empty">Yuklab bo\'lmadi</div>'; }
+        }
+
+        async function createCollection() {
+            const name = document.getElementById('colName').value.trim();
+            const description = document.getElementById('colDesc').value.trim();
+            const sortOrder = parseInt(document.getElementById('colSort').value) || 0;
+            const status = document.getElementById('colStatus');
+            if (!name) { status.className = 'status-msg error'; status.textContent = '❌ Nom shart'; return; }
+            try {
+                const res = await apiFetch(`${API}/collections`, {
+                    method: 'POST', headers: authHeaders(),
+                    body: JSON.stringify({ name, description, sortOrder, isActive: true })
+                });
+                if (!res.ok) throw new Error(`Xato: ${res.status}`);
+                status.className = 'status-msg success'; status.textContent = '✅ Yaratildi';
+                document.getElementById('colName').value = '';
+                document.getElementById('colDesc').value = '';
+                loadCollectionsAdmin();
+                setTimeout(() => status.className = 'status-msg', 2500);
+            } catch (err) { status.className = 'status-msg error'; status.textContent = '❌ ' + err.message; }
+        }
+
+        async function deleteCollection(id) {
+            if (!confirm('To\'plamni o\'chirmoqchimisiz?')) return;
+            try {
+                const res = await apiFetch(`${API}/collections/${id}`, { method: 'DELETE', headers: authHeaders(false) });
+                if (!res.ok && res.status !== 204) throw new Error();
+                loadCollectionsAdmin();
+            } catch { alert('Xato'); }
+        }
+
+        async function addBookToCollection(colId) {
+            const sel = document.getElementById(`colSel-${colId}`);
+            if (!sel || !sel.value) return;
+            try {
+                const res = await apiFetch(`${API}/collections/${colId}/books/${sel.value}`, { method: 'POST', headers: authHeaders(false) });
+                if (res.status === 409) { alert('Kitob allaqachon to\'plamda'); return; }
+                if (!res.ok) throw new Error();
+                loadCollectionsAdmin();
+            } catch { alert('Xato'); }
+        }
+
+        async function removeBookFromCollection(colId, bookId) {
+            try {
+                const res = await apiFetch(`${API}/collections/${colId}/books/${bookId}`, { method: 'DELETE', headers: authHeaders(false) });
+                if (!res.ok && res.status !== 204) throw new Error();
+                loadCollectionsAdmin();
+            } catch { alert('Xato'); }
         }
 
         // ==========================================

@@ -17,6 +17,8 @@ public class AppDbContext : DbContext
     public DbSet<RefreshToken> RefreshTokens { get; set; }
     public DbSet<Review> Reviews { get; set; }
     public DbSet<Notification> Notifications { get; set; }
+    public DbSet<Collection> Collections { get; set; }
+    public DbSet<CollectionItem> CollectionItems { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -76,6 +78,23 @@ public class AppDbContext : DbContext
             .WithMany()
             .HasForeignKey(r => r.UserId)
             .OnDelete(DeleteBehavior.Restrict);
+
+        // ===== Collection → Items → SaleBook =====
+        modelBuilder.Entity<CollectionItem>()
+            .HasOne(ci => ci.Collection)
+            .WithMany(c => c.Items)
+            .HasForeignKey(ci => ci.CollectionId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<CollectionItem>()
+            .HasOne(ci => ci.SaleBook)
+            .WithMany()
+            .HasForeignKey(ci => ci.SaleBookId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<CollectionItem>()
+            .HasIndex(ci => new { ci.CollectionId, ci.SaleBookId })
+            .IsUnique();
 
         modelBuilder.Entity<RefreshToken>()
             .HasOne(rt => rt.User)
