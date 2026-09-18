@@ -1,46 +1,52 @@
 /* ============================================
-   UMUMIY MAVZU — barcha sahifalar uchun (market bilan bir xil)
+   UMUMIY MAVZU — Warm premium (barcha sahifalar market bilan bir xil)
    Har sahifaning inline <style>'idan KEYIN ulanadi va :root'ni bekor qiladi.
    ============================================ */
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&display=swap');
+
 :root {
-    --bg-base: #f4f5f7;
-    --bg-elevated: #ffffff;
-    --bg-card: #ffffff;
-    --bg-glass: #f1f3f5;
-    --border: #e6e8ec;
-    --border-hover: #0d6efd;
-    --primary: #0d6efd;
-    --primary-glow: rgba(13, 110, 253, 0.22);
-    --secondary: #0aa2c0;
-    --accent: #0d6efd;
-    --warning: #f59e0b;
-    --success: #16a34a;
-    --danger: #dc3545;
-    --text: #1a1d21;
-    --text-dim: #5f6b7a;
-    --text-faint: #9aa4b2;
+    --bg-base: #fbf8f3;
+    --bg-elevated: #fdfbf7;
+    --bg-card: #fdfbf7;
+    --bg-glass: #f3ece0;
+    --border: #e6dcc9;
+    --border-hover: #b45309;
+    --primary: #b45309;
+    --primary-glow: rgba(180, 83, 9, 0.20);
+    --secondary: #0f766e;
+    --accent: #b45309;
+    --warning: #d97706;
+    --success: #15803d;
+    --danger: #b91c1c;
+    --text: #292524;
+    --text-dim: #78716c;
+    --text-faint: #a8a29e;
+    --font-serif: 'Playfair Display', Georgia, serif;
 }
 
 :root[data-theme="dark"] {
-    --bg-base: #0b0b10;
-    --bg-elevated: #15151c;
-    --bg-card: #15151c;
-    --bg-glass: #1c1c25;
-    --border: #262631;
-    --border-hover: #3b82f6;
-    --text: #f1f5f9;
-    --text-dim: #94a3b8;
-    --text-faint: #64748b;
+    --bg-base: #1c1917;
+    --bg-elevated: #292524;
+    --bg-card: #292524;
+    --bg-glass: #322c28;
+    --border: #44403c;
+    --border-hover: #ea9a3e;
+    --primary: #e0985a;
+    --primary-glow: rgba(224, 152, 90, 0.20);
+    --text: #f5f0e8;
+    --text-dim: #a8a29e;
+    --text-faint: #78716c;
 }
 
 /* Qorong'i fon gradientlarini o'chirish (yorug'da chalkashmasin) */
 body { background-image: none !important; }
 
-/* Oq'dan boshlanadigan gradient-sarlavhalar yorug'da ko'rinmaydi — solid qilamiz */
-h1, .auth-header h1, .header h1 {
+/* Sarlavhalar — serif, solid (gradient-clip'ni o'chiramiz) */
+h1, h2, .auth-header h1, .header h1, .card-title {
     background: none !important;
     -webkit-text-fill-color: var(--text) !important;
     color: var(--text) !important;
+    font-family: var(--font-serif) !important;
 }
 
 /* ===== TIL + MAVZU TUGMASI (ui.js quyadi) ===== */
