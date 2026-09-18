@@ -480,6 +480,74 @@
             padding-top: 24px;
             border-top: 1px solid var(--border);
         }
+
+        /* ===== SHARHLAR ===== */
+        .reviews-summary {
+            display: flex; align-items: center; gap: 12px;
+            margin-bottom: 16px; font-size: 14px; color: var(--text-dim);
+        }
+        .reviews-avg {
+            font-size: 32px; font-weight: 800; color: var(--text);
+            line-height: 1;
+        }
+        .reviews-avg-stars { color: #f59e0b; font-size: 16px; letter-spacing: 2px; }
+        .review-form {
+            background: var(--bg-glass);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 16px; margin-bottom: 18px;
+        }
+        .review-stars-pick { font-size: 26px; letter-spacing: 4px; cursor: pointer; margin-bottom: 10px; }
+        .review-stars-pick span { color: var(--border); transition: color 0.15s; }
+        .review-stars-pick span.on { color: #f59e0b; }
+        .review-textarea {
+            width: 100%; min-height: 72px; resize: vertical;
+            background: var(--bg-base);
+            border: 1px solid var(--border); border-radius: 10px;
+            padding: 10px 14px; color: var(--text);
+            font-family: inherit; font-size: 14px; outline: none;
+        }
+        .review-textarea:focus { border-color: var(--primary); }
+        .review-form-actions {
+            display: flex; align-items: center; justify-content: space-between;
+            margin-top: 10px; gap: 12px;
+        }
+        .review-hint { font-size: 12px; color: var(--text-faint); }
+        .review-submit {
+            background: var(--primary); color: #fff; border: none;
+            padding: 10px 22px; border-radius: 10px;
+            font-size: 14px; font-weight: 700; cursor: pointer; font-family: inherit;
+        }
+        .review-submit:hover { background: #0b5ed7; }
+        .review-submit:disabled { opacity: 0.5; cursor: not-allowed; }
+        .review-login-hint {
+            font-size: 13px; color: var(--text-dim);
+            background: var(--bg-glass); border: 1px solid var(--border);
+            border-radius: 10px; padding: 12px 14px; margin-bottom: 18px;
+        }
+        .review-login-hint a { color: var(--primary); }
+        .review-item {
+            padding: 14px 0; border-bottom: 1px solid var(--border);
+        }
+        .review-item:last-child { border-bottom: none; }
+        .review-item-head {
+            display: flex; align-items: center; gap: 10px; margin-bottom: 6px;
+        }
+        .review-avatar {
+            width: 32px; height: 32px; border-radius: 50%;
+            background: var(--primary); color: #fff;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 13px; font-weight: 700; flex: 0 0 auto;
+        }
+        .review-author { font-size: 13px; font-weight: 600; color: var(--text); }
+        .review-date { font-size: 11px; color: var(--text-faint); }
+        .review-stars { color: #f59e0b; font-size: 13px; letter-spacing: 1px; }
+        .review-content { font-size: 14px; color: var(--text-dim); line-height: 1.6; }
+        .review-del {
+            background: none; border: none; color: var(--danger);
+            cursor: pointer; font-size: 12px; margin-left: auto;
+        }
+        .reviews-empty { font-size: 13px; color: var(--text-faint); padding: 8px 0; }
         .detail-section h3 {
             font-size: 17px; font-weight: 700; margin-bottom: 14px;
         }
@@ -1587,6 +1655,29 @@
                 <h3>Mahsulot tafsilotlari</h3>
                 <table class="detail-table" id="dTable"></table>
             </div>
+
+            <!-- ===== SHARHLAR VA REYTING ===== -->
+            <div class="detail-section">
+                <h3>Sharhlar va reyting</h3>
+                <div class="reviews-summary" id="reviewsSummary"></div>
+
+                <!-- Sharh yozish formasi (login qilganlar uchun) -->
+                <div class="review-form" id="reviewForm" style="display:none;">
+                    <div class="review-stars-pick" id="reviewStars">
+                        <span data-v="1">★</span><span data-v="2">★</span><span data-v="3">★</span><span data-v="4">★</span><span data-v="5">★</span>
+                    </div>
+                    <textarea id="reviewText" class="review-textarea" placeholder="Bu kitob haqida fikringiz..." maxlength="1000"></textarea>
+                    <div class="review-form-actions">
+                        <span class="review-hint" id="reviewHint"></span>
+                        <button class="review-submit" id="reviewSubmit" onclick="submitReview()">Yuborish</button>
+                    </div>
+                </div>
+                <div class="review-login-hint" id="reviewLoginHint" style="display:none;">
+                    Sharh qoldirish uchun <a href="/login.html">tizimga kiring</a>.
+                </div>
+
+                <div class="reviews-list" id="reviewsList"></div>
+            </div>
         </div>
     </div>
 
@@ -1863,6 +1954,130 @@
                     }
                 }
             } catch (_) { /* statistikasiz ham modal ishlaydi */ }
+
+            // --- Sharhlar ---
+            loadReviews(bookId);
+        }
+
+        // ============================================
+        //  SHARHLAR VA REYTING
+        // ============================================
+        let reviewRating = 0;
+
+        function starStr(n) { return '★★★★★'.slice(0, n) + '☆☆☆☆☆'.slice(0, 5 - n); }
+
+        async function loadReviews(bookId) {
+            const summaryEl = document.getElementById('reviewsSummary');
+            const listEl = document.getElementById('reviewsList');
+            const formEl = document.getElementById('reviewForm');
+            const loginHint = document.getElementById('reviewLoginHint');
+            const ratingBadge = document.getElementById('dRating');
+            summaryEl.innerHTML = '';
+            listEl.innerHTML = '<div class="reviews-empty">Yuklanmoqda...</div>';
+            reviewRating = 0;
+            renderReviewStars();
+            const txt = document.getElementById('reviewText'); if (txt) txt.value = '';
+
+            try {
+                const res = await fetch(`${API_BASE}/api/salebooks/${bookId}/reviews`);
+                if (!res.ok) throw new Error();
+                const data = await res.json();
+
+                // Sarlavhadagi reyting badge
+                ratingBadge.textContent = data.totalReviews > 0
+                    ? `⭐ ${data.averageRating} (${data.totalReviews})`
+                    : '⭐ Yangi';
+
+                // Xulosa
+                summaryEl.innerHTML = data.totalReviews > 0
+                    ? `<span class="reviews-avg">${data.averageRating}</span>
+                       <div><div class="reviews-avg-stars">${starStr(Math.round(data.averageRating))}</div>
+                       <div style="font-size:12px;">${data.totalReviews} ta sharh</div></div>`
+                    : `<span>Hali sharhlar yo'q — birinchi bo'ling!</span>`;
+
+                // Login holati + o'zi sharh qoldirganmi
+                const user = getCurrentUser();
+                const already = user && data.reviews.some(r => r.userId === user.id);
+                formEl.style.display = (user && !already) ? 'block' : 'none';
+                loginHint.style.display = user ? 'none' : 'block';
+
+                // Ro'yxat
+                listEl.innerHTML = data.totalReviews > 0
+                    ? data.reviews.map(r => reviewCard(r, user)).join('')
+                    : '<div class="reviews-empty">Bu kitobga hali sharh yozilmagan.</div>';
+            } catch (_) {
+                listEl.innerHTML = '<div class="reviews-empty">Sharhlarni yuklab bo\'lmadi.</div>';
+            }
+        }
+
+        function reviewCard(r, user) {
+            const initials = (r.authorName || '?').trim().charAt(0).toUpperCase();
+            const canDelete = user && (user.role === 'Admin' || user.id === r.userId);
+            const date = new Date(r.createdAt).toLocaleDateString('uz-UZ');
+            const delBtn = canDelete
+                ? `<button class="review-del" onclick="deleteReview(${r.id})">O'chirish</button>` : '';
+            return `
+                <div class="review-item">
+                    <div class="review-item-head">
+                        <div class="review-avatar">${escapeHtml(initials)}</div>
+                        <div>
+                            <div class="review-author">${escapeHtml(r.authorName)}</div>
+                            <div class="review-date">${escapeHtml(date)}</div>
+                        </div>
+                        <span class="review-stars" style="margin-left:8px;">${starStr(r.rating)}</span>
+                        ${delBtn}
+                    </div>
+                    <div class="review-content">${escapeHtml(r.content)}</div>
+                </div>`;
+        }
+
+        function renderReviewStars() {
+            document.querySelectorAll('#reviewStars span').forEach(s => {
+                s.classList.toggle('on', Number(s.dataset.v) <= reviewRating);
+            });
+        }
+        document.getElementById('reviewStars')?.addEventListener('click', (e) => {
+            const v = e.target?.dataset?.v;
+            if (v) { reviewRating = Number(v); renderReviewStars(); }
+        });
+
+        async function submitReview() {
+            if (!currentDetailBook) return;
+            const hint = document.getElementById('reviewHint');
+            const content = document.getElementById('reviewText').value.trim();
+            if (reviewRating < 1) { hint.textContent = 'Yulduz tanlang'; return; }
+            if (content.length < 3) { hint.textContent = 'Kamida 3 belgi yozing'; return; }
+            hint.textContent = '';
+            const btn = document.getElementById('reviewSubmit');
+            btn.disabled = true;
+            try {
+                const res = await apiFetch(`${API_BASE}/api/salebooks/${currentDetailBook.id}/reviews`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ content, rating: reviewRating })
+                });
+                if (res.status === 409) { hint.textContent = 'Siz allaqachon sharh qoldirgansiz'; return; }
+                if (!res.ok) throw new Error(`Status ${res.status}`);
+                showToast('✅ Sharhingiz qo\'shildi!', 'success');
+                await loadReviews(currentDetailBook.id);
+            } catch (err) {
+                hint.textContent = 'Xato: ' + err.message;
+            } finally {
+                btn.disabled = false;
+            }
+        }
+
+        async function deleteReview(reviewId) {
+            if (!currentDetailBook) return;
+            if (!confirm('Sharhni o\'chirmoqchimisiz?')) return;
+            try {
+                const res = await apiFetch(`${API_BASE}/api/salebooks/${currentDetailBook.id}/reviews/${reviewId}`, {
+                    method: 'DELETE'
+                });
+                if (!res.ok && res.status !== 204) throw new Error(`Status ${res.status}`);
+                showToast('Sharh o\'chirildi', 'success');
+                await loadReviews(currentDetailBook.id);
+            } catch (err) { showToast('Xato: ' + err.message, 'error'); }
         }
 
         function closeDetail() {
