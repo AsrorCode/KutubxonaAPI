@@ -19,6 +19,7 @@ public class AppDbContext : DbContext
     public DbSet<Notification> Notifications { get; set; }
     public DbSet<Collection> Collections { get; set; }
     public DbSet<CollectionItem> CollectionItems { get; set; }
+    public DbSet<WishlistItem> WishlistItems { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -94,6 +95,23 @@ public class AppDbContext : DbContext
 
         modelBuilder.Entity<CollectionItem>()
             .HasIndex(ci => new { ci.CollectionId, ci.SaleBookId })
+            .IsUnique();
+
+        // ===== Wishlist =====
+        modelBuilder.Entity<WishlistItem>()
+            .HasOne(w => w.SaleBook)
+            .WithMany()
+            .HasForeignKey(w => w.SaleBookId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<WishlistItem>()
+            .HasOne(w => w.User)
+            .WithMany()
+            .HasForeignKey(w => w.UserId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<WishlistItem>()
+            .HasIndex(w => new { w.UserId, w.SaleBookId })
             .IsUnique();
 
         modelBuilder.Entity<RefreshToken>()

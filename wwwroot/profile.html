@@ -208,14 +208,11 @@
         }
 
         async function loadWishlist() {
-            const ids = getWishlist();
-            document.getElementById('statWish').textContent = ids.length;
             const box = document.getElementById('myWishlist');
-            if (!ids.length) { box.innerHTML = '<div class="empty">Sevimlilar bo\'sh.</div>'; return; }
             try {
-                const res = await fetch(`${API}/api/salebooks`);
-                const all = res.ok ? await res.json() : [];
-                const books = all.filter(b => ids.includes(b.id));
+                const res = await apiFetch(`${API}/api/wishlist`, {});
+                const books = res.ok ? await res.json() : [];
+                document.getElementById('statWish').textContent = books.length;
                 box.innerHTML = books.length
                     ? books.map(b => {
                         const price = b.finalPrice || b.price;
