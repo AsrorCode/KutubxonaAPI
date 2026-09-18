@@ -6,49 +6,59 @@
     <title>Marketplace — Kutubxona</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:wght@600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-base: #f4f5f7;
-            --bg-elevated: #ffffff;
-            --bg-card: #ffffff;
-            --bg-glass: #f1f3f5;
-            --border: #e6e8ec;
-            --border-hover: #0d6efd;
-            --primary: #0d6efd;
-            --primary-glow: rgba(13, 110, 253, 0.22);
-            --secondary: #0aa2c0;
-            --accent: #0d6efd;
-            --warning: #f59e0b;
-            --success: #16a34a;
-            --danger: #dc3545;
-            --text: #1a1d21;
-            --text-dim: #5f6b7a;
-            --text-faint: #9aa4b2;
+            --bg-base: #fbf8f3;
+            --bg-elevated: #fdfbf7;
+            --bg-card: #fdfbf7;
+            --bg-glass: #f3ece0;
+            --border: #e6dcc9;
+            --border-hover: #b45309;
+            --primary: #b45309;
+            --primary-glow: rgba(180, 83, 9, 0.20);
+            --secondary: #0f766e;
+            --accent: #b45309;
+            --warning: #d97706;
+            --success: #15803d;
+            --danger: #b91c1c;
+            --text: #292524;
+            --text-dim: #78716c;
+            --text-faint: #a8a29e;
+            --font-serif: 'Playfair Display', Georgia, 'Times New Roman', serif;
         }
 
-        /* ===== QORONG'I MAVZU ===== */
+        /* ===== QORONG'I MAVZU (iliq) ===== */
         :root[data-theme="dark"] {
-            --bg-base: #0b0b10;
-            --bg-elevated: #15151c;
-            --bg-card: #15151c;
-            --bg-glass: #1c1c25;
-            --border: #262631;
-            --border-hover: #3b82f6;
-            --text: #f1f5f9;
-            --text-dim: #94a3b8;
-            --text-faint: #64748b;
+            --bg-base: #1c1917;
+            --bg-elevated: #292524;
+            --bg-card: #292524;
+            --bg-glass: #322c28;
+            --border: #44403c;
+            --border-hover: #ea9a3e;
+            --primary: #e0985a;
+            --primary-glow: rgba(224, 152, 90, 0.20);
+            --text: #f5f0e8;
+            --text-dim: #a8a29e;
+            --text-faint: #78716c;
         }
-        [data-theme="dark"] .quote-banner { background: #15151c; }
-        [data-theme="dark"] .quote-banner-text { color: #e2e8f0; }
+        [data-theme="dark"] .quote-banner { background: #292524; }
+        [data-theme="dark"] .quote-banner-text { color: #f0e9df; }
         [data-theme="dark"] .qb-dot { background: rgba(255, 255, 255, 0.15); }
-        [data-theme="dark"] .wish-btn { background: #1c1c25; border-color: #262631; color: #94a3b8; box-shadow: none; }
-        [data-theme="dark"] .wish-btn.active { background: rgba(220, 53, 69, 0.18); border-color: rgba(220, 53, 69, 0.4); color: #f87171; }
-        [data-theme="dark"] .cart-total { background: rgba(13, 110, 253, 0.12); border-color: rgba(13, 110, 253, 0.3); }
-        [data-theme="dark"] .admin-bar .icon-btn.image { background: rgba(10, 162, 192, 0.15); border-color: rgba(10, 162, 192, 0.35); color: #67e8f9; }
-        [data-theme="dark"] .admin-bar .icon-btn.edit { background: rgba(13, 110, 253, 0.18); border-color: rgba(13, 110, 253, 0.4); color: #93c5fd; }
-        [data-theme="dark"] .admin-bar .icon-btn.delete { background: rgba(220, 53, 69, 0.15); border-color: rgba(220, 53, 69, 0.35); color: #fca5a5; }
+        [data-theme="dark"] .wish-btn { background: #322c28; border-color: #44403c; color: #a8a29e; box-shadow: none; }
+        [data-theme="dark"] .wish-btn.active { background: rgba(185, 28, 28, 0.22); border-color: rgba(185, 28, 28, 0.4); color: #f87171; }
+        [data-theme="dark"] .cart-total { background: rgba(224, 152, 90, 0.14); border-color: rgba(224, 152, 90, 0.35); }
+        [data-theme="dark"] .admin-bar .icon-btn.image { background: rgba(15, 118, 110, 0.18); border-color: rgba(15, 118, 110, 0.4); color: #5eead4; }
+        [data-theme="dark"] .admin-bar .icon-btn.edit { background: rgba(224, 152, 90, 0.18); border-color: rgba(224, 152, 90, 0.4); color: #e0985a; }
+        [data-theme="dark"] .admin-bar .icon-btn.delete { background: rgba(185, 28, 28, 0.18); border-color: rgba(185, 28, 28, 0.4); color: #fca5a5; }
         [data-theme="dark"] .book-card, [data-theme="dark"] .filter-sidebar { box-shadow: none; }
+
+        /* ===== SERIF SARLAVHALAR (Warm premium) ===== */
+        .nav-logo, .row-header h3, .detail-title, .book-title,
+        .modal-header h2, .detail-section h3, .reviews-avg, .bestseller-title, .similar-title {
+            font-family: var(--font-serif);
+            letter-spacing: 0;
+        }
 
         /* ===== STICKY NAVBAR (Klassik do'kon) ===== */
         .navbar {
@@ -141,7 +151,7 @@
         }
         .notif-item:last-child { border-bottom: none; }
         .notif-item:hover { background: var(--bg-glass); }
-        .notif-item.unread { background: rgba(13, 110, 253, 0.06); }
+        .notif-item.unread { background: rgba(180, 83, 9, 0.06); }
         .notif-item-title { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 2px; }
         .notif-item-msg { font-size: 12px; color: var(--text-dim); line-height: 1.4; }
         .notif-item-time { font-size: 11px; color: var(--text-faint); margin-top: 4px; }
@@ -259,7 +269,7 @@
 
             .auth-btn:hover {
                 border-color: var(--border-hover);
-                background: rgba(13, 110, 253, 0.08);
+                background: rgba(180, 83, 9, 0.08);
             }
 
         .cart-icon {
@@ -274,7 +284,7 @@
             font-size: 14px;
             font-weight: 600;
             font-family: inherit;
-            box-shadow: 0 4px 14px rgba(13, 110, 253, 0.25);
+            box-shadow: 0 4px 14px rgba(180, 83, 9, 0.25);
             display: flex;
             align-items: center;
             gap: 8px;
@@ -283,7 +293,7 @@
 
             .cart-icon:hover {
                 transform: translateY(-2px);
-                box-shadow: 0 8px 20px rgba(13, 110, 253, 0.35);
+                box-shadow: 0 8px 20px rgba(180, 83, 9, 0.35);
             }
 
         .cart-badge {
@@ -312,7 +322,7 @@
             .search-input::placeholder { color: var(--text-faint); }
             .search-input:focus {
                 border-color: var(--primary);
-                box-shadow: 0 0 0 4px rgba(13, 110, 253, 0.08);
+                box-shadow: 0 0 0 4px rgba(180, 83, 9, 0.08);
             }
 
         .search-icon-left {
@@ -338,7 +348,7 @@
             transition: all 0.2s;
             white-space: nowrap;
         }
-        .search-btn:hover { background: #0b5ed7; }
+        .search-btn:hover { background: #8a3f07; }
         @media (max-width: 640px) { .search-btn { padding: 0 18px; font-size: 14px; } }
 
         .cat-chip {
@@ -357,7 +367,7 @@
 
             .cat-chip:hover {
                 border-color: var(--border-hover);
-                background: rgba(13, 110, 253, 0.06);
+                background: rgba(180, 83, 9, 0.06);
             }
 
             .cat-chip.active {
@@ -502,7 +512,7 @@
             transition: all 0.2s;
             margin-bottom: 16px;
         }
-        .detail-cart-btn:hover { background: #0b5ed7; }
+        .detail-cart-btn:hover { background: #8a3f07; }
         .detail-cart-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
         .detail-delivery {
@@ -571,7 +581,7 @@
             padding: 10px 22px; border-radius: 10px;
             font-size: 14px; font-weight: 700; cursor: pointer; font-family: inherit;
         }
-        .review-submit:hover { background: #0b5ed7; }
+        .review-submit:hover { background: #8a3f07; }
         .review-submit:disabled { opacity: 0.5; cursor: not-allowed; }
         .review-login-hint {
             font-size: 13px; color: var(--text-dim);
@@ -644,7 +654,7 @@
         /* ===== IQTIBOS BANNER (katta) ===== */
         .quote-banner {
             position: relative;
-            background: linear-gradient(135deg, #eef4ff, #ffffff 60%);
+            background: linear-gradient(135deg, #f7efe2, #ffffff 60%);
             border: 1px solid var(--border);
             border-radius: 18px;
             padding: 32px 40px 24px;
@@ -757,7 +767,7 @@
         .row-header h3 { font-size: 20px; font-weight: 700; letter-spacing: -0.02em; }
 
         .flash-banner {
-            background: linear-gradient(135deg, #f59e0b, #ef4444, #ec4899);
+            background: linear-gradient(135deg, #f59e0b, #c2410c);
             border-radius: 16px;
             padding: 20px 28px;
             margin-bottom: 24px;
@@ -827,7 +837,7 @@
             font-family: inherit;
             transition: all 0.2s;
         }
-        .chip:hover { border-color: var(--border-hover); background: rgba(13, 110, 253, 0.08); }
+        .chip:hover { border-color: var(--border-hover); background: rgba(180, 83, 9, 0.08); }
         .chip.primary { background: linear-gradient(135deg, var(--primary), var(--accent)); border-color: transparent; }
         .chip.full { width: 100%; padding: 10px; margin-top: 12px; }
 
@@ -997,7 +1007,7 @@
         }
         .admin-bar .icon-btn:hover { transform: translateY(-2px); }
         .admin-bar .icon-btn.image { background: #e0f5fa; border-color: rgba(10, 162, 192, 0.3); color: #0a7d94; }
-        .admin-bar .icon-btn.edit { background: #e7f0ff; border-color: rgba(13, 110, 253, 0.3); color: #0b5ed7; }
+        .admin-bar .icon-btn.edit { background: #f5ead9; border-color: rgba(180, 83, 9, 0.3); color: #8a3f07; }
         .admin-bar .icon-btn.delete { background: #fde8e8; border-color: rgba(220, 53, 69, 0.3); color: #b02a37; }
 
         /* Empty state */
@@ -1026,7 +1036,7 @@
             .book-card:hover {
                 border-color: var(--border-hover);
                 transform: translateY(-3px);
-                box-shadow: 0 12px 28px rgba(13, 110, 253, 0.12);
+                box-shadow: 0 12px 28px rgba(180, 83, 9, 0.12);
             }
 
                 .book-card:hover::before {
@@ -1036,7 +1046,7 @@
         .book-image {
             width: 100%;
             height: 220px;
-            background: linear-gradient(135deg, rgba(13, 110, 253, 0.08), rgba(6, 182, 212, 0.05));
+            background: linear-gradient(135deg, rgba(180, 83, 9, 0.08), rgba(6, 182, 212, 0.05));
             border: 1px solid var(--border);
             border-radius: 12px;
             display: flex;
@@ -1281,8 +1291,8 @@
         }
 
         .cart-total {
-            background: #eef4ff;
-            border: 1px solid rgba(13, 110, 253, 0.2);
+            background: #f7efe2;
+            border: 1px solid rgba(180, 83, 9, 0.2);
             border-radius: 12px;
             padding: 18px;
             margin: 16px 0;
