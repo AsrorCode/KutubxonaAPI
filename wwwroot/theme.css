@@ -1,0 +1,68 @@
+/* ============================================
+   UMUMIY MAVZU — barcha sahifalar uchun (market bilan bir xil)
+   Har sahifaning inline <style>'idan KEYIN ulanadi va :root'ni bekor qiladi.
+   ============================================ */
+:root {
+    --bg-base: #f4f5f7;
+    --bg-elevated: #ffffff;
+    --bg-card: #ffffff;
+    --bg-glass: #f1f3f5;
+    --border: #e6e8ec;
+    --border-hover: #0d6efd;
+    --primary: #0d6efd;
+    --primary-glow: rgba(13, 110, 253, 0.22);
+    --secondary: #0aa2c0;
+    --accent: #0d6efd;
+    --warning: #f59e0b;
+    --success: #16a34a;
+    --danger: #dc3545;
+    --text: #1a1d21;
+    --text-dim: #5f6b7a;
+    --text-faint: #9aa4b2;
+}
+
+:root[data-theme="dark"] {
+    --bg-base: #0b0b10;
+    --bg-elevated: #15151c;
+    --bg-card: #15151c;
+    --bg-glass: #1c1c25;
+    --border: #262631;
+    --border-hover: #3b82f6;
+    --text: #f1f5f9;
+    --text-dim: #94a3b8;
+    --text-faint: #64748b;
+}
+
+/* Qorong'i fon gradientlarini o'chirish (yorug'da chalkashmasin) */
+body { background-image: none !important; }
+
+/* Oq'dan boshlanadigan gradient-sarlavhalar yorug'da ko'rinmaydi — solid qilamiz */
+h1, .auth-header h1, .header h1 {
+    background: none !important;
+    -webkit-text-fill-color: var(--text) !important;
+    color: var(--text) !important;
+}
+
+/* ===== TIL + MAVZU TUGMASI (ui.js quyadi) ===== */
+.uic {
+    position: fixed; top: 16px; left: 16px; z-index: 10000;
+    display: flex; gap: 8px; align-items: center;
+}
+.uic-lang {
+    display: flex; background: var(--bg-elevated);
+    border: 1px solid var(--border); border-radius: 999px; padding: 3px;
+    box-shadow: 0 2px 8px rgba(15, 23, 42, 0.06);
+}
+.uic-lang button {
+    border: none; background: none; padding: 5px 12px; border-radius: 999px;
+    font-size: 12px; font-weight: 600; color: var(--text-dim);
+    cursor: pointer; font-family: inherit;
+}
+.uic-lang button.on { background: var(--primary); color: #fff; }
+.uic-theme {
+    width: 34px; height: 34px; border-radius: 50%;
+    background: var(--bg-elevated); border: 1px solid var(--border);
+    cursor: pointer; font-size: 15px;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 2px 8px rgba(15, 23, 42, 0.06);
+}
