@@ -223,8 +223,6 @@ public class OrdersController : ControllerBase
         }
 
         var orders = await query
-            .Include(o => o.Items)
-                .ThenInclude(i => i.SaleBook)
             .OrderByDescending(o => o.CreatedAt)
             .ToListAsync();
 

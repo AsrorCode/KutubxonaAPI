@@ -452,7 +452,7 @@
             <h1>Mening buyurtmalarim</h1>
             <p class="subtitle">Sotib olgan kitoblaringiz tarixi va holati</p>
             <div class="top-nav">
-                <a href="/" class="nav-pill">📚 O'qish bo'limi</a>
+                <a href="/market.html" class="nav-pill">🛒 Marketplace</a>
                 <a href="/market.html" class="nav-pill">🛒 Marketplace</a>
             </div>
         </header>
@@ -521,9 +521,7 @@
             }
 
             try {
-                const response = await fetch(`${API_BASE}/api/orders/my`, {
-                    headers: { 'Authorization': `Bearer ${token}` }
-                });
+                const response = await apiFetch(`${API_BASE}/api/orders/my`, {});
 
                 if (response.status === 401) {
                     contentEl.innerHTML = `
