@@ -296,6 +296,35 @@
             border: 1px solid rgba(239, 68, 68, 0.3);
         }
 
+        /* ===== BUYURTMA BOSQICH-CHIZIG'I ===== */
+        .stepper {
+            display: flex; align-items: flex-start;
+            margin: 18px 0; padding: 4px 0;
+        }
+        .step { display: flex; flex-direction: column; align-items: center; gap: 6px; flex: 0 0 auto; width: 68px; }
+        .step-dot {
+            width: 34px; height: 34px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 15px; background: var(--bg-glass);
+            border: 2px solid var(--border); color: var(--text-faint);
+        }
+        .step-label { font-size: 11px; color: var(--text-faint); text-align: center; line-height: 1.2; }
+        .step.done .step-dot, .step.active .step-dot {
+            background: var(--primary); border-color: var(--primary); color: #fff;
+        }
+        .step.active .step-dot { box-shadow: 0 0 0 4px rgba(13, 110, 253, 0.18); }
+        .step.done .step-label, .step.active .step-label { color: var(--text); font-weight: 600; }
+        .step-line {
+            flex: 1; height: 2px; background: var(--border);
+            margin: 16px -6px 0; border-radius: 2px; min-width: 12px;
+        }
+        .step-line.done { background: var(--primary); }
+        .order-cancelled {
+            margin: 16px 0; padding: 10px 14px; border-radius: 10px;
+            background: rgba(239, 68, 68, 0.12); color: var(--danger);
+            font-size: 13px; font-weight: 600; text-align: center;
+        }
+
         .order-items {
             margin-bottom: 16px;
         }
@@ -442,6 +471,8 @@
             }
         }
     </style>
+    <link rel="stylesheet" href="/theme.css">
+    <script src="/ui.js"></script>
 </head>
 <body>
     <div class="auth-bar" id="authBar"></div>
@@ -594,6 +625,7 @@
                                 </div>
                                 <span class="order-status status-${order.status}">${statusLabel}</span>
                             </div>
+                            ${orderStepper(order.status)}
                             <div class="order-items">${items}</div>
                             <div class="order-footer">
                                 <div class="order-meta">${(order.items || []).length} ta kitob</div>
@@ -614,6 +646,35 @@
                         <p class="empty-text">${escapeHtml(error.message)}</p>
                     </div>`;
             }
+        }
+
+        // Buyurtma bosqich-chizig'i (status kuzatuvi)
+        function orderStepper(status) {
+            if (status === 'Cancelled') {
+                return `<div class="order-cancelled">🚫 Buyurtma bekor qilingan</div>`;
+            }
+            const steps = [
+                { label: 'Qabul qilindi', icon: '📥' },
+                { label: 'To\'landi', icon: '💳' },
+                { label: 'Yo\'lda', icon: '🚚' },
+                { label: 'Yetkazildi', icon: '📦' }
+            ];
+            const order = ['Pending', 'Paid', 'Shipped', 'Delivered'];
+            const current = order.indexOf(status);
+            let html = '<div class="stepper">';
+            steps.forEach((s, i) => {
+                const reached = i <= current;
+                const state = i < current ? 'done' : (i === current ? 'active' : '');
+                html += `
+                    <div class="step ${state}">
+                        <div class="step-dot">${reached ? '✓' : s.icon}</div>
+                        <div class="step-label">${s.label}</div>
+                    </div>`;
+                if (i < steps.length - 1) {
+                    html += `<div class="step-line ${i < current ? 'done' : ''}"></div>`;
+                }
+            });
+            return html + '</div>';
         }
 
         function formatPrice(n) { return Number(n).toLocaleString('uz-UZ'); }
