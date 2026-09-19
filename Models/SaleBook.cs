@@ -56,6 +56,9 @@ public class SaleBook : ISoftDelete
     [StringLength(50)]
     public string Isbn { get; set; } = string.Empty;
 
+    /// <summary>Nechта marta ko'rilгани (ijtimoiy dalil uchun).</summary>
+    public int ViewCount { get; set; } = 0;
+
     public bool IsActive { get; set; } = true;
 
     /// <summary>Chegirma foizi (0-100). Ixtiyoriy — 0 bo'lsa yo'q.</summary>

@@ -35,7 +35,22 @@ public class SaleBooksController : ControllerBase
             .OrderByDescending(b => b.CreatedAt)
             .ToListAsync();
 
-        return Ok(books.Select(b => b.ToDto()));
+        // Har kitob uchun sotilgan soni (ijtimoiy dalil)
+        var bookIds = books.Select(b => b.Id).ToList();
+        var soldMap = await _context.OrderItems
+            .Where(oi => bookIds.Contains(oi.SaleBookId))
+            .GroupBy(oi => oi.SaleBookId)
+            .Select(g => new { Id = g.Key, Sold = g.Sum(x => x.Quantity) })
+            .ToDictionaryAsync(x => x.Id, x => x.Sold);
+
+        var dtos = books.Select(b =>
+        {
+            var dto = b.ToDto();
+            dto.SoldCount = soldMap.GetValueOrDefault(b.Id, 0);
+            return dto;
+        });
+
+        return Ok(dtos);
     }
 
     // ======== GET /api/salebooks/bestsellers ========
@@ -101,6 +116,12 @@ public class SaleBooksController : ControllerBase
         var book = await _context.SaleBooks.FirstOrDefaultAsync(b => b.Id == id, ct);
         if (book == null) return NotFound(new { message = "Kitob topilmadi" });
 
+        // Ko'rishlar sonini atomik oshirish (RowVersion muammosisiz)
+        await _context.SaleBooks
+            .Where(b => b.Id == id)
+            .ExecuteUpdateAsync(s => s.SetProperty(b => b.ViewCount, b => b.ViewCount + 1), ct);
+        book.ViewCount++; // javobда yangi qiymat
+
         // Sotilgan soni
         var soldCount = await _context.OrderItems
             .Where(oi => oi.SaleBookId == id)
@@ -130,6 +151,58 @@ public class SaleBooksController : ControllerBase
             categoryRank = rank > 0 ? rank : (int?)null,
             category = book.Category
         });
+    }
+
+    // ======== GET /api/salebooks/for-you — shaxsiy tavsiya ========
+    /// <summary>
+    /// Foydalanuvchining buyurtma va sevimli kategoriyalariga qarab tavsiya.
+    /// Yangi foydalanuvchi — eng yangi/ommabop kitoblar.
+    /// </summary>
+    [Authorize]
+    [HttpGet("for-you")]
+    public async Task<ActionResult<IEnumerable<SaleBookResponseDto>>> ForYou(
+        [FromQuery] int count = 8, CancellationToken ct = default)
+    {
+        var userId = User.GetUserId();
+        if (userId is null) return Unauthorized();
+        if (count < 1) count = 8;
+        if (count > 20) count = 20;
+
+        var boughtBookIds = await _context.OrderItems
+            .Where(oi => oi.Order!.UserId == userId)
+            .Select(oi => oi.SaleBookId).Distinct().ToListAsync(ct);
+
+        var wishBookIds = await _context.WishlistItems
+            .Where(w => w.UserId == userId)
+            .Select(w => w.SaleBookId).ToListAsync(ct);
+
+        var seedIds = boughtBookIds.Concat(wishBookIds).Distinct().ToList();
+
+        var favCategories = await _context.SaleBooks
+            .Where(b => seedIds.Contains(b.Id))
+            .Select(b => b.Category).Distinct().ToListAsync(ct);
+
+        var recs = new List<SaleBook>();
+        if (favCategories.Count > 0)
+        {
+            recs = await _context.SaleBooks
+                .Where(b => b.IsActive && favCategories.Contains(b.Category) && !boughtBookIds.Contains(b.Id))
+                .OrderByDescending(b => b.ViewCount).ThenByDescending(b => b.CreatedAt)
+                .Take(count).ToListAsync(ct);
+        }
+
+        // To'ldirish — yangilar
+        if (recs.Count < count)
+        {
+            var have = recs.Select(r => r.Id).Concat(boughtBookIds).ToHashSet();
+            var fillers = await _context.SaleBooks
+                .Where(b => b.IsActive && !have.Contains(b.Id))
+                .OrderByDescending(b => b.CreatedAt)
+                .Take(count - recs.Count).ToListAsync(ct);
+            recs.AddRange(fillers);
+        }
+
+        return Ok(recs.Select(b => b.ToDto()));
     }
 
     // ======== GET /api/salebooks/{id}/similar ========
