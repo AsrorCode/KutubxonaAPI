@@ -53,6 +53,7 @@ public static class MappingExtensions
             CoverType = s.CoverType,
             PageCount = s.PageCount,
             Isbn = s.Isbn,
+            ViewCount = s.ViewCount,
             CreatedAt = s.CreatedAt,
             UpdatedAt = s.UpdatedAt
         };

@@ -21,6 +21,8 @@ public class SaleBookResponseDto
     public string CoverType { get; set; } = string.Empty;
     public int? PageCount { get; set; }
     public string Isbn { get; set; } = string.Empty;
+    public int ViewCount { get; set; }
+    public int SoldCount { get; set; }
     public DateTime CreatedAt { get; set; }
     public DateTime? UpdatedAt { get; set; }
 }
