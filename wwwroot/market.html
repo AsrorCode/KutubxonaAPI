@@ -228,6 +228,7 @@
             padding: 24px 24px 80px;
         }
 
+        .pill-avatar { width: 20px; height: 20px; border-radius: 50%; object-fit: cover; vertical-align: middle; }
         .user-pill {
             display: inline-flex;
             align-items: center;
@@ -1913,7 +1914,7 @@
                         <button class="cart-icon" id="cartIcon" onclick="openCart()">
                             🛒 <span class="cart-badge" id="cartBadge">0</span>
                         </button>
-                        <a href="/profile.html" class="user-pill" style="text-decoration:none;" title="Profil">👤 ${escapeHtml(user.firstName)} ${badge}</a>
+                        <a href="/profile.html" class="user-pill" style="text-decoration:none;" title="Profil">${user.avatarUrl ? `<img src="${escapeHtml(user.avatarUrl)}" class="pill-avatar" alt="">` : '👤'} ${escapeHtml(user.firstName)} ${badge}</a>
                         <button class="auth-btn" onclick="logout()">Chiqish</button>
                     `;
                 if (adminLink) adminLink.style.display = isAdmin ? 'inline-flex' : 'none';

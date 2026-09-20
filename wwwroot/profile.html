@@ -25,12 +25,22 @@
             box-shadow: 0 2px 10px rgba(15, 23, 42, 0.04);
         }
         .profile-head { display: flex; align-items: center; gap: 18px; }
+        .avatar-wrap { position: relative; flex: 0 0 auto; cursor: pointer; }
         .avatar {
-            width: 72px; height: 72px; border-radius: 50%; flex: 0 0 auto;
-            background: var(--primary); color: #fff;
+            width: 72px; height: 72px; border-radius: 50%;
+            background: var(--primary); color: #fff; overflow: hidden;
             display: flex; align-items: center; justify-content: center;
             font-size: 30px; font-weight: 800;
         }
+        .avatar img { width: 100%; height: 100%; object-fit: cover; }
+        .avatar-cam {
+            position: absolute; bottom: 0; right: 0;
+            width: 26px; height: 26px; border-radius: 50%;
+            background: var(--bg-elevated); border: 1px solid var(--border);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 13px; box-shadow: 0 2px 6px rgba(15, 23, 42, 0.12);
+        }
+        .avatar-wrap:hover .avatar-cam { border-color: var(--border-hover); }
         .pf-name { font-size: 24px; font-weight: 800; letter-spacing: -0.02em; }
         .pf-meta { font-size: 14px; color: var(--text-dim); margin-top: 4px; }
         .role-tag {
@@ -94,10 +104,15 @@
         <a href="/market.html" class="back">← Marketplace</a>
 
         <div class="card profile-head">
-            <div class="avatar" id="pfAvatar">?</div>
+            <div class="avatar-wrap" onclick="document.getElementById('avatarFile').click()" title="Rasm o'zgartirish">
+                <div class="avatar" id="pfAvatar">?</div>
+                <div class="avatar-cam">📷</div>
+                <input type="file" id="avatarFile" accept="image/*" style="display:none;" onchange="onAvatarPick(event)">
+            </div>
             <div>
                 <div class="pf-name" id="pfName">—</div>
                 <div class="pf-meta" id="pfMeta"></div>
+                <div class="status-msg" id="avatarStatus"></div>
             </div>
         </div>
 
@@ -149,13 +164,24 @@
         // Login tekshiruvi
         if (!getCurrentUser()) { location.href = '/login.html'; }
 
+        let currentUser = null;
+
+        function renderAvatar(u) {
+            const el = document.getElementById('pfAvatar');
+            if (u.avatarUrl) {
+                el.innerHTML = `<img src="${esc(u.avatarUrl)}" alt="">`;
+            } else {
+                el.textContent = ((u.firstName || '?').charAt(0) + (u.lastName || '').charAt(0)).toUpperCase();
+            }
+        }
+
         async function loadProfile() {
             try {
                 const res = await apiFetch(`${API}/api/auth/me`, {});
                 if (!res.ok) throw new Error();
                 const u = await res.json();
-                const initials = ((u.firstName || '?').charAt(0) + (u.lastName || '').charAt(0)).toUpperCase();
-                document.getElementById('pfAvatar').textContent = initials;
+                currentUser = u;
+                renderAvatar(u);
                 document.getElementById('pfName').textContent = `${u.firstName} ${u.lastName}`;
                 const roleTag = u.role === 'Admin' ? '<span class="role-tag">ADMIN</span>' : '';
                 document.getElementById('pfMeta').innerHTML =
@@ -185,6 +211,57 @@
                 status.className = 'status-msg ok'; status.textContent = '✅ Saqlandi';
             } catch (err) { status.className = 'status-msg err'; status.textContent = 'Xato: ' + err.message; }
             finally { btn.disabled = false; }
+        }
+
+        // Rasmni 256x256 ga kichraytirish (canvas) — baza yengil qoladi
+        function resizeImage(file, size = 256) {
+            return new Promise((resolve, reject) => {
+                if (!file.type.startsWith('image/')) { reject(new Error('Faqat rasm')); return; }
+                const reader = new FileReader();
+                reader.onload = () => {
+                    const img = new Image();
+                    img.onload = () => {
+                        const canvas = document.createElement('canvas');
+                        canvas.width = size; canvas.height = size;
+                        const ctx = canvas.getContext('2d');
+                        // kvadrat kesib (cover) chizish
+                        const min = Math.min(img.width, img.height);
+                        const sx = (img.width - min) / 2, sy = (img.height - min) / 2;
+                        ctx.drawImage(img, sx, sy, min, min, 0, 0, size, size);
+                        resolve(canvas.toDataURL('image/jpeg', 0.85));
+                    };
+                    img.onerror = reject;
+                    img.src = reader.result;
+                };
+                reader.onerror = reject;
+                reader.readAsDataURL(file);
+            });
+        }
+
+        async function onAvatarPick(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            const status = document.getElementById('avatarStatus');
+            status.className = 'status-msg'; status.textContent = 'Yuklanmoqda...';
+            try {
+                const dataUrl = await resizeImage(file, 256);
+                const firstName = document.getElementById('fFirst').value.trim() || (currentUser?.firstName || '');
+                const lastName = document.getElementById('fLast').value.trim() || (currentUser?.lastName || '');
+                const res = await apiFetch(`${API}/api/auth/me`, {
+                    method: 'PUT', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ firstName, lastName, avatarUrl: dataUrl })
+                });
+                if (!res.ok) throw new Error(`Status ${res.status}`);
+                const u = await res.json();
+                currentUser = u;
+                renderAvatar(u);
+                // localStorage'даги user'ga avatar qo'shish (navbar uchun)
+                const stored = getCurrentUser(); if (stored) { stored.avatarUrl = u.avatarUrl; localStorage.setItem('auth_user', JSON.stringify(stored)); }
+                status.className = 'status-msg ok'; status.textContent = '✅ Rasm yangilandi';
+                setTimeout(() => status.textContent = '', 2500);
+            } catch (err) {
+                status.className = 'status-msg err'; status.textContent = 'Xato: ' + err.message;
+            } finally { e.target.value = ''; }
         }
 
         async function loadMyReviews() {
