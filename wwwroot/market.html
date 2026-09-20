@@ -966,6 +966,15 @@
             display: flex; align-items: center; gap: 4px;
         }
 
+        /* Ijtimoiy dalil nishonlari */
+        .pf-row { display: flex; flex-wrap: wrap; gap: 5px; margin: 6px 0; }
+        .pf-badge {
+            font-size: 10px; font-weight: 600; padding: 2px 8px; border-radius: 999px;
+            background: var(--bg-glass); color: var(--text-dim); border: 1px solid var(--border);
+        }
+        .pf-badge.trend { background: #fde8d3; color: #9a3412; border-color: rgba(180, 83, 9, 0.25); }
+        .pf-badge.urgent { background: rgba(217, 119, 6, 0.12); color: #b45309; border-color: rgba(217, 119, 6, 0.3); }
+
         /* Book cover wrapper */
         .book-cover-wrap {
             position: relative;
@@ -1510,6 +1519,9 @@
         <div class="categories" id="categoriesBar"></div>
 
         <!-- ===== ENG KO'P SOTILGAN KITOBLAR ===== -->
+        <!-- ===== SIZ UCHUN (shaxsiy) ===== -->
+        <div id="forYouSection" style="display:none;"></div>
+
         <div id="bestsellerSection" style="display:none;">
             <div class="row-header">
                 <h3>🏆 Eng ko'p sotilgan kitoblar</h3>
@@ -2584,6 +2596,14 @@
                 const hasDiscount = book.discount > 0;
                 const finalPrice = book.finalPrice || book.price;
 
+                // Ijtimoiy dalil nishonlari (haqiqiy ma'lumot)
+                const proof = [];
+                if ((book.soldCount || 0) >= 5) proof.push('<span class="pf-badge trend">🔥 Trendda</span>');
+                else if ((book.soldCount || 0) > 0) proof.push(`<span class="pf-badge">📦 ${book.soldCount} sotildi</span>`);
+                if (book.stock > 0 && book.stock < 5) proof.push(`<span class="pf-badge urgent">⚡ ${book.stock} ta qoldi</span>`);
+                if ((book.viewCount || 0) >= 10) proof.push(`<span class="pf-badge">👁 ${book.viewCount}</span>`);
+                const proofBadges = proof.length ? `<div class="pf-row">${proof.join('')}</div>` : '';
+
                 // COVER: rasm bo'lsa img, aks holda SVG. onerror bilan URL buzilsa SVG
                 const svgCover = generateCover(book.title, book.author, 140, 200);
                 const coverInner = (book.imageUrl && book.imageUrl.startsWith('http') || book.imageUrl?.startsWith('data:'))
@@ -2619,6 +2639,7 @@
                             <span class="price-final">${formatPrice(finalPrice)} so'm</span>
                             ${hasDiscount ? `<span class="price-old">${formatPrice(book.price)}</span>` : ''}
                         </div>
+                        ${proofBadges}
                         <div class="delivery-badge">🚚 Bepul yetkazish • 1-2 kun</div>
                         <div class="book-stock ${book.stock === 0 ? 'out' : (book.stock < 5 ? 'low' : '')}">${stockText}</div>
                         <button class="add-cart-btn" onclick="addToCart(${book.id})" ${book.stock === 0 ? 'disabled' : ''}>
@@ -3037,6 +3058,33 @@
             } catch (_) { /* kolleksiyasiz ham ishlaydi */ }
         }
 
+        // ===== "SIZ UCHUN" — shaxsiy tavsiya =====
+        function bookRowCard(b) {
+            const price = b.finalPrice || b.price;
+            const isImg = b.imageUrl && (b.imageUrl.startsWith('http') || b.imageUrl.startsWith('data:'));
+            const cover = isImg
+                ? `<img src="${escapeHtml(b.imageUrl)}" alt="" data-t="${escapeHtml(b.title)}" data-a="${escapeHtml(b.author)}" onerror="coverFallback(this,150,210)">`
+                : generateCover(b.title, b.author, 150, 210);
+            return `<div class="bestseller-card" onclick="openDetail(${b.id})">
+                <div class="bestseller-cover">${cover}</div>
+                <div class="bestseller-title">${escapeHtml(b.title)}</div>
+                <div class="bestseller-meta"><span>${formatPrice(price)} so'm</span></div>
+            </div>`;
+        }
+        async function loadForYou() {
+            const section = document.getElementById('forYouSection');
+            if (!section || !getCurrentUser()) return;
+            try {
+                const res = await apiFetch(`${API_BASE}/api/salebooks/for-you?count=8`, {});
+                if (!res.ok) return;
+                const books = await res.json();
+                if (!books.length) return;
+                section.innerHTML = `<div class="row-header"><h3>✨ Siz uchun tanlandi</h3></div>
+                    <div class="bestseller-row">${books.map(bookRowCard).join('')}</div>`;
+                section.style.display = 'block';
+            } catch (_) { /* tavsiyasiz ham ishlaydi */ }
+        }
+
         renderAuthBar();
         updateCartBadge();
         loadBooks();
@@ -3045,6 +3093,7 @@
         loadNotifications();
         loadCollections();
         loadWishlistServer();
+        loadForYou();
 
         document.addEventListener('keydown', e => { if (e.key === 'Escape') closeCart(); });
     </script>
