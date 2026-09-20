@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using KutubxonaAPI.Models.Enums;
 
 namespace KutubxonaAPI.Models;
@@ -47,6 +48,10 @@ public class User : ISoftDelete
 
     /// <summary>Oxirgi marta qachon kirgan.</summary>
     public DateTime? LastLoginAt { get; set; }
+
+    /// <summary>Profil rasmi (base64 data URL yoki tashqi URL). Ixtiyoriy.</summary>
+    [Column(TypeName = "nvarchar(max)")]
+    public string AvatarUrl { get; set; } = string.Empty;
 
     /// <summary>Foydalanuvchining to'liq ismi (yordamchi property).</summary>
     public string FullName => $"{FirstName} {LastName}";

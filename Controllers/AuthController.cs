@@ -262,6 +262,15 @@ public class AuthController : ControllerBase
 
         user.FirstName = dto.FirstName.Trim();
         user.LastName = dto.LastName.Trim();
+
+        // Avatar (ixtiyoriy). null bo'lsa tegilmaydi; hajm cheklovi.
+        if (dto.AvatarUrl != null)
+        {
+            if (dto.AvatarUrl.Length > 3_000_000)
+                return BadRequest(new { message = "Rasm juda katta (taxminan 2MB dan oshmasin)" });
+            user.AvatarUrl = dto.AvatarUrl;
+        }
+
         await _context.SaveChangesAsync();
 
         return Ok(user.ToDto());
@@ -391,4 +400,7 @@ public class UpdateProfileDto
     [Required(ErrorMessage = "Familiya kerak")]
     [StringLength(50, MinimumLength = 2, ErrorMessage = "Familiya 2-50 belgi")]
     public string LastName { get; set; } = string.Empty;
+
+    /// <summary>Profil rasmi (base64 yoki URL). null = tegilmaydi.</summary>
+    public string? AvatarUrl { get; set; }
 }

@@ -21,6 +21,7 @@ public static class MappingExtensions
         LastName = u.LastName,
         FullName = u.FullName,
         Role = u.Role,
+        AvatarUrl = u.AvatarUrl,
         CreatedAt = u.CreatedAt,
         LastLoginAt = u.LastLoginAt
     };
