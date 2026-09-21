@@ -43,6 +43,9 @@ public class User : ISoftDelete
     /// </summary>
     public UserRole Role { get; set; } = UserRole.User;
 
+    /// <summary>Email tasdiqlanganmi (yumshoq — kirishni bloklamaydi, faqat belgi).</summary>
+    public bool IsEmailVerified { get; set; } = false;
+
     /// <summary>Ro'yxatdan o'tgan vaqti.</summary>
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 

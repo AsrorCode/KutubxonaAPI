@@ -22,6 +22,7 @@ public static class MappingExtensions
         FullName = u.FullName,
         Role = u.Role,
         AvatarUrl = u.AvatarUrl,
+        IsEmailVerified = u.IsEmailVerified,
         CreatedAt = u.CreatedAt,
         LastLoginAt = u.LastLoginAt
     };
