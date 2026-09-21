@@ -1750,6 +1750,7 @@
 
                     <div class="detail-actions-row">
                         <span class="detail-rating" id="dRating">⭐ Yangi</span>
+                        <span class="detail-share" id="dWish" onclick="toggleWishFromDetail()">♡ Sevimlilarga</span>
                         <span class="detail-share" onclick="shareBook()">🔗 Ulashish</span>
                     </div>
                 </div>
@@ -1987,6 +1988,7 @@
             const book = allBooks.find(b => b.id === bookId);
             if (!book) return;
             currentDetailBook = book;
+            renderDetailWish();
 
             const overlay = document.getElementById('detailOverlay');
             overlay.classList.add('active');
@@ -1994,7 +1996,7 @@
 
             // --- Rasm ---
             const coverEl = document.getElementById('dCover');
-            const hasImg = (book.imageUrl && book.imageUrl.startsWith('http')) || book.imageUrl?.startsWith('data:');
+            const hasImg = (book.imageUrl && book.imageUrl.startsWith('http')) || book.imageUrl?.startsWith('data:') || book.imageUrl?.startsWith('/');
             coverEl.innerHTML = hasImg
                 ? `<img src="${escapeHtml(book.imageUrl)}" alt="" data-t="${escapeHtml(book.title)}" data-a="${escapeHtml(book.author)}" onerror="coverFallback(this,260,370)">`
                 : generateCover(book.title, book.author, 260, 370);
@@ -2088,7 +2090,7 @@
                 if (!books.length) return;
                 row.innerHTML = books.map(b => {
                     const price = b.finalPrice || b.price;
-                    const isImg = b.imageUrl && (b.imageUrl.startsWith('http') || b.imageUrl.startsWith('data:'));
+                    const isImg = b.imageUrl && (b.imageUrl.startsWith('http') || b.imageUrl.startsWith('data:') || b.imageUrl.startsWith('/'));
                     const cover = isImg
                         ? `<img src="${escapeHtml(b.imageUrl)}" alt="" data-t="${escapeHtml(b.title)}" data-a="${escapeHtml(b.author)}" onerror="coverFallback(this,120,168)">`
                         : generateCover(b.title, b.author, 120, 168);
@@ -2230,6 +2232,19 @@
             currentDetailBook = null;
         }
 
+        function renderDetailWish() {
+            const el = document.getElementById('dWish');
+            if (!el || !currentDetailBook) return;
+            const on = isWished(currentDetailBook.id);
+            el.innerHTML = on ? '❤️ Sevimlida' : '♡ Sevimlilarga';
+            el.style.color = on ? 'var(--danger)' : '';
+        }
+        async function toggleWishFromDetail() {
+            if (!currentDetailBook) return;
+            await toggleWishlist(currentDetailBook.id);
+            renderDetailWish();
+        }
+
         function shareBook() {
             if (!currentDetailBook) return;
             const url = `${window.location.origin}/market.html#book-${currentDetailBook.id}`;
@@ -2329,6 +2344,7 @@
             const token = getToken();
             if (!token) { showToast('Avval tizimga kiring', 'error'); return; }
             try {
+                newImageUrl = await uploadIfDataUrl(newImageUrl);
                 const response = await apiFetch(`${API_BASE}/api/salebooks/${bookId}`, {
                     method: 'PUT',
                     headers: { 'Content-Type': 'application/json' },
@@ -2607,14 +2623,12 @@
 
                 // COVER: rasm bo'lsa img, aks holda SVG. onerror bilan URL buzilsa SVG
                 const svgCover = generateCover(book.title, book.author, 140, 200);
-                const coverInner = (book.imageUrl && book.imageUrl.startsWith('http') || book.imageUrl?.startsWith('data:'))
+                const coverInner = (book.imageUrl && book.imageUrl.startsWith('http') || book.imageUrl?.startsWith('data:') || book.imageUrl?.startsWith('/'))
                     ? `<img src="${escapeHtml(book.imageUrl)}" alt="" onerror="showCoverFallback(${book.id})">`
                     : svgCover;
 
-                // Wishlist yurakcha (faqat foydalanuvchilar uchun)
-                const wishBtn = !isAdmin
-                    ? `<button class="wish-btn ${wished ? 'active' : ''}" onclick="toggleWishlist(${book.id})" title="Sevimlilarga">${wished ? '❤️' : '♡'}</button>`
-                    : '';
+                // Wishlist yurakcha (barcha foydalanuvchilar uchun)
+                const wishBtn = `<button class="wish-btn ${wished ? 'active' : ''}" onclick="event.stopPropagation(); toggleWishlist(${book.id})" title="Sevimlilarga">${wished ? '❤️' : '♡'}</button>`;
 
                 // Admin bar (pastda)
                 const adminBar = isAdmin
@@ -2766,6 +2780,7 @@
                 isActive: true
             };
             try {
+                dto.imageUrl = await uploadIfDataUrl(dto.imageUrl);
                 const res = await apiFetch(`${API_BASE}/api/salebooks/${currentEditId}`, {
                     method: 'PUT',
                     headers: { 'Content-Type': 'application/json' },
@@ -2931,7 +2946,7 @@
                 row.innerHTML = items.map((item, i) => {
                     const b = item.book;
                     const sold = item.soldCount;
-                    const isImg = b.imageUrl && (b.imageUrl.startsWith('http') || b.imageUrl.startsWith('data:'));
+                    const isImg = b.imageUrl && (b.imageUrl.startsWith('http') || b.imageUrl.startsWith('data:') || b.imageUrl.startsWith('/'));
                     const cover = isImg
                         ? `<img src="${escapeHtml(b.imageUrl)}" alt="" data-t="${escapeHtml(b.title)}" data-a="${escapeHtml(b.author)}" onerror="coverFallback(this,150,210)">`
                         : generateCover(b.title, b.author, 150, 210);
@@ -3043,7 +3058,7 @@
                 section.innerHTML = collections.map(col => {
                     const cards = col.books.map(b => {
                         const price = b.finalPrice || b.price;
-                        const isImg = b.imageUrl && (b.imageUrl.startsWith('http') || b.imageUrl.startsWith('data:'));
+                        const isImg = b.imageUrl && (b.imageUrl.startsWith('http') || b.imageUrl.startsWith('data:') || b.imageUrl.startsWith('/'));
                         const cover = isImg
                             ? `<img src="${escapeHtml(b.imageUrl)}" alt="" data-t="${escapeHtml(b.title)}" data-a="${escapeHtml(b.author)}" onerror="coverFallback(this,150,210)">`
                             : generateCover(b.title, b.author, 150, 210);
@@ -3062,7 +3077,7 @@
         // ===== "SIZ UCHUN" — shaxsiy tavsiya =====
         function bookRowCard(b) {
             const price = b.finalPrice || b.price;
-            const isImg = b.imageUrl && (b.imageUrl.startsWith('http') || b.imageUrl.startsWith('data:'));
+            const isImg = b.imageUrl && (b.imageUrl.startsWith('http') || b.imageUrl.startsWith('data:') || b.imageUrl.startsWith('/'));
             const cover = isImg
                 ? `<img src="${escapeHtml(b.imageUrl)}" alt="" data-t="${escapeHtml(b.title)}" data-a="${escapeHtml(b.author)}" onerror="coverFallback(this,150,210)">`
                 : generateCover(b.title, b.author, 150, 210);

@@ -114,6 +114,22 @@ async function apiFetch(url, options = {}) {
 }
 
 /**
+ * Rasm base64 (data:) bo'lsa — serverga fayl qilib yuklab, URL qaytaradi.
+ * URL yoki bo'sh bo'lsa — o'zini qaytaradi. Baza yengil qoladi.
+ */
+async function uploadIfDataUrl(val) {
+    if (!val || !val.startsWith('data:')) return val;
+    const res = await apiFetch('/api/uploads/image', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ dataUrl: val })
+    });
+    if (!res.ok) throw new Error('Rasm yuklanmadi');
+    const data = await res.json();
+    return data.url;
+}
+
+/**
  * Logout — refresh tokenni serverda bekor qilib, local'dan tozalaydi
  */
 async function serverLogout() {

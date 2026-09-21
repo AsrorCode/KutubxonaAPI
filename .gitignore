@@ -22,6 +22,10 @@ logs/
 # User secrets
 secrets.json
 
+# Yuklangan rasmlar (foydalanuvchi kontenti — repoda saqlanmaydi)
+wwwroot/uploads/*
+!wwwroot/uploads/.gitkeep
+
 # OS
 .DS_Store
 Thumbs.db
