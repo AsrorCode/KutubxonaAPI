@@ -949,10 +949,12 @@
             }
 
             try {
+                // Rasm base64 bo'lsa — serverga fayl qilib yuklab, URL olamiz (baza yengil)
+                const finalImageUrl = await uploadIfDataUrl(imageUrl);
                 const res = await apiFetch(`${API}/salebooks`, {
                     method: 'POST',
                     headers: authHeaders(),
-                    body: JSON.stringify({ title, author, description, price, stock, category, year, imageUrl, isActive, discount, discountEndsAt, publisher, coverType, pageCount, isbn })
+                    body: JSON.stringify({ title, author, description, price, stock, category, year, imageUrl: finalImageUrl, isActive, discount, discountEndsAt, publisher, coverType, pageCount, isbn })
                 });
                 if (!res.ok) throw new Error(`Xato: ${res.status}`);
                 status.className = 'status-msg success';

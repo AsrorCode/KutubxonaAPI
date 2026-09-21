@@ -245,11 +245,12 @@
             status.className = 'status-msg'; status.textContent = 'Yuklanmoqda...';
             try {
                 const dataUrl = await resizeImage(file, 256);
+                const avatarUrl = await uploadIfDataUrl(dataUrl); // serverga fayl qilib yuklaymiz
                 const firstName = document.getElementById('fFirst').value.trim() || (currentUser?.firstName || '');
                 const lastName = document.getElementById('fLast').value.trim() || (currentUser?.lastName || '');
                 const res = await apiFetch(`${API}/api/auth/me`, {
                     method: 'PUT', headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ firstName, lastName, avatarUrl: dataUrl })
+                    body: JSON.stringify({ firstName, lastName, avatarUrl })
                 });
                 if (!res.ok) throw new Error(`Status ${res.status}`);
                 const u = await res.json();
@@ -293,7 +294,7 @@
                 box.innerHTML = books.length
                     ? books.map(b => {
                         const price = b.finalPrice || b.price;
-                        const img = (b.imageUrl && (b.imageUrl.startsWith('http') || b.imageUrl.startsWith('data:')))
+                        const img = (b.imageUrl && (b.imageUrl.startsWith('http') || b.imageUrl.startsWith('data:') || b.imageUrl.startsWith('/')))
                             ? `<img src="${esc(b.imageUrl)}" alt="">` : '';
                         return `<div class="wish-card" onclick="location.href='/market.html#book-${b.id}'">
                             <div class="wish-cover">${img}</div>
