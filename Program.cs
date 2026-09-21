@@ -96,6 +96,14 @@ try
                    .SetVaryByQuery("page", "pageSize", "category", "search"));
     });
 
+    // ============================================
+    // EMAIL SENDER — SMTP sozlangan bo'lsa haqiqiy, aks holda log
+    // ============================================
+    if (!string.IsNullOrWhiteSpace(builder.Configuration["Email:Smtp:Host"]))
+        builder.Services.AddScoped<KutubxonaAPI.Services.IEmailSender, KutubxonaAPI.Services.SmtpEmailSender>();
+    else
+        builder.Services.AddScoped<KutubxonaAPI.Services.IEmailSender, KutubxonaAPI.Services.LoggingEmailSender>();
+
     // Database
     var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
         ?? throw new InvalidOperationException("DefaultConnection topilmadi");

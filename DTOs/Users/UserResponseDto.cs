@@ -15,6 +15,7 @@ public class UserResponseDto
     public string FullName { get; set; } = string.Empty;
     public UserRole Role { get; set; }
     public string AvatarUrl { get; set; } = string.Empty;
+    public bool IsEmailVerified { get; set; }
     public DateTime CreatedAt { get; set; }
     public DateTime? LastLoginAt { get; set; }
 }

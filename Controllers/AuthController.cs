@@ -31,15 +31,18 @@ public class AuthController : ControllerBase
     private readonly AppDbContext _context;
     private readonly IConfiguration _config;
     private readonly ILogger<AuthController> _logger;
+    private readonly KutubxonaAPI.Services.IEmailSender _email;
 
     public AuthController(
         AppDbContext context,
         IConfiguration config,
-        ILogger<AuthController> logger)
+        ILogger<AuthController> logger,
+        KutubxonaAPI.Services.IEmailSender email)
     {
         _context = context;
         _config = config;
         _logger = logger;
+        _email = email;
     }
 
     // ============================================
@@ -73,6 +76,9 @@ public class AuthController : ControllerBase
         await _context.SaveChangesAsync();
 
         _logger.LogInformation("Yangi foydalanuvchi ro'yxatdan o'tdi: {Email}", user.Email);
+
+        // Email tasdiqlash havolasini yuborish (yumshoq — bloklamaydi)
+        await SendVerificationEmailAsync(user);
 
         // Access + Refresh token
         var accessToken = GenerateAccessToken(user);
@@ -277,6 +283,107 @@ public class AuthController : ControllerBase
     }
 
     // ============================================
+    // EMAIL TASDIQLASH
+    // ============================================
+    [HttpGet("verify-email")]
+    public async Task<IActionResult> VerifyEmail([FromQuery] string token, CancellationToken ct = default)
+    {
+        var t = await _context.UserTokens
+            .Include(x => x.User)
+            .FirstOrDefaultAsync(x => x.Token == token && x.Type == "verify", ct);
+
+        if (t == null || t.IsUsed || t.ExpiresAt < DateTime.UtcNow || t.User == null)
+            return BadRequest(new { message = "Havola noto'g'ri yoki muddati o'tgan" });
+
+        t.User.IsEmailVerified = true;
+        t.IsUsed = true;
+        await _context.SaveChangesAsync(ct);
+        return Ok(new { message = "Email tasdiqlandi" });
+    }
+
+    // ============================================
+    // PAROLNI UNUTDIM — havola yuborish
+    // ============================================
+    [HttpPost("forgot-password")]
+    [EnableRateLimiting("auth")]
+    public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordDto dto, CancellationToken ct = default)
+    {
+        var email = (dto.Email ?? "").ToLower().Trim();
+        var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == email, ct);
+
+        // Email mavjudligini oshkor qilmaymiz — har doim 200
+        if (user != null)
+        {
+            var token = await CreateUserTokenAsync(user.Id, "reset", TimeSpan.FromHours(1), ct);
+            var link = $"{Request.Scheme}://{Request.Host}/reset-password.html?token={token}";
+            var body = $@"<p>Assalomu alaykum, {user.FirstName}!</p>
+<p>Parolni tiklash uchun quyidagi havolani bosing (1 soat amal qiladi):</p>
+<p><a href=""{link}"">{link}</a></p>
+<p>Agar bu siz bo'lmasangiz — bu xatni e'tiborsiz qoldiring.</p>";
+            await _email.SendAsync(user.Email, "Parolni tiklash — Kutubxona", body, ct);
+        }
+
+        return Ok(new { message = "Agar bu email ro'yxatda bo'lsa, tiklash havolasi yuborildi" });
+    }
+
+    // ============================================
+    // PAROLNI TIKLASH
+    // ============================================
+    [HttpPost("reset-password")]
+    [EnableRateLimiting("auth")]
+    public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordDto dto, CancellationToken ct = default)
+    {
+        if (string.IsNullOrWhiteSpace(dto.NewPassword) || dto.NewPassword.Length < 6)
+            return BadRequest(new { message = "Parol kamida 6 belgi bo'lishi kerak" });
+
+        var t = await _context.UserTokens
+            .Include(x => x.User)
+            .FirstOrDefaultAsync(x => x.Token == dto.Token && x.Type == "reset", ct);
+
+        if (t == null || t.IsUsed || t.ExpiresAt < DateTime.UtcNow || t.User == null)
+            return BadRequest(new { message = "Havola noto'g'ri yoki muddati o'tgan" });
+
+        t.User.PasswordHash = BCrypt.Net.BCrypt.HashPassword(dto.NewPassword);
+        t.IsUsed = true;
+
+        // Xavfsizlik — barcha eski refresh tokenlarni bekor qilish
+        var tokens = await _context.RefreshTokens.Where(rt => rt.UserId == t.UserId && !rt.IsRevoked).ToListAsync(ct);
+        foreach (var rt in tokens) { rt.IsRevoked = true; rt.RevokedAt = DateTime.UtcNow; rt.RevokedReason = "Parol tiklandi"; }
+
+        await _context.SaveChangesAsync(ct);
+        _logger.LogInformation("Parol tiklandi: UserId={UserId}", t.UserId);
+        return Ok(new { message = "Parol yangilandi. Endi kirishingiz mumkin." });
+    }
+
+    // Email tasdiqlash havolasini yuborish (yordamchi)
+    private async Task SendVerificationEmailAsync(User user)
+    {
+        var token = await CreateUserTokenAsync(user.Id, "verify", TimeSpan.FromDays(3));
+        var link = $"{Request.Scheme}://{Request.Host}/verify-email.html?token={token}";
+        var body = $@"<p>Assalomu alaykum, {user.FirstName}!</p>
+<p>Kutubxonaga xush kelibsiz. Emailingizni tasdiqlash uchun havolani bosing:</p>
+<p><a href=""{link}"">{link}</a></p>";
+        await _email.SendAsync(user.Email, "Emailni tasdiqlang — Kutubxona", body);
+    }
+
+    // Xavfsiz token yaratish
+    private async Task<string> CreateUserTokenAsync(int userId, string type, TimeSpan lifetime, CancellationToken ct = default)
+    {
+        var token = Convert.ToBase64String(RandomNumberGenerator.GetBytes(48))
+            .Replace("+", "-").Replace("/", "_").Replace("=", "");
+        _context.UserTokens.Add(new UserToken
+        {
+            UserId = userId,
+            Token = token,
+            Type = type,
+            ExpiresAt = DateTime.UtcNow.Add(lifetime),
+            CreatedAt = DateTime.UtcNow
+        });
+        await _context.SaveChangesAsync(ct);
+        return token;
+    }
+
+    // ============================================
     // YORDAMCHI METODLAR
     // ============================================
 
@@ -403,4 +510,21 @@ public class UpdateProfileDto
 
     /// <summary>Profil rasmi (base64 yoki URL). null = tegilmaydi.</summary>
     public string? AvatarUrl { get; set; }
+}
+
+public class ForgotPasswordDto
+{
+    [Required(ErrorMessage = "Email kerak")]
+    [EmailAddress(ErrorMessage = "Email format noto'g'ri")]
+    public string Email { get; set; } = string.Empty;
+}
+
+public class ResetPasswordDto
+{
+    [Required]
+    public string Token { get; set; } = string.Empty;
+
+    [Required(ErrorMessage = "Yangi parol kerak")]
+    [StringLength(100, MinimumLength = 6, ErrorMessage = "Parol kamida 6 belgi")]
+    public string NewPassword { get; set; } = string.Empty;
 }

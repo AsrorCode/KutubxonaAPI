@@ -20,6 +20,7 @@ public class AppDbContext : DbContext
     public DbSet<Collection> Collections { get; set; }
     public DbSet<CollectionItem> CollectionItems { get; set; }
     public DbSet<WishlistItem> WishlistItems { get; set; }
+    public DbSet<UserToken> UserTokens { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -113,6 +114,14 @@ public class AppDbContext : DbContext
         modelBuilder.Entity<WishlistItem>()
             .HasIndex(w => new { w.UserId, w.SaleBookId })
             .IsUnique();
+
+        // ===== UserToken =====
+        modelBuilder.Entity<UserToken>()
+            .HasOne(t => t.User)
+            .WithMany()
+            .HasForeignKey(t => t.UserId)
+            .OnDelete(DeleteBehavior.Cascade);
+        modelBuilder.Entity<UserToken>().HasIndex(t => t.Token).IsUnique();
 
         modelBuilder.Entity<RefreshToken>()
             .HasOne(rt => rt.User)

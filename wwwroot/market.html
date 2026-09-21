@@ -1589,6 +1589,8 @@
             </div>
         </div>
 
+        <div id="scrollSentinel" style="height:1px;"></div>
+
         <!-- ===== FOOTER IQTIBOS (5 sekundda almashadi) ===== -->
         <div class="quote-banner quote-footer" id="quoteBanner">
             <div class="quote-banner-mark">"</div>
@@ -2606,66 +2608,99 @@
                 return;
             }
 
-            grid.innerHTML = filtered.map(book => {
-                const stockText = book.stock === 0 ? '❌ Tugagan'
-                    : (book.stock < 5 ? `⚠️ Faqat ${book.stock} ta qoldi!` : `✅ ${book.stock} ta mavjud`);
-                const wished = isWished(book.id);
-                const hasDiscount = book.discount > 0;
-                const finalPrice = book.finalPrice || book.price;
-
-                // Ijtimoiy dalil nishonlari (haqiqiy ma'lumot)
-                const proof = [];
-                if ((book.soldCount || 0) >= 5) proof.push('<span class="pf-badge trend">🔥 Trendda</span>');
-                else if ((book.soldCount || 0) > 0) proof.push(`<span class="pf-badge">📦 ${book.soldCount} sotildi</span>`);
-                if (book.stock > 0 && book.stock < 5) proof.push(`<span class="pf-badge urgent">⚡ ${book.stock} ta qoldi</span>`);
-                if ((book.viewCount || 0) >= 10) proof.push(`<span class="pf-badge">👁 ${book.viewCount}</span>`);
-                const proofBadges = proof.length ? `<div class="pf-row">${proof.join('')}</div>` : '';
-
-                // COVER: rasm bo'lsa img, aks holda SVG. onerror bilan URL buzilsa SVG
-                const svgCover = generateCover(book.title, book.author, 140, 200);
-                const coverInner = (book.imageUrl && book.imageUrl.startsWith('http') || book.imageUrl?.startsWith('data:') || book.imageUrl?.startsWith('/'))
-                    ? `<img src="${escapeHtml(book.imageUrl)}" alt="" onerror="showCoverFallback(${book.id})">`
-                    : svgCover;
-
-                // Wishlist yurakcha (barcha foydalanuvchilar uchun)
-                const wishBtn = `<button class="wish-btn ${wished ? 'active' : ''}" onclick="event.stopPropagation(); toggleWishlist(${book.id})" title="Sevimlilarga">${wished ? '❤️' : '♡'}</button>`;
-
-                // Admin bar (pastda)
-                const adminBar = isAdmin
-                    ? `<div class="admin-bar">
-                         <button class="icon-btn image" onclick="updateImage(${book.id})" title="Rasm o'zgartirish">📷 Rasm</button>
-                         <button class="icon-btn edit" onclick="openEdit(${book.id})" title="Tahrirlash">✏️ Tahrir</button>
-                         <button class="icon-btn delete" onclick="deleteSaleBook(${book.id})" title="O'chirish">🗑️</button>
-                       </div>`
-                    : '';
-
-                return `
-                    <div class="book-card">
-                        ${hasDiscount ? `<div class="discount-badge">-${book.discount}%</div>` : ''}
-                        ${wishBtn}
-                        <div class="book-cover-wrap" id="cover-${book.id}" onclick="openDetail(${book.id})" style="cursor:pointer;">${coverInner}</div>
-                        <div class="book-title" onclick="openDetail(${book.id})" style="font-size:15px;font-weight:600;margin-bottom:4px;cursor:pointer;">${escapeHtml(book.title)}</div>
-                        <div class="book-author" style="color:var(--text-dim);font-size:12px;margin-bottom:8px;">✍️ ${escapeHtml(book.author)}</div>
-                        <div class="book-meta" style="display:flex;justify-content:space-between;font-size:11px;color:var(--text-faint);margin-bottom:8px;">
-                            <span class="badge" style="background:var(--bg-glass);border:1px solid var(--border);padding:2px 8px;border-radius:999px;">${escapeHtml(book.category)}</span>
-                            <span>${book.year || '—'}</span>
-                        </div>
-                        <div class="price-row">
-                            <span class="price-final">${formatPrice(finalPrice)} so'm</span>
-                            ${hasDiscount ? `<span class="price-old">${formatPrice(book.price)}</span>` : ''}
-                        </div>
-                        ${proofBadges}
-                        <div class="delivery-badge">🚚 Bepul yetkazish • 1-2 kun</div>
-                        <div class="book-stock ${book.stock === 0 ? 'out' : (book.stock < 5 ? 'low' : '')}">${stockText}</div>
-                        <button class="add-cart-btn" onclick="addToCart(${book.id})" ${book.stock === 0 ? 'disabled' : ''}>
-                            ${book.stock === 0 ? 'Tugagan' : "🛒 Savatchaga qo'shish"}
-                        </button>
-                        ${adminBar}
-                    </div>`;
-            }).join('');
+            // Infinite scroll — bo'laklab chizamiz
+            _filteredBooks = filtered;
+            _renderedCount = 0;
+            grid.innerHTML = '';
+            renderMoreBooks();
 
             renderFlashBanner(filtered);
         }
+
+        // ===== INFINITE SCROLL =====
+        const BOOKS_CHUNK = 24;
+        let _filteredBooks = [];
+        let _renderedCount = 0;
+        let _scrollObserver = null;
+
+        function bookCardHtml(book) {
+            const u = getCurrentUser();
+            const isAdmin = u && u.role === 'Admin';
+            const stockText = book.stock === 0 ? '❌ Tugagan'
+                : (book.stock < 5 ? `⚠️ Faqat ${book.stock} ta qoldi!` : `✅ ${book.stock} ta mavjud`);
+            const wished = isWished(book.id);
+            const hasDiscount = book.discount > 0;
+            const finalPrice = book.finalPrice || book.price;
+
+            const proof = [];
+            if ((book.soldCount || 0) >= 5) proof.push('<span class="pf-badge trend">🔥 Trendda</span>');
+            else if ((book.soldCount || 0) > 0) proof.push(`<span class="pf-badge">📦 ${book.soldCount} sotildi</span>`);
+            if (book.stock > 0 && book.stock < 5) proof.push(`<span class="pf-badge urgent">⚡ ${book.stock} ta qoldi</span>`);
+            if ((book.viewCount || 0) >= 10) proof.push(`<span class="pf-badge">👁 ${book.viewCount}</span>`);
+            const proofBadges = proof.length ? `<div class="pf-row">${proof.join('')}</div>` : '';
+
+            const svgCover = generateCover(book.title, book.author, 140, 200);
+            const coverInner = (book.imageUrl && book.imageUrl.startsWith('http') || book.imageUrl?.startsWith('data:') || book.imageUrl?.startsWith('/'))
+                ? `<img src="${escapeHtml(book.imageUrl)}" alt="" onerror="showCoverFallback(${book.id})">`
+                : svgCover;
+
+            const wishBtn = `<button class="wish-btn ${wished ? 'active' : ''}" onclick="event.stopPropagation(); toggleWishlist(${book.id})" title="Sevimlilarga">${wished ? '❤️' : '♡'}</button>`;
+
+            const adminBar = isAdmin
+                ? `<div class="admin-bar">
+                     <button class="icon-btn image" onclick="updateImage(${book.id})" title="Rasm o'zgartirish">📷 Rasm</button>
+                     <button class="icon-btn edit" onclick="openEdit(${book.id})" title="Tahrirlash">✏️ Tahrir</button>
+                     <button class="icon-btn delete" onclick="deleteSaleBook(${book.id})" title="O'chirish">🗑️</button>
+                   </div>`
+                : '';
+
+            return `
+                <div class="book-card">
+                    ${hasDiscount ? `<div class="discount-badge">-${book.discount}%</div>` : ''}
+                    ${wishBtn}
+                    <div class="book-cover-wrap" id="cover-${book.id}" onclick="openDetail(${book.id})" style="cursor:pointer;">${coverInner}</div>
+                    <div class="book-title" onclick="openDetail(${book.id})" style="font-size:15px;font-weight:600;margin-bottom:4px;cursor:pointer;">${escapeHtml(book.title)}</div>
+                    <div class="book-author" style="color:var(--text-dim);font-size:12px;margin-bottom:8px;">✍️ ${escapeHtml(book.author)}</div>
+                    <div class="book-meta" style="display:flex;justify-content:space-between;font-size:11px;color:var(--text-faint);margin-bottom:8px;">
+                        <span class="badge" style="background:var(--bg-glass);border:1px solid var(--border);padding:2px 8px;border-radius:999px;">${escapeHtml(book.category)}</span>
+                        <span>${book.year || '—'}</span>
+                    </div>
+                    <div class="price-row">
+                        <span class="price-final">${formatPrice(finalPrice)} so'm</span>
+                        ${hasDiscount ? `<span class="price-old">${formatPrice(book.price)}</span>` : ''}
+                    </div>
+                    ${proofBadges}
+                    <div class="delivery-badge">🚚 Bepul yetkazish • 1-2 kun</div>
+                    <div class="book-stock ${book.stock === 0 ? 'out' : (book.stock < 5 ? 'low' : '')}">${stockText}</div>
+                    <button class="add-cart-btn" onclick="addToCart(${book.id})" ${book.stock === 0 ? 'disabled' : ''}>
+                        ${book.stock === 0 ? 'Tugagan' : "🛒 Savatchaga qo'shish"}
+                    </button>
+                    ${adminBar}
+                </div>`;
+        }
+
+        function renderMoreBooks() {
+            const grid = document.getElementById('bookGrid');
+            if (!grid) return;
+            const next = _filteredBooks.slice(_renderedCount, _renderedCount + BOOKS_CHUNK);
+            if (next.length) {
+                grid.insertAdjacentHTML('beforeend', next.map(bookCardHtml).join(''));
+                _renderedCount += next.length;
+            }
+            const sentinel = document.getElementById('scrollSentinel');
+            if (sentinel) sentinel.style.display = _renderedCount < _filteredBooks.length ? 'block' : 'none';
+        }
+
+        (function initScrollObserver() {
+            document.addEventListener('DOMContentLoaded', () => {
+                const sentinel = document.getElementById('scrollSentinel');
+                if (!sentinel || _scrollObserver) return;
+                _scrollObserver = new IntersectionObserver(entries => {
+                    if (entries[0].isIntersecting && _renderedCount < _filteredBooks.length) renderMoreBooks();
+                }, { rootMargin: '400px' });
+                _scrollObserver.observe(sentinel);
+            });
+        })();
 
         // Rasm URL noto'g'ri bo'lsa — SVG cover'ga o'tkazish
         function showCoverFallback(bookId) {

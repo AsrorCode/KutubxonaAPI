@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Email tasdiqlash — Kutubxona</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg-base); color: var(--text);
+            min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; }
+        .card { background: var(--bg-elevated); border: 1px solid var(--border); border-radius: 16px;
+            padding: 40px 32px; max-width: 400px; width: 100%; text-align: center; box-shadow: 0 8px 30px rgba(15,23,42,.06); }
+        .icon { font-size: 48px; margin-bottom: 12px; }
+        h1 { font-size: 20px; margin-bottom: 8px; }
+        p { font-size: 14px; color: var(--text-dim); margin-bottom: 20px; }
+        a.btn { display: inline-block; padding: 11px 22px; background: var(--primary); color: #fff;
+            border-radius: 10px; font-size: 14px; font-weight: 700; text-decoration: none; }
+    </style>
+    <link rel="stylesheet" href="/theme.css">
+    <script src="/ui.js"></script>
+</head>
+<body>
+    <div class="card">
+        <div class="icon" id="icon">⏳</div>
+        <h1 id="title">Tasdiqlanmoqda...</h1>
+        <p id="text">Iltimos kuting.</p>
+        <a href="/market.html" class="btn">Marketplace'ga o'tish</a>
+    </div>
+    <script>
+        (async () => {
+            const token = new URLSearchParams(location.search).get('token') || '';
+            const icon = document.getElementById('icon'), title = document.getElementById('title'), text = document.getElementById('text');
+            if (!token) { icon.textContent = '⚠️'; title.textContent = 'Havola noto\'g\'ri'; text.textContent = 'Token topilmadi.'; return; }
+            try {
+                const res = await fetch('/api/auth/verify-email?token=' + encodeURIComponent(token));
+                const data = await res.json();
+                if (res.ok) { icon.textContent = '✅'; title.textContent = 'Email tasdiqlandi!'; text.textContent = 'Rahmat. Hisobingiz tasdiqlandi.'; }
+                else { icon.textContent = '⚠️'; title.textContent = 'Tasdiqlanmadi'; text.textContent = data.message || 'Havola muddati o\'tgan.'; }
+            } catch (e) { icon.textContent = '⚠️'; title.textContent = 'Xato'; text.textContent = 'Qayta urinib ko\'ring.'; }
+        })();
+    </script>
+</body>
+</html>
