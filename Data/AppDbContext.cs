@@ -21,6 +21,8 @@ public class AppDbContext : DbContext
     public DbSet<CollectionItem> CollectionItems { get; set; }
     public DbSet<WishlistItem> WishlistItems { get; set; }
     public DbSet<UserToken> UserTokens { get; set; }
+    public DbSet<SaleBookImage> SaleBookImages { get; set; }
+    public DbSet<BookVote> BookVotes { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -114,6 +116,30 @@ public class AppDbContext : DbContext
         modelBuilder.Entity<WishlistItem>()
             .HasIndex(w => new { w.UserId, w.SaleBookId })
             .IsUnique();
+
+        // ===== SaleBookImage (galereya) =====
+        modelBuilder.Entity<SaleBookImage>()
+            .HasOne(i => i.SaleBook)
+            .WithMany(s => s.Images)
+            .HasForeignKey(i => i.SaleBookId)
+            .OnDelete(DeleteBehavior.Cascade);
+        modelBuilder.Entity<SaleBookImage>().HasIndex(i => i.SaleBookId);
+
+        // ===== BookVote (ovoz bering) =====
+        modelBuilder.Entity<BookVote>()
+            .HasOne(v => v.SaleBook)
+            .WithMany()
+            .HasForeignKey(v => v.SaleBookId)
+            .OnDelete(DeleteBehavior.Cascade);
+        modelBuilder.Entity<BookVote>()
+            .HasOne(v => v.User)
+            .WithMany()
+            .HasForeignKey(v => v.UserId)
+            .OnDelete(DeleteBehavior.Cascade);
+        modelBuilder.Entity<BookVote>()
+            .HasIndex(v => new { v.UserId, v.SaleBookId })
+            .IsUnique();
+        modelBuilder.Entity<BookVote>().HasIndex(v => v.SaleBookId);
 
         // ===== UserToken =====
         modelBuilder.Entity<UserToken>()

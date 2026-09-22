@@ -488,6 +488,20 @@
                             <input type="hidden" id="sImageUrl">
                         </div>
                     </div>
+                    <div class="form-row">
+                        <div class="form-field">
+                            <label>Qo'shimcha rasmlar — galereya (ixtiyoriy, maks 8 ta)</label>
+                            <div class="image-picker" id="sGalleryPicker" tabindex="0" style="min-height:auto;">
+                                <div id="sGalleryPreview" style="display:flex; flex-wrap:wrap; gap:8px;"></div>
+                                <div class="image-picker-actions" style="margin-top:10px;">
+                                    <button type="button" class="btn btn-secondary btn-sm" onclick="document.getElementById('sGalleryFiles').click()">📁 Rasmlar tanlash</button>
+                                    <button type="button" class="btn btn-secondary btn-sm" onclick="addGalleryUrl()">🔗 URL qo'shish</button>
+                                </div>
+                                <input type="file" id="sGalleryFiles" accept="image/*" multiple style="display:none;" onchange="handleGalleryFiles(event)">
+                                <div style="font-size:11px; color:var(--text-faint); margin-top:6px;">Kitobning turli tomonlari — orqa muqova, ichki sahifalar. Bosib tashlang yoki tanlang.</div>
+                            </div>
+                        </div>
+                    </div>
                     <div class="status-msg" id="createSaleStatus"></div>
                 </div>
 
@@ -901,6 +915,50 @@
             setImagePreview(null);
         }
 
+        // ===== GALEREYA (bir nechta rasm) =====
+        let galleryImages = []; // data: yoki URL massivi
+
+        function renderGallery() {
+            const box = document.getElementById('sGalleryPreview');
+            if (!box) return;
+            box.innerHTML = galleryImages.map((url, i) => `
+                <div style="position:relative; width:64px; height:88px; border-radius:8px; overflow:hidden; border:1px solid var(--border);">
+                    <img src="${url}" alt="" style="width:100%; height:100%; object-fit:cover;">
+                    <button type="button" onclick="removeGalleryImage(${i})" title="O'chirish"
+                        style="position:absolute; top:2px; right:2px; width:18px; height:18px; border:none; border-radius:50%; background:rgba(0,0,0,.6); color:#fff; font-size:12px; line-height:1; cursor:pointer;">×</button>
+                </div>
+            `).join('');
+        }
+
+        function removeGalleryImage(i) {
+            galleryImages.splice(i, 1);
+            renderGallery();
+        }
+
+        async function handleGalleryFiles(event) {
+            const files = Array.from(event.target.files || []);
+            for (const file of files) {
+                if (galleryImages.length >= 8) { alert('Maksimum 8 ta rasm'); break; }
+                try {
+                    const dataUrl = await fileToDataUrl(file);
+                    galleryImages.push(dataUrl);
+                } catch (err) { alert(err.message); }
+            }
+            event.target.value = '';
+            renderGallery();
+        }
+
+        function addGalleryUrl() {
+            if (galleryImages.length >= 8) { alert('Maksimum 8 ta rasm'); return; }
+            const url = prompt('Rasm URL:');
+            if (url && url.trim()) { galleryImages.push(url.trim()); renderGallery(); }
+        }
+
+        function clearGallery() {
+            galleryImages = [];
+            renderGallery();
+        }
+
         // Drag & drop
         document.addEventListener('DOMContentLoaded', () => {
             const picker = document.getElementById('sImagePicker');
@@ -951,10 +1009,15 @@
             try {
                 // Rasm base64 bo'lsa — serverga fayl qilib yuklab, URL olamiz (baza yengil)
                 const finalImageUrl = await uploadIfDataUrl(imageUrl);
+                // Galereya rasmlarini ham yuklab, URL massivini olamiz
+                const galleryUrls = [];
+                for (const g of galleryImages) {
+                    galleryUrls.push(await uploadIfDataUrl(g));
+                }
                 const res = await apiFetch(`${API}/salebooks`, {
                     method: 'POST',
                     headers: authHeaders(),
-                    body: JSON.stringify({ title, author, description, price, stock, category, year, imageUrl: finalImageUrl, isActive, discount, discountEndsAt, publisher, coverType, pageCount, isbn })
+                    body: JSON.stringify({ title, author, description, price, stock, category, year, imageUrl: finalImageUrl, isActive, discount, discountEndsAt, publisher, coverType, pageCount, isbn, galleryUrls })
                 });
                 if (!res.ok) throw new Error(`Xato: ${res.status}`);
                 status.className = 'status-msg success';
@@ -965,6 +1028,7 @@
                 document.getElementById('sStock').value = '1';
                 document.getElementById('sDiscount').value = '0';
                 clearImage();
+                clearGallery();
                 await loadSaleBooks();
                 await loadStats();
                 setTimeout(() => status.className = 'status-msg', 3000);
