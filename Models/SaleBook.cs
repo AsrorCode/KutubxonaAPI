@@ -79,4 +79,7 @@ public class SaleBook : ISoftDelete
     public byte[]? RowVersion { get; set; }
 
     public List<OrderItem> OrderItems { get; set; } = new();
+
+    /// <summary>Qo'shimcha galereya rasmlari (thumbnail qatori uchun).</summary>
+    public List<SaleBookImage> Images { get; set; } = new();
 }

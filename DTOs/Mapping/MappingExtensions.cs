@@ -56,6 +56,9 @@ public static class MappingExtensions
             PageCount = s.PageCount,
             Isbn = s.Isbn,
             ViewCount = s.ViewCount,
+            GalleryUrls = s.Images != null
+                ? s.Images.OrderBy(i => i.SortOrder).Select(i => i.Url).ToList()
+                : new List<string>(),
             CreatedAt = s.CreatedAt,
             UpdatedAt = s.UpdatedAt
         };

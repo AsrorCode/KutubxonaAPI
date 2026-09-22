@@ -445,6 +445,76 @@
         }
         .detail-cover img { width: 100%; height: 100%; object-fit: cover; }
 
+        /* ===== Galereya (thumbnail qatori + asosiy rasm) ===== */
+        .detail-gallery { display: flex; gap: 12px; }
+        .detail-thumbs {
+            display: flex; flex-direction: column; gap: 8px;
+            width: 54px; flex-shrink: 0;
+            max-height: 340px; overflow-y: auto;
+        }
+        .detail-thumb {
+            width: 54px; height: 74px; border-radius: 8px;
+            overflow: hidden; cursor: pointer;
+            border: 2px solid transparent; background: var(--bg-glass);
+            transition: border-color .15s;
+        }
+        .detail-thumb:hover { border-color: var(--border-hover); }
+        .detail-thumb.active { border-color: var(--primary); }
+        .detail-thumb img { width: 100%; height: 100%; object-fit: cover; }
+        .detail-main {
+            position: relative; flex: 1;
+            width: 224px; height: 340px;
+            border-radius: 12px; overflow: hidden;
+            box-shadow: 0 12px 30px rgba(15, 23, 42, 0.15);
+            background: var(--bg-glass);
+        }
+        .detail-main img { width: 100%; height: 100%; object-fit: cover; display: block; }
+        .detail-main svg { width: 100%; height: 100%; }
+        .gal-arrow {
+            position: absolute; top: 50%; transform: translateY(-50%);
+            width: 34px; height: 34px; border-radius: 50%;
+            background: rgba(255,255,255,.9); border: 1px solid var(--border);
+            color: #292524; font-size: 20px; line-height: 1; cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,.15); z-index: 2;
+        }
+        .gal-arrow:hover { background: #fff; }
+        .gal-prev { left: 8px; }
+        .gal-next { right: 8px; }
+        @media (max-width: 720px) {
+            .detail-gallery { flex-direction: column-reverse; align-items: center; }
+            .detail-thumbs { flex-direction: row; width: auto; max-width: 100%; overflow-x: auto; }
+            .detail-main { width: 240px; height: 340px; }
+        }
+
+        /* ===== Ovoz bering (o'qish holati) ===== */
+        .vote-section { margin-top: 8px; }
+        .vote-title { font-size: 15px; font-weight: 700; margin-bottom: 10px; }
+        .vote-grid {
+            display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;
+        }
+        @media (min-width: 640px) { .vote-grid { grid-template-columns: repeat(4, 1fr); } }
+        .vote-btn {
+            display: flex; align-items: center; gap: 8px;
+            padding: 12px 14px; border-radius: 12px;
+            border: 1px solid var(--border); background: var(--bg-glass);
+            cursor: pointer; transition: all .15s; text-align: left;
+            font-family: inherit; color: var(--text);
+        }
+        .vote-btn:hover { border-color: var(--border-hover); transform: translateY(-1px); }
+        .vote-btn.active {
+            border-color: var(--primary);
+            background: rgba(180, 83, 9, 0.08);
+        }
+        .vote-ico { font-size: 20px; flex-shrink: 0; }
+        .vote-body { display: flex; flex-direction: column; line-height: 1.2; }
+        .vote-label { font-size: 13px; font-weight: 600; }
+        .vote-count {
+            font-size: 13px; font-weight: 800; color: var(--primary);
+            margin-left: auto; background: var(--bg-elevated);
+            min-width: 26px; text-align: center; padding: 2px 6px; border-radius: 8px;
+        }
+
         .detail-breadcrumb {
             font-size: 12px; color: var(--text-dim);
             margin-bottom: 10px;
@@ -1720,9 +1790,15 @@
         <div class="detail-modal">
             <button class="detail-close" onclick="closeDetail()">×</button>
             <div class="detail-grid">
-                <!-- Chap: rasm -->
+                <!-- Chap: rasm galereyasi -->
                 <div class="detail-cover-col">
-                    <div class="detail-cover" id="dCover"></div>
+                    <div class="detail-gallery">
+                        <div class="detail-thumbs" id="dThumbs" style="display:none;"></div>
+                        <div class="detail-main" id="dCover">
+                            <button class="gal-arrow gal-prev" id="dGalPrev" onclick="galStep(-1)" style="display:none;">‹</button>
+                            <button class="gal-arrow gal-next" id="dGalNext" onclick="galStep(1)" style="display:none;">›</button>
+                        </div>
+                    </div>
                 </div>
                 <!-- O'ng: ma'lumot -->
                 <div class="detail-info-col">
@@ -1756,6 +1832,34 @@
                         <span class="detail-share" onclick="shareBook()">🔗 Ulashish</span>
                     </div>
                 </div>
+            </div>
+
+            <!-- ===== OVOZ BERING (o'qish holati) ===== -->
+            <div class="detail-section vote-section">
+                <div class="vote-title">Ovoz bering:</div>
+                <div class="vote-grid" id="voteGrid">
+                    <button class="vote-btn" data-v="read" onclick="castVote('read')">
+                        <span class="vote-ico">📖</span>
+                        <span class="vote-body"><span class="vote-label">O'qidim</span></span>
+                        <span class="vote-count" id="vc-read">0</span>
+                    </button>
+                    <button class="vote-btn" data-v="reading" onclick="castVote('reading')">
+                        <span class="vote-ico">👓</span>
+                        <span class="vote-body"><span class="vote-label">O'qiyapman</span></span>
+                        <span class="vote-count" id="vc-reading">0</span>
+                    </button>
+                    <button class="vote-btn" data-v="want" onclick="castVote('want')">
+                        <span class="vote-ico">📚</span>
+                        <span class="vote-body"><span class="vote-label">O'qimoqchiman</span></span>
+                        <span class="vote-count" id="vc-want">0</span>
+                    </button>
+                    <button class="vote-btn" data-v="recommend" onclick="castVote('recommend')">
+                        <span class="vote-ico">👍</span>
+                        <span class="vote-body"><span class="vote-label">Tavsiya qilaman</span></span>
+                        <span class="vote-count" id="vc-recommend">0</span>
+                    </button>
+                </div>
+                <div id="voteHint" style="font-size:12px; color:var(--text-dim); margin-top:8px;"></div>
             </div>
 
             <!-- Tavsif -->
@@ -1996,12 +2100,8 @@
             overlay.classList.add('active');
             document.body.style.overflow = 'hidden';
 
-            // --- Rasm ---
-            const coverEl = document.getElementById('dCover');
-            const hasImg = (book.imageUrl && book.imageUrl.startsWith('http')) || book.imageUrl?.startsWith('data:') || book.imageUrl?.startsWith('/');
-            coverEl.innerHTML = hasImg
-                ? `<img src="${escapeHtml(book.imageUrl)}" alt="" data-t="${escapeHtml(book.title)}" data-a="${escapeHtml(book.author)}" onerror="coverFallback(this,260,370)">`
-                : generateCover(book.title, book.author, 260, 370);
+            // --- Rasm galereyasi ---
+            initGallery(book);
 
             // --- Asosiy maydonlar ---
             document.getElementById('dBreadcrumb').textContent = `Bosh sahifa › ${book.category || 'Kitoblar'}`;
@@ -2062,6 +2162,11 @@
                 const res = await fetch(`${API_BASE}/api/salebooks/${bookId}/detail`);
                 if (res.ok) {
                     const d = await res.json();
+                    // Galereya rasmlari faqat /detail'dan keladi — kelsa qayta chizamiz
+                    if (d.book && Array.isArray(d.book.galleryUrls) && d.book.galleryUrls.length) {
+                        book.galleryUrls = d.book.galleryUrls;
+                        if (currentDetailBook === book) initGallery(book);
+                    }
                     if (d.soldThisWeek > 0) {
                         hotEl.textContent = `🔥 Bu hafta ${d.soldThisWeek} marta sotib olindi`;
                         hotEl.style.display = 'inline-block';
@@ -2076,9 +2181,113 @@
                 }
             } catch (_) { /* statistikasiz ham modal ishlaydi */ }
 
-            // --- Sharhlar + o'xshash kitoblar ---
+            // --- Sharhlar + o'xshash kitoblar + ovozlar ---
             loadReviews(bookId);
             loadSimilar(bookId);
+            loadVotes(bookId);
+        }
+
+        // ============================================
+        //  RASM GALEREYASI (thumbnail + aylantirish)
+        // ============================================
+        let galImages = [];
+        let galIndex = 0;
+        let galBook = null;
+
+        function isImgUrl(u) {
+            return !!u && (u.startsWith('http') || u.startsWith('data:') || u.startsWith('/'));
+        }
+
+        function initGallery(book) {
+            galBook = book;
+            galIndex = 0;
+            const imgs = [];
+            if (isImgUrl(book.imageUrl)) imgs.push(book.imageUrl);
+            (book.galleryUrls || []).forEach(u => { if (isImgUrl(u) && !imgs.includes(u)) imgs.push(u); });
+            galImages = imgs;
+            renderGalleryMain();
+            renderGalleryThumbs();
+        }
+
+        function renderGalleryMain() {
+            const main = document.getElementById('dCover');
+            let inner;
+            if (galImages.length) {
+                const url = galImages[galIndex];
+                inner = `<img src="${escapeHtml(url)}" alt="" data-t="${escapeHtml(galBook.title)}" data-a="${escapeHtml(galBook.author)}" onerror="coverFallback(this,224,340)">`;
+            } else {
+                inner = generateCover(galBook.title, galBook.author, 224, 340);
+            }
+            const multi = galImages.length > 1;
+            main.innerHTML = `
+                <button class="gal-arrow gal-prev" onclick="galStep(-1)" style="display:${multi ? 'flex' : 'none'};">‹</button>
+                <button class="gal-arrow gal-next" onclick="galStep(1)" style="display:${multi ? 'flex' : 'none'};">›</button>
+                ${inner}`;
+        }
+
+        function renderGalleryThumbs() {
+            const thumbs = document.getElementById('dThumbs');
+            if (galImages.length <= 1) { thumbs.style.display = 'none'; thumbs.innerHTML = ''; return; }
+            thumbs.style.display = 'flex';
+            thumbs.innerHTML = galImages.map((url, i) => `
+                <div class="detail-thumb ${i === galIndex ? 'active' : ''}" onclick="galSelect(${i})">
+                    <img src="${escapeHtml(url)}" alt="" onerror="this.parentElement.style.display='none'">
+                </div>`).join('');
+        }
+
+        function galSelect(i) { galIndex = i; renderGalleryMain(); renderGalleryThumbs(); }
+        function galStep(d) {
+            if (galImages.length < 2) return;
+            galIndex = (galIndex + d + galImages.length) % galImages.length;
+            renderGalleryMain();
+            renderGalleryThumbs();
+        }
+
+        // ============================================
+        //  OVOZ BERING (o'qish holati)
+        // ============================================
+        const VOTE_TYPES = ['read', 'reading', 'want', 'recommend'];
+
+        function applyVotes(d) {
+            const counts = d.counts || {};
+            VOTE_TYPES.forEach(t => {
+                const el = document.getElementById('vc-' + t);
+                if (el) el.textContent = counts[t] || 0;
+            });
+            document.querySelectorAll('.vote-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.v === d.myVote);
+            });
+            const hint = document.getElementById('voteHint');
+            if (hint) {
+                if (!getToken()) hint.innerHTML = 'Ovoz berish uchun <a href="/login.html" style="color:var(--primary);">tizimga kiring</a>.';
+                else if (d.myVote) hint.textContent = 'Sizning ovozingiz saqlandi. O\'zgartirish uchun boshqasini bosing yoki bekor qilish uchun qaytadan bosing.';
+                else hint.textContent = 'Bu kitobni o\'qish holatingizni belgilang.';
+            }
+        }
+
+        async function loadVotes(bookId) {
+            // reset
+            VOTE_TYPES.forEach(t => { const el = document.getElementById('vc-' + t); if (el) el.textContent = '0'; });
+            document.querySelectorAll('.vote-btn').forEach(b => b.classList.remove('active'));
+            try {
+                const res = await apiFetch(`${API_BASE}/api/salebooks/${bookId}/votes`, {});
+                if (!res.ok) return;
+                applyVotes(await res.json());
+            } catch (_) { /* ovozsiz ham modal ishlaydi */ }
+        }
+
+        async function castVote(type) {
+            if (!currentDetailBook) return;
+            if (!getToken()) { showToast('Ovoz berish uchun tizimga kiring'); location.href = '/login.html'; return; }
+            try {
+                const res = await apiFetch(`${API_BASE}/api/salebooks/${currentDetailBook.id}/votes`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ voteType: type })
+                });
+                if (!res.ok) throw new Error('vote failed');
+                applyVotes(await res.json());
+            } catch (_) { showToast('Ovoz berishda xatolik'); }
         }
 
         async function loadSimilar(bookId) {

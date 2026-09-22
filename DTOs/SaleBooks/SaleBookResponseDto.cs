@@ -23,6 +23,8 @@ public class SaleBookResponseDto
     public string Isbn { get; set; } = string.Empty;
     public int ViewCount { get; set; }
     public int SoldCount { get; set; }
+    /// <summary>Qo'shimcha galereya rasmlari (asosiy rasmdan tashqari).</summary>
+    public List<string> GalleryUrls { get; set; } = new();
     public DateTime CreatedAt { get; set; }
     public DateTime? UpdatedAt { get; set; }
 }
@@ -73,4 +75,7 @@ public class SaleBookCreateDto
 
     [StringLength(50)]
     public string Isbn { get; set; } = string.Empty;
+
+    /// <summary>Qo'shimcha galereya rasmlari (URL yoki data:). Maks 8 ta.</summary>
+    public List<string>? GalleryUrls { get; set; }
 }

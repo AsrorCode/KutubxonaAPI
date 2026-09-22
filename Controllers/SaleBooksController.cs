@@ -113,7 +113,9 @@ public class SaleBooksController : ControllerBase
     [HttpGet("{id:int}/detail")]
     public async Task<ActionResult<object>> GetDetail(int id, CancellationToken ct = default)
     {
-        var book = await _context.SaleBooks.FirstOrDefaultAsync(b => b.Id == id, ct);
+        var book = await _context.SaleBooks
+            .Include(b => b.Images)
+            .FirstOrDefaultAsync(b => b.Id == id, ct);
         if (book == null) return NotFound(new { message = "Kitob topilmadi" });
 
         // Ko'rishlar sonini atomik oshirish (RowVersion muammosisiz)
@@ -327,10 +329,17 @@ public class SaleBooksController : ControllerBase
         _context.SaleBooks.Add(book);
         await _context.SaveChangesAsync();
 
+        // Galereya rasmlari (maks 8 ta)
+        var gallery = CleanGallery(dto.GalleryUrls);
+        AddGalleryImages(book, gallery);
+        if (gallery.Count > 0) await _context.SaveChangesAsync();
+
         await AddBookNotificationAsync(book, isNew: true);
 
         _logger.LogInformation("Yangi sotuv kitobi qo'shildi: {Title}", book.Title);
-        return CreatedAtAction(nameof(GetOne), new { id = book.Id }, book.ToDto());
+        var created = book.ToDto();
+        created.GalleryUrls = gallery;
+        return CreatedAtAction(nameof(GetOne), new { id = book.Id }, created);
     }
 
     // ======== PUT /api/salebooks/{id} (Admin) ========
@@ -340,7 +349,9 @@ public class SaleBooksController : ControllerBase
     {
         if (!ModelState.IsValid) return BadRequest(ModelState);
 
-        var book = await _context.SaleBooks.FindAsync(id);
+        var book = await _context.SaleBooks
+            .Include(b => b.Images)
+            .FirstOrDefaultAsync(b => b.Id == id);
         if (book == null) return NotFound(new { message = "Kitob topilmadi" });
 
         var oldDiscount = book.Discount;
@@ -362,13 +373,47 @@ public class SaleBooksController : ControllerBase
         book.Isbn = dto.Isbn ?? "";
         book.UpdatedAt = DateTime.UtcNow;
 
+        // Galereya rasmlarini almashtirish (faqat GalleryUrls yuborilgan bo'lsa)
+        var gallery = book.Images.OrderBy(i => i.SortOrder).Select(i => i.Url).ToList();
+        if (dto.GalleryUrls != null)
+        {
+            _context.SaleBookImages.RemoveRange(book.Images);
+            book.Images.Clear();
+            gallery = CleanGallery(dto.GalleryUrls);
+            AddGalleryImages(book, gallery);
+        }
+
         await _context.SaveChangesAsync();
 
         // Yangi aksiya qo'yilganda (0 dan >0 ga) bildirishnoma
         if (oldDiscount == 0 && book.Discount > 0)
             await AddBookNotificationAsync(book, isNew: false);
 
-        return Ok(book.ToDto());
+        var updated = book.ToDto();
+        updated.GalleryUrls = gallery;
+        return Ok(updated);
+    }
+
+    // ======== Yordamchi: galereya rasmlari ========
+    private static List<string> CleanGallery(List<string>? urls)
+    {
+        if (urls == null) return new List<string>();
+        return urls
+            .Where(u => !string.IsNullOrWhiteSpace(u))
+            .Select(u => u.Trim())
+            .Distinct()
+            .Take(8)
+            .ToList();
+    }
+
+    private void AddGalleryImages(SaleBook book, List<string> urls)
+    {
+        for (int i = 0; i < urls.Count; i++)
+        {
+            var img = new SaleBookImage { SaleBookId = book.Id, Url = urls[i], SortOrder = i };
+            book.Images.Add(img);
+            _context.SaleBookImages.Add(img);
+        }
     }
 
     // ======== Yordamchi: aksiya/yangi kitob bildirishnomasi ========
