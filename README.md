@@ -8,7 +8,7 @@ O'zbek tilidagi onlayn kitob do'koni (marketplace) — ASP.NET Core backend va v
 |--------|-------------|
 | Framework | .NET 10, ASP.NET Core Web API |
 | ORM | Entity Framework Core 10 |
-| Ma'lumotlar bazasi | SQL Server (LocalDB) |
+| Ma'lumotlar bazasi | PostgreSQL (Npgsql) |
 | Autentifikatsiya | JWT Bearer + Refresh Token (rotation), BCrypt |
 | Validatsiya | FluentValidation |
 | Loglar | Serilog (Console + File) |
@@ -38,7 +38,7 @@ O'zbek tilidagi onlayn kitob do'koni (marketplace) — ASP.NET Core backend va v
 
 ### Talablar
 - .NET 10 SDK
-- SQL Server LocalDB (yoki boshqa SQL Server)
+- PostgreSQL (lokal yoki Docker)
 
 ### Qadamlar
 
@@ -49,8 +49,9 @@ cd KutubxonaAPI
 
 # 2. Sirlarni o'rnatish (MAJBURIY)
 dotnet user-secrets set "Jwt:Key" "<kamida-32-belgili-maxfiy-kalit>"
+dotnet user-secrets set "ConnectionStrings:DefaultConnection" "Host=localhost;Port=5432;Database=kutubxona;Username=postgres;Password=<parol>"
 
-# 3. Bazani yaratish
+# 3. Bazani yaratish (PostgreSQL)
 dotnet ef database update
 
 # 4. Ishga tushirish

@@ -44,6 +44,16 @@ public class AppDbContext : DbContext
             .HasConversion<string>()
             .HasMaxLength(30);
 
+        // ===== Concurrency — PostgreSQL `xmin` tizim ustuni =====
+        // SaleBook.Stock'ni bir vaqtda ikki buyurtma o'zgartira olmasligi uchun.
+        // UseXminAsConcurrencyToken() ning qo'lda, versiyaga bog'liq bo'lmagan ko'rinishi:
+        modelBuilder.Entity<SaleBook>()
+            .Property<uint>("xmin")
+            .HasColumnName("xmin")
+            .HasColumnType("xid")
+            .ValueGeneratedOnAddOrUpdate()
+            .IsConcurrencyToken();
+
         // ===== Decimal precision (pul) =====
         modelBuilder.Entity<SaleBook>()
             .Property(s => s.Price)

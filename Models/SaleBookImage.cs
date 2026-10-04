@@ -1,5 +1,3 @@
-using System.ComponentModel.DataAnnotations.Schema;
-
 namespace KutubxonaAPI.Models;
 
 /// <summary>
@@ -13,7 +11,6 @@ public class SaleBookImage
     public int SaleBookId { get; set; }
     public SaleBook? SaleBook { get; set; }
 
-    [Column(TypeName = "nvarchar(max)")]
     public string Url { get; set; } = string.Empty;
 
     /// <summary>Chapdagi thumbnail qatoridagi tartib (0 — birinchi).</summary>

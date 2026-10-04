@@ -52,8 +52,7 @@ public class User : ISoftDelete
     /// <summary>Oxirgi marta qachon kirgan.</summary>
     public DateTime? LastLoginAt { get; set; }
 
-    /// <summary>Profil rasmi (base64 data URL yoki tashqi URL). Ixtiyoriy.</summary>
-    [Column(TypeName = "nvarchar(max)")]
+    /// <summary>Profil rasmi (tashqi URL yoki base64 data URL). Ixtiyoriy.</summary>
     public string AvatarUrl { get; set; } = string.Empty;
 
     /// <summary>Foydalanuvchining to'liq ismi (yordamchi property).</summary>
