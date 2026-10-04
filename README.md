@@ -1,92 +1,96 @@
-# 📚 KutubxonaAPI
+# KutubxonaAPI 📚
 
-**O'zbek onlayn kutubxona** — kitob o'qish, sotib olish va boshqarish uchun to'liq platforma.
+O'zbek tilidagi onlayn kitob do'koni (marketplace) — ASP.NET Core backend va vanilla HTML/CSS/JS frontend. Portfolio + real biznes loyihasi.
 
-![.NET](https://img.shields.io/badge/.NET-10.0-512BD4?logo=dotnet)
-![C#](https://img.shields.io/badge/C%23-239120?logo=csharp)
-![JWT](https://img.shields.io/badge/JWT-000?logo=jsonwebtokens)
-![SQL Server](https://img.shields.io/badge/SQL_Server-CC2927?logo=microsoftsqlserver)
-[![CI](https://github.com/AsrorCode/KutubxonaAPI/actions/workflows/build.yml/badge.svg)](https://github.com/AsrorCode/KutubxonaAPI/actions)
+## Texnologiyalar
 
----
+| Qatlam | Texnologiya |
+|--------|-------------|
+| Framework | .NET 10, ASP.NET Core Web API |
+| ORM | Entity Framework Core 10 |
+| Ma'lumotlar bazasi | SQL Server (LocalDB) |
+| Autentifikatsiya | JWT Bearer + Refresh Token (rotation), BCrypt |
+| Validatsiya | FluentValidation |
+| Loglar | Serilog (Console + File) |
+| Hujjat | OpenAPI + Scalar |
+| Frontend | Vanilla HTML / CSS / JS (`wwwroot`) |
+| Testlar | xUnit |
 
-## ✨ Nima bor?
+## Asosiy imkoniyatlar
 
-**Foydalanuvchi**: 3D varaqlash bilan kitob o'qish · Izoh va yulduzli reyting · O'qish davom etishi · Marketplace'dan xarid · Buyurtmalar tarixi · Reading streak · Wishlist · Kunlik iqtiboslar
+- **Marketplace** — kitob katalogi, qidiruv + autocomplete, kategoriya filtri, chegirmalar, rasm galereyasi
+- **Buyurtmalar** — savat, transaction + concurrency himoyali buyurtma yaratish, status kuzatuvi, stock boshqaruvi
+- **Autentifikatsiya** — ro'yxatdan o'tish, kirish, refresh token, parol tiklash, email tasdiqlash
+- **Ijtimoiy** — sharhlar va reyting, "Ovoz bering" (o'qish holati), sevimlilar (wishlist), bildirishnomalar
+- **Shaxsiy** — "Siz uchun" tavsiya, profil + avatar, kolleksiyalar
+- **Admin** — kitob CRUD, buyurtma boshqaruvi, statistika dashboard (grafiklar)
 
-**Admin**: Kitob boshqaruvi · PDF yuklab avto-sahifalash · Marketplace CRUD · Chegirmalar boshqaruvi · Buyurtma statusini o'zgartirish · Tahlil va statistika
+## Xavfsizlik va ishlash
 
-**Xavfsizlik**: JWT + Refresh Token (15 daq access, 7 kun refresh) · BCrypt hash · Rate limiting · Kuchli parol · CORS · Global exception handler · Soft Delete
+- JWT imzo kaliti va DB paroli **`dotnet user-secrets`da** (hech qachon repo'ga tushmaydi)
+- Rate limiting — auth endpoint'lar (5/min) + global limiter (100/min har IP)
+- Soft delete + global query filter, optimistik concurrency (RowVersion)
+- Response compression (Brotli/Gzip), Output cache (kitob ro'yxatlari 30s)
+- Sahifalash (opt-in `?page&pageSize`), fon tozalash xizmati (eskirgan token/bildirishnoma)
+- Global exception middleware, health checks (`/health`, `/health/ready`, `/health/live`)
 
----
+## Ishga tushirish
 
-## 🛠️ Stack
+### Talablar
+- .NET 10 SDK
+- SQL Server LocalDB (yoki boshqa SQL Server)
 
-**Backend**: .NET 10, ASP.NET Core, EF Core 10, SQL Server, JWT, BCrypt, Serilog, FluentValidation, Scalar  
-**Frontend**: Vanilla HTML/CSS/JS, Dark Premium Design, StPageFlip, PDF.js  
-**DevOps**: GitHub Actions CI/CD, Dependabot
-
----
-
-## 🚀 Ishga tushirish
+### Qadamlar
 
 ```bash
+# 1. Repo
 git clone https://github.com/AsrorCode/KutubxonaAPI.git
 cd KutubxonaAPI
-dotnet user-secrets set "Jwt:Key" "SIZNING_MAXFIY_KALITINGIZ"
+
+# 2. Sirlarni o'rnatish (MAJBURIY)
+dotnet user-secrets set "Jwt:Key" "<kamida-32-belgili-maxfiy-kalit>"
+
+# 3. Bazani yaratish
 dotnet ef database update
+
+# 4. Ishga tushirish
 dotnet run
 ```
 
-Ochish: `http://localhost:5000` · API docs: `/scalar/v1`
+Sayt: `https://localhost:5001` — API hujjati (dev): `https://localhost:5001/scalar/v1`
 
----
+### Testlar
 
-## 📡 Asosiy endpointlar
-
-| Metod | Endpoint | Auth |
-|-------|----------|------|
-| POST | `/api/auth/register`, `/login`, `/refresh`, `/logout` | ❌ / ✅ |
-| GET | `/api/books?page=1&pageSize=20` | ❌ |
-| POST | `/api/books` | 👮 Admin |
-| GET | `/api/books/{id}/pages/{n}` | ❌ |
-| POST | `/api/books/{id}/comments` | ✅ |
-| GET | `/api/salebooks` | ❌ |
-| POST | `/api/orders` | ✅ |
-| GET | `/health`, `/health/ready`, `/health/live` | ❌ |
-
-To'liq ro'yxat: `/scalar/v1` (loyiha ishga tushgach)
-
----
-
-## 📁 Loyiha strukturasi
-
-```
-Controllers/  Common/  Data/  DTOs/  Exceptions/
-Middleware/   Migrations/  Models/  Validators/
-wwwroot/  docs/  .github/
+```bash
+dotnet test Tests/KutubxonaAPI.Tests.csproj
 ```
 
-Batafsil: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)
+## Loyiha tuzilmasi
 
----
+```
+Controllers/     — API endpointlar (SaleBooks, Orders, Auth, Reviews, Votes, ...)
+Models/          — EF entity'lar
+DTOs/            — so'rov/javob obyektlari + mapping
+Validators/      — FluentValidation qoidalari
+Services/        — Email, fon tozalash xizmati
+Data/            — AppDbContext
+Common/          — konstantalar, extension'lar, pagination
+Middleware/      — global exception handler
+Migrations/      — EF migratsiyalar
+Tests/           — xUnit testlar (alohida loyiha)
+wwwroot/         — frontend (market, admin, profil, auth sahifalari)
+```
 
-## 📚 Dokumentatsiya
+## Muhit sozlamalari
 
-- 🏛️ [ARCHITECTURE](docs/ARCHITECTURE.md) — Arxitektura qarorlari
-- 🤝 [CONTRIBUTING](docs/CONTRIBUTING.md) — Hissa qo'shish qoidalari
-- 📋 [CHANGELOG](CHANGELOG.md) — Versiya tarixi
+| Kalit | Tavsif |
+|-------|--------|
+| `Jwt:Key` | JWT imzo kaliti (user-secrets) |
+| `ConnectionStrings:DefaultConnection` | Baza ulanishi |
+| `Email:Smtp:*` | SMTP (ixtiyoriy — bo'lmasa havola logga yoziladi) |
+| `AutoMigrate` | Production'da avtomatik migratsiya (default: false) |
+| `AllowedOrigins` | CORS uchun ruxsat etilgan manzillar |
 
----
+## Litsenziya
 
-## 🔮 Kelajakda
-
-Service Layer + Repository · MediatR (CQRS) · Docker · xUnit testlar · Email service · Click/Payme · Blazor WASM · Full-text search
-
----
-
-## 👨‍💻 Muallif
-
-**Asror Haydarov** · 📧 asroh131@gmail.com · 🐙 [@AsrorCode](https://github.com/AsrorCode)
-
-MIT License · Made in Uzbekistan 🇺🇿
+Shaxsiy / ta'lim loyihasi.

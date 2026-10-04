@@ -90,10 +90,12 @@ try
         options.AddPolicy("static-5min", builder =>
             builder.Expire(TimeSpan.FromMinutes(5)));
 
-        // Kitob ro'yxati — 30 sekund
+        // Kitob ro'yxati — 30 sekund (barcha filtr parametrlari bo'yicha farqlanadi)
         options.AddPolicy("books-30sec", builder =>
             builder.Expire(TimeSpan.FromSeconds(30))
-                   .SetVaryByQuery("page", "pageSize", "category", "search"));
+                   .SetVaryByQuery(
+                        "includeInactive", "page", "pageSize",
+                        "category", "search", "q", "count"));
     });
 
     // ============================================
@@ -110,6 +112,9 @@ try
 
     builder.Services.AddDbContext<AppDbContext>(options =>
         options.UseSqlServer(connectionString));
+
+    // Fon tozalash xizmati — eskirgan token/bildirishnomalarни o'chiradi
+    builder.Services.AddHostedService<KutubxonaAPI.Services.CleanupHostedService>();
 
     // ============================================
     // HEALTH CHECKS
@@ -156,6 +161,7 @@ try
     {
         options.RejectionStatusCode = 429;
 
+        // Auth endpoint'lar uchun qattiqroq (login/register/parol) — [EnableRateLimiting("auth")]
         options.AddFixedWindowLimiter(AuthConstants.AuthRateLimitPolicy, opt =>
         {
             opt.PermitLimit = AuthConstants.AuthRateLimitPerMinute;
@@ -163,12 +169,17 @@ try
             opt.QueueLimit = 0;
         });
 
-        options.AddFixedWindowLimiter(AuthConstants.GeneralRateLimitPolicy, opt =>
-        {
-            opt.PermitLimit = AuthConstants.GeneralRateLimitPerMinute;
-            opt.Window = TimeSpan.FromMinutes(1);
-            opt.QueueLimit = 10;
-        });
+        // GLOBAL limiter — har IP uchun 1 daqiqada N so'rov (barcha API'ga).
+        // Statik fayllar pipeline'da RateLimiter'dan oldin uzatiladi, shuning uchun cheklanmaydi.
+        options.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(httpContext =>
+            RateLimitPartition.GetFixedWindowLimiter(
+                partitionKey: httpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown",
+                factory: _ => new FixedWindowRateLimiterOptions
+                {
+                    PermitLimit = AuthConstants.GeneralRateLimitPerMinute,
+                    Window = TimeSpan.FromMinutes(1),
+                    QueueLimit = 0
+                }));
     });
 
     // ============================================
@@ -199,12 +210,20 @@ try
     // ============================================
     var app = builder.Build();
 
-    // Database migration
-    using (var scope = app.Services.CreateScope())
+    // Database migration — development'да avtomatik,
+    // production'да faqat AutoMigrate=true bo'lsa (nazoratsiz migratsiya xavfi).
+    var autoMigrate = app.Environment.IsDevelopment()
+        || app.Configuration.GetValue<bool>("AutoMigrate");
+    if (autoMigrate)
     {
+        using var scope = app.Services.CreateScope();
         var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
         dbContext.Database.Migrate();
         Log.Information("✅ Database migration bajarildi");
+    }
+    else
+    {
+        Log.Warning("⏭️ Avtomatik migratsiya o'chirilgan (production). Migratsiyalarni qo'lda qo'llang: dotnet ef database update");
     }
 
     // ============================================
@@ -247,7 +266,9 @@ try
         });
     }
 
-    // 4. HTTPS
+    // 4. HTTPS + HSTS (production'da brauzerni faqat HTTPS'ga majburlaydi)
+    if (!app.Environment.IsDevelopment())
+        app.UseHsts();
     app.UseHttpsRedirection();
 
     // 5. Static files
