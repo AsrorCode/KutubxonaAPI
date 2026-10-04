@@ -1,10 +1,12 @@
 using KutubxonaAPI.Common.Extensions;
+using KutubxonaAPI.Common.Pagination;
 using KutubxonaAPI.Data;
 using KutubxonaAPI.DTOs.Mapping;
 using KutubxonaAPI.DTOs.SaleBooks;
 using KutubxonaAPI.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.OutputCaching;
 using Microsoft.EntityFrameworkCore;
 
 namespace KutubxonaAPI.Controllers;
@@ -24,33 +26,62 @@ public class SaleBooksController : ControllerBase
     }
 
     // ======== GET /api/salebooks ========
+    /// <summary>
+    /// Kitoblar ro'yxati. ?page & ?pageSize berilsa — sahifalangan
+    /// (PagedResult) qaytadi; berilmasa — to'liq array (eski moslik).
+    /// </summary>
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<SaleBookResponseDto>>> GetAll(
-        [FromQuery] bool includeInactive = false)
+    [OutputCache(PolicyName = "books-30sec")]
+    public async Task<IActionResult> GetAll(
+        [FromQuery] bool includeInactive = false,
+        [FromQuery] int? page = null,
+        [FromQuery] int? pageSize = null,
+        CancellationToken ct = default)
     {
         var query = _context.SaleBooks.AsQueryable();
         if (!includeInactive) query = query.Where(b => b.IsActive);
+        query = query.OrderByDescending(b => b.CreatedAt);
 
-        var books = await query
-            .OrderByDescending(b => b.CreatedAt)
-            .ToListAsync();
+        // --- Eski rejim: page berilmasa hammasini qaytaramiz ---
+        if (page is null && pageSize is null)
+        {
+            var all = await query.ToListAsync(ct);
+            return Ok(await AttachSoldCountsAsync(all, ct));
+        }
 
-        // Har kitob uchun sotilgan soni (ijtimoiy dalil)
+        // --- Sahifalangan rejim ---
+        var p = PagedResult<object>.NormalizePage(page);
+        var ps = PagedResult<object>.NormalizePageSize(pageSize);
+        var total = await query.CountAsync(ct);
+        var items = await query.Skip((p - 1) * ps).Take(ps).ToListAsync(ct);
+        var dtos = await AttachSoldCountsAsync(items, ct);
+
+        return Ok(new PagedResult<SaleBookResponseDto>
+        {
+            Items = dtos,
+            Page = p,
+            PageSize = ps,
+            TotalItems = total
+        });
+    }
+
+    // Kitob ro'yxatiga "sotilgan soni"ni biriktirish (1 ta guruhlangan so'rov)
+    private async Task<List<SaleBookResponseDto>> AttachSoldCountsAsync(
+        List<SaleBook> books, CancellationToken ct)
+    {
         var bookIds = books.Select(b => b.Id).ToList();
         var soldMap = await _context.OrderItems
             .Where(oi => bookIds.Contains(oi.SaleBookId))
             .GroupBy(oi => oi.SaleBookId)
             .Select(g => new { Id = g.Key, Sold = g.Sum(x => x.Quantity) })
-            .ToDictionaryAsync(x => x.Id, x => x.Sold);
+            .ToDictionaryAsync(x => x.Id, x => x.Sold, ct);
 
-        var dtos = books.Select(b =>
+        return books.Select(b =>
         {
             var dto = b.ToDto();
             dto.SoldCount = soldMap.GetValueOrDefault(b.Id, 0);
             return dto;
-        });
-
-        return Ok(dtos);
+        }).ToList();
     }
 
     // ======== GET /api/salebooks/bestsellers ========
@@ -59,6 +90,7 @@ public class SaleBooksController : ControllerBase
     /// Sotuv bo'lmasa, eng yangi faol kitoblar qaytariladi.
     /// </summary>
     [HttpGet("bestsellers")]
+    [OutputCache(PolicyName = "books-30sec")]
     public async Task<ActionResult<IEnumerable<object>>> GetBestsellers(
         [FromQuery] int count = 6,
         CancellationToken ct = default)
@@ -118,11 +150,18 @@ public class SaleBooksController : ControllerBase
             .FirstOrDefaultAsync(b => b.Id == id, ct);
         if (book == null) return NotFound(new { message = "Kitob topilmadi" });
 
-        // Ko'rishlar sonini atomik oshirish (RowVersion muammosisiz)
-        await _context.SaleBooks
-            .Where(b => b.Id == id)
-            .ExecuteUpdateAsync(s => s.SetProperty(b => b.ViewCount, b => b.ViewCount + 1), ct);
-        book.ViewCount++; // javobда yangi qiymat
+        // Ko'rishlar sonini atomik oshirish — xato bo'lsa ham detail javobi buzilmasin
+        try
+        {
+            await _context.SaleBooks
+                .Where(b => b.Id == id)
+                .ExecuteUpdateAsync(s => s.SetProperty(b => b.ViewCount, b => b.ViewCount + 1), ct);
+            book.ViewCount++; // javobда yangi qiymat
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "ViewCount oshirilmadi: Id={Id}", id);
+        }
 
         // Sotilgan soni
         var soldCount = await _context.OrderItems
@@ -213,6 +252,7 @@ public class SaleBooksController : ControllerBase
     /// Yetarli bo'lmasa, boshqa kategoriyalardan to'ldiriladi.
     /// </summary>
     [HttpGet("{id:int}/similar")]
+    [OutputCache(PolicyName = "books-30sec")]
     public async Task<ActionResult<IEnumerable<SaleBookResponseDto>>> GetSimilar(
         int id, [FromQuery] int count = 6, CancellationToken ct = default)
     {
@@ -275,6 +315,7 @@ public class SaleBooksController : ControllerBase
 
     // ======== GET /api/salebooks/search ========
     [HttpGet("search")]
+    [OutputCache(PolicyName = "books-30sec")]
     public async Task<ActionResult<IEnumerable<SaleBookResponseDto>>> Search(
         [FromQuery] string q = "",
         [FromQuery] string? category = null)

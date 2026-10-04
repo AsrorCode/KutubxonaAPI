@@ -1,5 +1,6 @@
 using KutubxonaAPI.Common.Constants;
 using KutubxonaAPI.Common.Extensions;
+using KutubxonaAPI.Common.Pagination;
 using KutubxonaAPI.Data;
 using KutubxonaAPI.DTOs.Mapping;
 using KutubxonaAPI.DTOs.Orders;
@@ -188,19 +189,38 @@ public class OrdersController : ControllerBase
     // GET /api/orders/my — Foydalanuvchi buyurtmalari
     // ============================================
     [HttpGet("my")]
-    public async Task<IActionResult> GetMyOrders()
+    public async Task<IActionResult> GetMyOrders(
+        [FromQuery] int? page = null,
+        [FromQuery] int? pageSize = null,
+        CancellationToken ct = default)
     {
         var userId = User.GetUserId() ?? 0;
         if (userId == 0) return Unauthorized();
 
-        var orders = await _context.Orders
+        var query = _context.Orders
             .Where(o => o.UserId == userId)
             .Include(o => o.Items)
                 .ThenInclude(i => i.SaleBook)
-            .OrderByDescending(o => o.CreatedAt)
-            .ToListAsync();
+            .OrderByDescending(o => o.CreatedAt);
 
-        return Ok(orders.Select(o => o.ToSummaryDto()));
+        if (page is null && pageSize is null)
+        {
+            var all = await query.ToListAsync(ct);
+            return Ok(all.Select(o => o.ToSummaryDto()));
+        }
+
+        var p = PagedResult<object>.NormalizePage(page);
+        var ps = PagedResult<object>.NormalizePageSize(pageSize);
+        var total = await query.CountAsync(ct);
+        var items = await query.Skip((p - 1) * ps).Take(ps).ToListAsync(ct);
+
+        return Ok(new PagedResult<DTOs.Orders.OrderSummaryDto>
+        {
+            Items = items.Select(o => o.ToSummaryDto()).ToList(),
+            Page = p,
+            PageSize = ps,
+            TotalItems = total
+        });
     }
 
     // ============================================
@@ -208,7 +228,11 @@ public class OrdersController : ControllerBase
     // ============================================
     [Authorize(Roles = "Admin")]
     [HttpGet]
-    public async Task<IActionResult> GetAll([FromQuery] string? status = null)
+    public async Task<IActionResult> GetAll(
+        [FromQuery] string? status = null,
+        [FromQuery] int? page = null,
+        [FromQuery] int? pageSize = null,
+        CancellationToken ct = default)
     {
         var query = _context.Orders
             .Include(o => o.User)
@@ -222,11 +246,26 @@ public class OrdersController : ControllerBase
             query = query.Where(o => o.Status == statusFilter);
         }
 
-        var orders = await query
-            .OrderByDescending(o => o.CreatedAt)
-            .ToListAsync();
+        query = query.OrderByDescending(o => o.CreatedAt);
 
-        return Ok(orders.Select(o => o.ToDetailDto()));
+        if (page is null && pageSize is null)
+        {
+            var all = await query.ToListAsync(ct);
+            return Ok(all.Select(o => o.ToDetailDto()));
+        }
+
+        var p = PagedResult<object>.NormalizePage(page);
+        var ps = PagedResult<object>.NormalizePageSize(pageSize);
+        var total = await query.CountAsync(ct);
+        var items = await query.Skip((p - 1) * ps).Take(ps).ToListAsync(ct);
+
+        return Ok(new PagedResult<DTOs.Orders.OrderDetailDto>
+        {
+            Items = items.Select(o => o.ToDetailDto()).ToList(),
+            Page = p,
+            PageSize = ps,
+            TotalItems = total
+        });
     }
 
     // ============================================
@@ -284,10 +323,15 @@ public class OrdersController : ControllerBase
             // Bekor qilinsa — stock qaytariladi
             if (newStatus == OrderStatus.Cancelled && oldStatus != OrderStatus.Cancelled)
             {
+                // Bitta so'rovда barcha kitoblarni olamiz (N+1 emas)
+                var itemBookIds = order.Items.Select(i => i.SaleBookId).Distinct().ToList();
+                var books = await _context.SaleBooks
+                    .Where(b => itemBookIds.Contains(b.Id))
+                    .ToDictionaryAsync(b => b.Id);
+
                 foreach (var item in order.Items)
                 {
-                    var book = await _context.SaleBooks.FindAsync(item.SaleBookId);
-                    if (book != null)
+                    if (books.TryGetValue(item.SaleBookId, out var book))
                     {
                         book.Stock += item.Quantity;
                         book.UpdatedAt = DateTime.UtcNow;
