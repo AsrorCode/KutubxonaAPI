@@ -33,6 +33,8 @@
     --border-hover: #ea9a3e;
     --primary: #e0985a;
     --primary-glow: rgba(224, 152, 90, 0.20);
+    --accent: #e0985a;
+    --secondary: #2dd4bf;
     --text: #f5f0e8;
     --text-dim: #a8a29e;
     --text-faint: #78716c;
@@ -48,6 +50,48 @@ h1, h2, .auth-header h1, .header h1, .card-title {
     color: var(--text) !important;
     font-family: var(--font-serif) !important;
 }
+
+/* ============================================
+   EDITORIAL + BOUTIQUE — global sayqal
+   Barcha sahifalarni market bilan bir xil ko'rinishga keltiradi.
+   ============================================ */
+
+/* Kartalar — yumshoq soya, kattaroq radius, yengil chegara */
+.card, .auth-card, .stat-card, .chart-card, .order-card, .collection-card {
+    border-radius: 18px !important;
+    box-shadow: 0 6px 24px rgba(41, 37, 36, 0.06) !important;
+    border: 1px solid var(--border) !important;
+}
+
+/* Birlamchi tugmalar — solid amber, gradientsiz, kattaroq radius */
+.btn, .btn-primary, .submit-btn, .add-cart-btn, button.primary {
+    border-radius: 12px !important;
+}
+.btn-primary, .submit-btn, button.primary {
+    background: var(--primary) !important;
+    color: #fff !important;
+    box-shadow: none !important;
+}
+.btn-primary:hover:not(:disabled),
+.submit-btn:hover:not(:disabled) {
+    filter: brightness(0.93);
+    box-shadow: 0 8px 20px var(--primary-glow) !important;
+}
+
+/* Ikonka-badge gradientlarini solid amber qilish (auth/admin bosh ikonka) */
+.auth-header .icon, .header .icon {
+    background: var(--primary) !important;
+}
+
+/* Sarlavha ierarxiyasi — serif, editorial o'lcham */
+h1 { font-size: 30px !important; line-height: 1.2; }
+h3, .section-title, .row-header h3 {
+    font-family: var(--font-serif) !important;
+    color: var(--text) !important;
+}
+
+/* Inputlar — bir xil yumshoqlik */
+input, select, textarea { border-radius: 10px; }
 
 /* ===== TIL + MAVZU TUGMASI (ui.js quyadi) ===== */
 .uic {
