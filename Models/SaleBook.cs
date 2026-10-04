@@ -30,8 +30,7 @@ public class SaleBook : ISoftDelete
     [Range(0, int.MaxValue)]
     public int Stock { get; set; }
 
-    // Base64 rasmlarga joy kerak — nvarchar(max)
-    [Column(TypeName = "nvarchar(max)")]
+    // Rasm URL yoki (zarur bo'lsa) base64 — uzunlik cheklovsiz (text)
     public string ImageUrl { get; set; } = string.Empty;
 
     [StringLength(50)]
@@ -71,12 +70,9 @@ public class SaleBook : ISoftDelete
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public DateTime? UpdatedAt { get; set; }
 
-    /// <summary>
-    /// Concurrency token — bir vaqtda 2 kishi Stock ni o'zgartira olmaydi.
-    /// EF Core avtomatik boshqaradi.
-    /// </summary>
-    [Timestamp]
-    public byte[]? RowVersion { get; set; }
+    // Concurrency — PostgreSQL'da tizim ustuni `xmin` orqali boshqariladi
+    // (AppDbContext.OnModelCreating → UseXminAsConcurrencyToken). Alohida
+    // ustun kerak emas, shuning uchun RowVersion property olib tashlandi.
 
     public List<OrderItem> OrderItems { get; set; } = new();
 

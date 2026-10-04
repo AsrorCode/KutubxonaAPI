@@ -17,6 +17,10 @@ using Microsoft.IdentityModel.Tokens;
 using Scalar.AspNetCore;
 using Serilog;
 
+// PostgreSQL — DateTime'ni (Kind=Unspecified/Local bo'lsa ham) timestamp'ga
+// yozishga ruxsat (DiscountEndsAt kabi mijozdan kelgan sanalar uchun).
+AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
+
 // ============================================
 // SERILOG — Startup uchun bootstrap logger
 // ============================================
@@ -111,7 +115,7 @@ try
         ?? throw new InvalidOperationException("DefaultConnection topilmadi");
 
     builder.Services.AddDbContext<AppDbContext>(options =>
-        options.UseSqlServer(connectionString));
+        options.UseNpgsql(connectionString));
 
     // Fon tozalash xizmati — eskirgan token/bildirishnomalarни o'chiradi
     builder.Services.AddHostedService<KutubxonaAPI.Services.CleanupHostedService>();
@@ -124,9 +128,9 @@ try
             name: "database",
             failureStatus: HealthStatus.Unhealthy,
             tags: new[] { "db", "ready" })
-        .AddSqlServer(
+        .AddNpgSql(
             connectionString: connectionString,
-            name: "sqlserver",
+            name: "postgresql",
             failureStatus: HealthStatus.Degraded,
             tags: new[] { "db", "ready" });
 
@@ -220,6 +224,10 @@ try
         var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
         dbContext.Database.Migrate();
         Log.Information("✅ Database migration bajarildi");
+
+        // Eski kitoblarni ko'chirish — seed/salebooks.json bo'lsa va baza bo'sh bo'lsa
+        var seedLogger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
+        await KutubxonaAPI.Data.BookJsonSeeder.SeedAsync(dbContext, app.Environment.ContentRootPath, seedLogger);
     }
     else
     {
