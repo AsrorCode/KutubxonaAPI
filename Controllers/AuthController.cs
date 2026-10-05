@@ -320,7 +320,7 @@ public class AuthController : ControllerBase
 <p>Parolni tiklash uchun quyidagi havolani bosing (1 soat amal qiladi):</p>
 <p><a href=""{link}"">{link}</a></p>
 <p>Agar bu siz bo'lmasangiz — bu xatni e'tiborsiz qoldiring.</p>";
-            await _email.SendAsync(user.Email, "Parolni tiklash — Kutubxona", body, ct);
+            await _email.SendAsync(user.Email, "Parolni tiklash — Zarvaraq", body, ct);
         }
 
         return Ok(new { message = "Agar bu email ro'yxatda bo'lsa, tiklash havolasi yuborildi" });
@@ -361,9 +361,9 @@ public class AuthController : ControllerBase
         var token = await CreateUserTokenAsync(user.Id, "verify", TimeSpan.FromDays(3));
         var link = $"{Request.Scheme}://{Request.Host}/verify-email.html?token={token}";
         var body = $@"<p>Assalomu alaykum, {user.FirstName}!</p>
-<p>Kutubxonaga xush kelibsiz. Emailingizni tasdiqlash uchun havolani bosing:</p>
+<p>Zarvaraqga xush kelibsiz. Emailingizni tasdiqlash uchun havolani bosing:</p>
 <p><a href=""{link}"">{link}</a></p>";
-        await _email.SendAsync(user.Email, "Emailni tasdiqlang — Kutubxona", body);
+        await _email.SendAsync(user.Email, "Emailni tasdiqlang — Zarvaraq", body);
     }
 
     // Xavfsiz token yaratish
