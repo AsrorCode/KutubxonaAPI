@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Panel — KutubxonaAPI</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='45' fill='%23fbf8f3' stroke='%23b45309' stroke-width='4'/><circle cx='50' cy='50' r='37' fill='none' stroke='%23c8922a' stroke-width='2'/><text x='50' y='64' font-family='Georgia,serif' font-size='34' font-weight='bold' fill='%23b45309' text-anchor='middle'>ZV</text></svg>">
+    <title>Admin Panel — Zarvaraq</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -330,7 +331,7 @@
 </head>
 <body>
     <div class="container">
-        <a href="/" class="back-btn">← Kutubxonaga qaytish</a>
+        <a href="/" class="back-btn">← Zarvaraqga qaytish</a>
 
         <header>
             <div class="header-icon">⚙️</div>
@@ -345,7 +346,7 @@
             <!-- TABS -->
             <div class="tabs">
                 <button class="tab-btn active" onclick="switchTab('stats', this)">📊 Statistika</button>
-                <button class="tab-btn" onclick="switchTab('market', this)">🛒 Marketplace</button>
+                <button class="tab-btn" onclick="switchTab('market', this)">🛒 Zarvaraq</button>
                 <button class="tab-btn" onclick="switchTab('orders', this)">📦 Buyurtmalar</button>
                 <button class="tab-btn" onclick="switchTab('collections', this)">📚 Kolleksiyalar</button>
             </div>
@@ -381,7 +382,7 @@
             <!-- ============================================ -->
             <div class="tab-panel" id="tab-market">
                 <div class="card">
-                    <div class="card-title">🛒 Marketplace'ga kitob qo'shish</div>
+                    <div class="card-title">🛒 Zarvaraq'ga kitob qo'shish</div>
                     <div class="form-row cols-2">
                         <div class="form-field">
                             <label>Kitob nomi *</label>
@@ -506,7 +507,7 @@
                 </div>
 
                 <div class="card">
-                    <div class="card-title">🛍️ Marketplace kitoblari</div>
+                    <div class="card-title">🛍️ Zarvaraq kitoblari</div>
                     <div id="saleBooksList"><div class="empty">Yuklanmoqda...</div></div>
                 </div>
             </div>
@@ -786,7 +787,7 @@
                 document.getElementById('statsGrid').innerHTML = `
                     <div class="stat-card">
                         <div class="stat-value">${saleBooks.length || 0}</div>
-                        <div class="stat-label">🛒 Marketplace</div>
+                        <div class="stat-label">🛒 Zarvaraq</div>
                     </div>
                     <div class="stat-card">
                         <div class="stat-value">${orders.length || 0}</div>
@@ -801,7 +802,7 @@
         }
 
         // ==========================================
-        // SALE BOOKS (Marketplace)
+        // SALE BOOKS (Zarvaraq)
         // ==========================================
         async function loadSaleBooks() {
             try {
@@ -810,7 +811,7 @@
 
                 const list = document.getElementById('saleBooksList');
                 if (books.length === 0) {
-                    list.innerHTML = '<div class="empty">Marketplace\'da hali kitoblar yo\'q</div>';
+                    list.innerHTML = '<div class="empty">Zarvaraq\'da hali kitoblar yo\'q</div>';
                     return;
                 }
                 list.innerHTML = books.map(b => `
@@ -1021,7 +1022,7 @@
                 });
                 if (!res.ok) throw new Error(`Xato: ${res.status}`);
                 status.className = 'status-msg success';
-                status.textContent = '✅ Marketplace\'ga qo\'shildi!';
+                status.textContent = '✅ Zarvaraq\'ga qo\'shildi!';
                 ['sTitle', 'sAuthor', 'sDescription', 'sPrice', 'sCategory', 'sYear', 'sImageUrl', 'sDiscountEnds', 'sPublisher', 'sCoverType', 'sPageCount', 'sIsbn'].forEach(id =>
                     document.getElementById(id).value = ''
                 );

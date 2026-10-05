@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Marketplace — Kutubxona</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='45' fill='%23fbf8f3' stroke='%23b45309' stroke-width='4'/><circle cx='50' cy='50' r='37' fill='none' stroke='%23c8922a' stroke-width='2'/><text x='50' y='64' font-family='Georgia,serif' font-size='34' font-weight='bold' fill='%23b45309' text-anchor='middle'>ZV</text></svg>">
+    <title>Zarvaraq — Onlayn kitob do'koni</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:wght@600;700;800&display=swap" rel="stylesheet">
@@ -82,6 +83,7 @@
             border-radius: 9px; display: flex; align-items: center; justify-content: center;
             font-size: 18px;
         }
+        .nav-logo-mark { width: 38px; height: 38px; color: var(--primary); flex-shrink: 0; }
         .nav-search {
             flex: 1 1 300px; min-width: 200px;
             display: flex; align-items: stretch; gap: 8px; position: relative;
@@ -916,27 +918,91 @@
         .chip.primary { background: var(--primary); border-color: transparent; color: #fff; }
         .chip.full { width: 100%; padding: 10px; margin-top: 12px; }
 
-        /* Layout */
-        .market-layout {
-            display: grid;
-            grid-template-columns: 260px 1fr;
-            gap: 20px;
-            align-items: start;
-        }
-        @media (max-width: 900px) {
-            .market-layout { grid-template-columns: 1fr; }
-            .filter-sidebar.collapsed { display: none; }
-        }
-
-        .filter-sidebar {
+        /* ===== HERO — haftaning kitobi ===== */
+        .hero {
+            display: grid; grid-template-columns: 210px 1fr; gap: 34px;
+            align-items: center;
             background: var(--bg-elevated);
             border: 1px solid var(--border);
-            border-radius: 14px;
-            padding: 18px;
-            box-shadow: 0 2px 10px rgba(15, 23, 42, 0.04);
-            position: sticky;
-            top: 90px;
+            border-radius: 20px;
+            padding: 34px;
+            margin-bottom: 48px;
+            box-shadow: 0 6px 24px rgba(41, 37, 36, 0.06);
         }
+        .hero-cover {
+            width: 210px; height: 290px; border-radius: 12px; overflow: hidden;
+            box-shadow: 0 16px 36px rgba(41, 37, 36, 0.18);
+            background: var(--bg-glass); cursor: pointer;
+        }
+        .hero-cover img { width: 100%; height: 100%; object-fit: cover; }
+        .hero-cover svg { width: 100%; height: 100%; }
+        .hero-tag { font-size: 12px; font-weight: 700; letter-spacing: 2.5px; color: var(--primary); margin-bottom: 12px; }
+        .hero-title { font-family: var(--font-serif); font-size: 36px; font-weight: 800; line-height: 1.12; margin-bottom: 6px; }
+        .hero-author { font-size: 15px; font-style: italic; color: var(--text-dim); margin-bottom: 14px; }
+        .hero-desc {
+            font-size: 14.5px; color: var(--text); max-width: 580px; line-height: 1.65; margin-bottom: 20px;
+            display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+        }
+        .hero-row { display: flex; align-items: center; gap: 22px; flex-wrap: wrap; }
+        .hero-price { font-size: 27px; font-weight: 800; color: var(--primary); font-family: var(--font-serif); }
+        .hero-btn {
+            background: var(--primary); color: #fff; border: none; padding: 14px 28px;
+            border-radius: 12px; font-size: 14px; font-weight: 600; cursor: pointer; font-family: inherit;
+            transition: filter 0.2s;
+        }
+        .hero-btn:hover { filter: brightness(0.93); }
+        @media (max-width: 680px) {
+            .hero { grid-template-columns: 1fr; justify-items: center; text-align: center; padding: 24px; }
+            .hero-cover { width: 170px; height: 238px; }
+            .hero-title { font-size: 28px; }
+        }
+
+        /* Layout — bitta ustun, grid butun kenglikda */
+        .market-layout { display: block; }
+
+        /* Filter — o'ngdan chiqadigan panel (off-canvas) */
+        .filter-overlay {
+            display: none; position: fixed; inset: 0;
+            background: rgba(41, 37, 36, 0.45); z-index: 900;
+        }
+        .filter-overlay.open { display: block; }
+        .filter-sidebar {
+            position: fixed; top: 0; right: 0; height: 100%;
+            width: 330px; max-width: 86vw;
+            background: var(--bg-elevated);
+            border-left: 1px solid var(--border);
+            padding: 24px; z-index: 1000; overflow-y: auto;
+            transform: translateX(100%);
+            transition: transform 0.28s ease;
+            box-shadow: -12px 0 44px rgba(41, 37, 36, 0.14);
+        }
+        .filter-sidebar.open { transform: translateX(0); }
+        .filter-drawer-head {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 20px;
+        }
+        .filter-drawer-head h3 { font-family: var(--font-serif); font-size: 20px; }
+        .filter-drawer-close {
+            width: 34px; height: 34px; border-radius: 10px;
+            background: var(--bg-glass); border: 1px solid var(--border);
+            color: var(--text); font-size: 20px; cursor: pointer;
+        }
+
+        /* ===== FOOTER ===== */
+        .site-footer {
+            margin-top: 64px;
+            background: #292524; color: #f5f0e8;
+            border-radius: 20px;
+            padding: 36px 40px;
+            display: flex; justify-content: space-between; align-items: flex-start;
+            flex-wrap: wrap; gap: 20px;
+        }
+        .site-footer .f-brand { font-family: var(--font-serif); font-size: 22px; font-weight: 700; }
+        .site-footer .f-sub { font-size: 13px; color: #d6b98c; margin-top: 6px; }
+        .site-footer a { color: #d6b98c; text-decoration: none; font-size: 14px; }
+        .site-footer a:hover { color: #fff; }
+        .site-footer .f-links { display: flex; flex-direction: column; gap: 8px; }
+        .site-footer .f-copy { font-size: 12px; color: #a8a29e; margin-top: 10px; }
         .filter-section { margin-bottom: 20px; }
         .filter-title {
             font-size: 13px; font-weight: 700;
@@ -1549,7 +1615,7 @@
     <!-- ===== STICKY NAVBAR ===== -->
     <nav class="navbar">
         <div class="navbar-inner">
-            <a href="/market.html" class="nav-logo"><span class="nav-logo-icon">🛒</span><span>Marketplace</span></a>
+            <a href="/market.html" class="nav-logo"><svg class="nav-logo-mark" viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="45" fill="none" stroke="currentColor" stroke-width="5"/><circle cx="50" cy="50" r="37" fill="none" stroke="#c8922a" stroke-width="2"/><text x="50" y="64" text-anchor="middle" font-family="'Playfair Display',Georgia,serif" font-size="38" font-weight="800" fill="currentColor">ZV</text></svg><span>Zarvaraq</span></a>
             <div class="nav-search">
                 <span class="search-icon-left">🔍</span>
                 <input type="text" id="searchInput" class="search-input" placeholder="Kitob yoki muallif qidirish..." autocomplete="off" oninput="onSearchInput()">
@@ -1579,6 +1645,9 @@
     </nav>
 
     <div class="container">
+        <!-- ===== HERO — haftaning kitobi ===== -->
+        <div class="hero" id="heroSection" style="display:none;"></div>
+
         <!-- ===== FLASH SALE BANNER ===== -->
         <div class="flash-banner" id="flashBanner" style="display:none;">
             <div class="flash-icon">⚡</div>
@@ -1606,6 +1675,7 @@
         <div id="bestsellerSection" style="display:none;">
             <div class="row-header">
                 <h3>🏆 Eng ko'p sotilgan kitoblar</h3>
+                <span style="font-size:14px; color:var(--primary); font-weight:600;">Pastda barchasi ↓</span>
             </div>
             <div class="bestseller-row" id="bestsellerRow"></div>
         </div>
@@ -1613,7 +1683,12 @@
         <!-- ===== KOLLEKSIYALAR ===== -->
         <div id="collectionsSection"></div>
 
-        <!-- Sort bar -->
+        <!-- ===== BARCHA KITOBLAR ===== -->
+        <div class="row-header" style="margin-top:8px;">
+            <h3>Barcha kitoblar</h3>
+        </div>
+
+        <!-- Sort bar / toolbar -->
         <div class="sort-bar">
             <div class="sort-left">
                 <span id="resultsCount">0 ta kitob</span>
@@ -1630,10 +1705,15 @@
             </div>
         </div>
 
-        <!-- Ikki-ustunli layout: filter + kitoblar -->
+        <!-- Kitoblar grid (butun kenglik) -->
         <div class="market-layout">
-            <!-- Filter sidebar -->
+            <!-- Filter — o'ngdan chiqadigan panel -->
+            <div class="filter-overlay" id="filterOverlay" onclick="toggleFilter()"></div>
             <aside class="filter-sidebar" id="filterSidebar">
+                <div class="filter-drawer-head">
+                    <h3>Filter</h3>
+                    <button class="filter-drawer-close" onclick="toggleFilter()">×</button>
+                </div>
                 <div class="filter-section">
                     <div class="filter-title">💰 Narx oralig'i</div>
                     <div class="price-inputs">
@@ -1680,6 +1760,20 @@
             </div>
             <div class="quote-banner-dots" id="qbDots"></div>
         </div>
+
+        <!-- ===== FOOTER ===== -->
+        <footer class="site-footer">
+            <div>
+                <div class="f-brand">📚 Zarvaraq</div>
+                <div class="f-sub">O'zbek onlayn kitob do'koni</div>
+                <div class="f-copy">© 2026 Zarvaraq. Barcha huquqlar himoyalangan.</div>
+            </div>
+            <div class="f-links">
+                <a href="/market.html">Bosh sahifa</a>
+                <a href="/my-orders.html">Buyurtmalarim</a>
+                <a href="/profile.html">Profil</a>
+            </div>
+        </footer>
     </div>
 
     <!-- Admin edit modal -->
@@ -2471,7 +2565,7 @@
             const url = `${window.location.origin}/market.html#book-${currentDetailBook.id}`;
             const shareData = {
                 title: currentDetailBook.title,
-                text: `"${currentDetailBook.title}" — ${currentDetailBook.author}. KutubxonaAPI marketplace'da ko'ring:`,
+                text: `"${currentDetailBook.title}" — ${currentDetailBook.author}. Zarvaraq marketplace'da ko'ring:`,
                 url
             };
             if (navigator.share) {
@@ -2587,6 +2681,7 @@
                 if (!response.ok) throw new Error('Kitoblarni yuklab bo\'lmadi');
                 allBooks = await response.json();
                 renderCategories();
+                renderHero();
                 renderBooks();
             } catch (error) {
                 document.getElementById('bookGrid').innerHTML = `<div class="message">Xato: ${error.message}</div>`;
@@ -2731,7 +2826,43 @@
         }
         function toggleFilter() {
             const s = document.getElementById('filterSidebar');
-            s.classList.toggle('collapsed');
+            const o = document.getElementById('filterOverlay');
+            const open = s.classList.toggle('open');
+            if (o) o.classList.toggle('open', open);
+            document.body.style.overflow = open ? 'hidden' : '';
+        }
+
+        // ===== HERO — haftaning kitobi =====
+        function renderHero() {
+            const el = document.getElementById('heroSection');
+            if (!el) return;
+            if (!allBooks.length) { el.style.display = 'none'; return; }
+            const discounted = allBooks.filter(b => b.discount > 0);
+            const pool = discounted.length ? discounted : allBooks;
+            const book = pool.slice().sort((a, b) =>
+                (b.discount - a.discount) ||
+                ((b.viewCount || 0) - (a.viewCount || 0)) ||
+                ((b.soldCount || 0) - (a.soldCount || 0)))[0];
+            const price = book.finalPrice || book.price;
+            const cover = isImgUrl(book.imageUrl)
+                ? `<img src="${escapeHtml(book.imageUrl)}" alt="" data-t="${escapeHtml(book.title)}" data-a="${escapeHtml(book.author)}" onerror="coverFallback(this,210,290)">`
+                : generateCover(book.title, book.author, 210, 290);
+            const old = book.discount > 0
+                ? `<span class="price-old" style="font-size:16px;">${formatPrice(book.price)} so'm</span>` : '';
+            el.innerHTML = `
+                <div class="hero-cover" onclick="openDetail(${book.id})">${cover}</div>
+                <div class="hero-info">
+                    <div class="hero-tag">${book.discount > 0 ? '🔥 HAFTANING CHEGIRMASI' : '✦ HAFTANING KITOBI'}</div>
+                    <div class="hero-title">${escapeHtml(book.title)}</div>
+                    <div class="hero-author">${escapeHtml(book.author)}</div>
+                    <div class="hero-desc">${escapeHtml(book.description || 'Ushbu tanlangan kitob bilan tanishing.')}</div>
+                    <div class="hero-row">
+                        <span class="hero-price">${formatPrice(price)} so'm</span>
+                        ${old}
+                        <button class="hero-btn" onclick="event.stopPropagation(); openDetail(${book.id})">Batafsil ko'rish</button>
+                    </div>
+                </div>`;
+            el.style.display = 'grid';
         }
 
         // ===== BOOK COVER SVG (index.html'dagi kabi) =====
