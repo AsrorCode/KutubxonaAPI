@@ -28,9 +28,8 @@ jobs:
       - name: 🔨 Build
         run: dotnet build --no-restore --configuration Release
 
-      # Tests hozircha yo'q, keyinchalik qo'shiladi
-      # - name: 🧪 Test
-      #   run: dotnet test --no-build --configuration Release --verbosity normal
+      - name: 🧪 Test
+        run: dotnet test Tests/KutubxonaAPI.Tests.csproj --configuration Release --verbosity normal
 
   code-quality:
     name: Code Quality Check
